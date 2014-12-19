@@ -40,10 +40,41 @@ class DataItem extends Entity
         return $container;
     }
 
-    public function getData()
+
+    // data is 'pseudo property'
+    public function getData($recursive=false, $section_id=null)
     {
-        return $this->getAll(self::TABLE. ' where data_item_id = '.$this->id);
+        if (is_numeric($section_id)) {
+            $data_set = array();
+            $data_set_sections = $this->getSectionData($section_id);
+            foreach ($data_set_sections as $d) {
+                array_push($data_set, array('id' => $d)); 
+            }
+        } else {
+            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id);
+        }
+
+        if ($recursive) {
+            foreach ($data_set as $index => $item) {
+                $data = Model::load('DataItem');
+                $data->id = $item['id'];
+                $data->load();
+
+                $props = $data->getProperties();
+                foreach ($props as $p) {
+                    if ($data->$p === null || $data->$p == '0') {
+                        unset($data->$p);
+                    }
+                }
+                if ($data->isContainer()) {
+                    $data->getData(true);
+                }            
+                $this->data[$data->id] = $data; 
+            }
+        }
+        return $data_set;
     }
+
 
     public function getSectionData($section_id)
     {
@@ -60,6 +91,14 @@ class DataItem extends Entity
 
         return $ids;
     }
+
+    public function getSectionDataRecursive($section_id)
+    {
+        $this->getData(true, $section_id);
+        return $this->data;
+    }
+
+
 
     public function validates()
     {
