@@ -11,6 +11,12 @@ class DataItem extends Entity
 {
     const TABLE = 'data_item';
 
+    const FIND_BY_LABEL = 1;
+    const FIND_BODY = 2;
+    const FIND_IMAGE = 3;
+
+
+
     public $id;
     public $data_item_id;
     public $section_id;
@@ -29,10 +35,10 @@ class DataItem extends Entity
     public function isContainer()
     {
         $container = false;
-        if($this->heading == '' &&
-           $this->body == '' &&
-           $this->image == '' &&
-           $this->video == '')
+        if(!isset($this->heading) &&
+           !isset($this->body) &&
+           !isset($this->image) &&
+           !isset($this->video))
         {
             $container = true;
         }
@@ -97,6 +103,48 @@ class DataItem extends Entity
         $this->getData(true, $section_id);
         return $this->data;
     }
+
+
+    public function find($data, $type, $pattern=null, $unpack=false)
+    {
+        $item = null;
+        foreach ($data as $d) {
+            switch ($type) {
+                case self::FIND_BY_LABEL:                  
+                    if (isset($d->label)) {
+                        if (isset($pattern) && $pattern == $d->label) {
+                            $item = $d;
+                        }
+                    }
+                    break;
+                case self::FIND_BODY:
+                    if (isset($d->body)) {
+                        $item = $d;
+                    }
+                    break;
+                case self::FIND_IMAGE:
+                    if (isset($d->image)) {
+                        $item = $d;
+                    }
+                    break;                    
+                default:
+                    break;
+            }
+            if ($item !== null) {
+                break;
+            }
+        }
+        if ($item === null && isset($data->data)) {
+                $item = $this->find($data->data, $type, $pattern, $unpack);
+        }
+        if ($unpack && isset($item->data)) {
+            return $item->data;
+        } else {
+            return $item;
+        }
+    }
+
+
 
 
 
