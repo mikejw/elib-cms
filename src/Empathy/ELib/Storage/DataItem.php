@@ -2,8 +2,8 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\ELib\Model;
+use Empathy\MVC\Entity;
 
 
 
@@ -14,7 +14,8 @@ class DataItem extends Entity
     const FIND_BY_LABEL = 1;
     const FIND_BODY = 2;
     const FIND_IMAGE = 3;
-
+    const FIND_OPT_UNPACK = 4;
+    const FIND_OPT_CONVERT_MD = 5;
 
 
     public $id;
@@ -48,7 +49,7 @@ class DataItem extends Entity
 
 
     // data is 'pseudo property'
-    public function getData($recursive=false, $section_id=null)
+    public function getData($recursive=false, $section_id=null, $disconnect=true)
     {
         if (is_numeric($section_id)) {
             $data_set = array();
@@ -57,14 +58,14 @@ class DataItem extends Entity
                 array_push($data_set, array('id' => $d)); 
             }
         } else {
-            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id);
+            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id);            
         }
 
         if ($recursive) {
             foreach ($data_set as $index => $item) {
                 $data = Model::load('DataItem');
                 $data->id = $item['id'];
-                $data->load();
+                $data->load();                
 
                 $props = $data->getProperties();
                 foreach ($props as $p) {
@@ -74,6 +75,9 @@ class DataItem extends Entity
                 }
                 if ($data->isContainer()) {
                     $data->getData(true);
+                }
+                if ($disconnect) {                    
+                    $data->dbDisconnect();
                 }            
                 $this->data[$data->id] = $data; 
             }
@@ -98,14 +102,14 @@ class DataItem extends Entity
         return $ids;
     }
 
-    public function getSectionDataRecursive($section_id)
+    public function getSectionDataRecursive($section_id, $disconnect=true)
     {
-        $this->getData(true, $section_id);
+        $this->getData(true, $section_id, $disconnect);
         return $this->data;
     }
 
 
-    public function find($data, $type, $pattern=null, $unpack=false)
+    public function find($data, $type, $pattern=null, $options=array())
     {
         $item = null;
         foreach ($data as $d) {
@@ -120,6 +124,16 @@ class DataItem extends Entity
                 case self::FIND_BODY:
                     if (isset($d->body)) {
                         $item = $d;
+                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+                            $output = array();
+                            $tmp_file = DOC_ROOT.'/tmp/content.md';
+                            if (!is_writable($tmp_file)) {
+                                throw new \Exception('Could not write to md cache file.');
+                            }
+                            file_put_contents($tmp_file, $item->body);
+                            exec("Markdown.pl $tmp_file", $output);
+                            $item->body = implode("\n", $output);
+                        }
                     }
                     break;
                 case self::FIND_IMAGE:
@@ -135,9 +149,9 @@ class DataItem extends Entity
             }
         }
         if ($item === null && isset($data->data)) {
-                $item = $this->find($data->data, $type, $pattern, $unpack);
+                $item = $this->find($data->data, $type, $pattern, $options);
         }
-        if ($unpack && isset($item->data)) {
+        if (in_array(self::FIND_OPT_UNPACK, $options) && isset($item->data)) {
             return $item->data;
         } else {
             return $item;
