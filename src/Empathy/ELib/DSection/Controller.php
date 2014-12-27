@@ -13,6 +13,16 @@ use Empathy\ELib\AdminController,
 
 class Controller extends AdminController
 {
+
+    private function clearCache()
+    {        
+        $cache = $this->stash->get('cache');
+        if (is_object($cache)) {
+            $cache->clear();
+        }
+    }
+
+
     // functions that are similar to those in data_item
     public function getDataTypes()
     {
@@ -67,7 +77,7 @@ class Controller extends AdminController
             }
             $this->presenter->assign('container_types', $containers_arr);
             //	$this->presenter->assign('class', 'section');
-        }
+        }        
     }
 
     public function addDataContainer()
@@ -83,7 +93,8 @@ class Controller extends AdminController
             $d->hidden = 'DEFAULT';
             $su = Model::load('SectionItem');
             $u = new SectionsUpdate($su, $d->section_id);
-            $id = $d->insert(Model::getTable('DataItem'), 1, array(), 0);
+            $id = $d->insert(Model::getTable('DataItem'), 1, array(), 0);            
+            $this->clearCache();
         }
         $this->redirect('admin/dsection/data_item/'.$id);
     }
@@ -105,6 +116,7 @@ class Controller extends AdminController
                 $su = Model::load('SectionItem');
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/'.$d->section_id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -132,6 +144,7 @@ class Controller extends AdminController
                 $su = Model::load('SectionItem');
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/'.$d->section_id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -160,6 +173,7 @@ class Controller extends AdminController
                 $su = Model::load('SectionItem');
                 $u = new SectionsUpdate($su, $d->section_id);
                 $id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -222,6 +236,7 @@ class Controller extends AdminController
             $s->position = 'DEFAULT';
             $s->hidden = 'DEFAULT';
             $s->insert(Model::getTable('SectionItem'), 1, array(), 0);
+            $this->clearCache();
         }
         $this->redirect('admin/dsection/'.$_GET['id']);
     }
@@ -234,6 +249,7 @@ class Controller extends AdminController
         $s->id = $_GET['id'];
         $s->load();
         $sd = new SectionsDelete($s, $d, 1);
+        $this->clearCache();
         $this->redirect('admin/dsection/'.$s->section_id);
     }
 
@@ -253,6 +269,7 @@ class Controller extends AdminController
                 $s->save(Model::getTable('SectionItem'), array(), 1);
                 $su = Model::load('SectionItem');
                 $u = new SectionsUpdate($su, $s->id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/'.$s->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -281,6 +298,7 @@ class Controller extends AdminController
                 $s->save(Model::getTable('SectionItem'), array(), 2);
                 $su = Model::load('SectionItem');
                 $u = new SectionsUpdate($su, $s->id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/'.$s->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -304,6 +322,7 @@ class Controller extends AdminController
         $s->load();
         $s->hidden = ($s->hidden)? 0 : 1;
         $s->save(Model::getTable('SectionItem'), array(), 0);
+        $this->clearCache();
         $this->redirect('admin/dsection/'.$s->id);
     }
 
@@ -353,6 +372,7 @@ class Controller extends AdminController
         $d->load();
         $this->update_timestamps($d->id);
         $sd = new SectionsDelete($s, $d, 0);
+        $this->clearCache();
         if (!is_numeric($d->data_item_id)) {
             $this->redirect('admin/dsection/'.$d->section_id);
         } else {
@@ -389,6 +409,7 @@ class Controller extends AdminController
             } else {
                 $d->save(Model::getTable('DataItem'), array(), 2);
                 $this->update_timestamps($d->id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$d->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -420,6 +441,7 @@ class Controller extends AdminController
             } else {
                 $d->save(Model::getTable('DataItem'), array(), 1);
                 $this->update_timestamps($d->id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$d->id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -441,6 +463,7 @@ class Controller extends AdminController
         $d->load();
         $d->hidden = ($d->hidden)? 0 : 1;
         $d->save(Model::getTable('DataItem'), array(), 0);
+        $this->clearCache();
         $this->redirect('admin/dsection/data_item/'.$d->id);
     }
 
@@ -509,6 +532,7 @@ class Controller extends AdminController
             } else {
                 $this->update_timestamps($d->data_item_id);
                 $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -533,8 +557,9 @@ class Controller extends AdminController
                 $this->presenter->assign('data_item', $d);
                 $this->presenter->assign('errors', $d->getValErrors());
             } else {
-                $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                $d->insert(Model::getTable('DataItem'), 1, array(), 1);                
                 $this->update_timestamps($d->data_item_id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$d->data_item_id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -573,6 +598,7 @@ class Controller extends AdminController
                 $d->hidden = 'DEFAULT';
                 $new_id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
                 $this->update_timestamps($d->data_item_id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$new_id);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -612,8 +638,9 @@ class Controller extends AdminController
                 $d->position = 'DEFAULT';
                 $d->hidden = 'DEFAULT';
                 $d->insert(Model::getTable('DataItem'), 1, array(), 1);
-                $this->update_timestamps($d->data_item_id);
+                $this->update_timestamps($d->data_item_id);                
                 $v->generateThumb();
+                $this->clearCache();
                 //$this->redirect('admin/data_item/'.mysql_insert_id());
             }
         }
@@ -633,6 +660,7 @@ class Controller extends AdminController
             $d->hidden = 'DEFAULT';
             $this->update_timestamps($d->data_item_id);
             $id = $d->insert(Model::getTable('DataItem'), 1, array(), 0);
+            $this->clearCache();
             $this->redirect('admin/dsection/data_item/'.$id);
         }
     }
@@ -651,6 +679,7 @@ class Controller extends AdminController
             } else {
                 $this->update_timestamps($d->id);
                 $d->save(Model::getTable('DataItem'), array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -679,6 +708,7 @@ class Controller extends AdminController
             } else {
                 $d->save(Model::getTable('DataItem'), array(), 1);
                 $this->update_timestamps($d->id);
+                $this->clearCache();
                 $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
@@ -706,6 +736,7 @@ class Controller extends AdminController
         $c = Model::load('Container');
         $c->name = '#New Container';
         $c->insert(Model::getTable('Container'), 1, array(), 0);
+        $this->clearCache();
         $this->redirect('admin/dsection/containers');
     }
 
@@ -718,6 +749,7 @@ class Controller extends AdminController
                 $c = Model::load('Container');
                 $c->update($index, $value);
             }
+            $this->clearCache();
             $this->redirect('admin/dsection');
         }
 
@@ -735,6 +767,7 @@ class Controller extends AdminController
         $c = Model::load('Container');
         $c->id = $_GET['id'];
         $c->remove();
+        $this->clearCache();
         $this->redirect('admin/dsection/containers');
     }
 
@@ -751,6 +784,7 @@ class Controller extends AdminController
             $c->validates();
             if (!$c->hasValErrors()) {
                 $c->save(Model::getTable('Container'), array(), 1);
+                $this->clearCache();
                 $this->redirect('admin/dsection/containers');
             } else {
                 $this->assign('container', $c);
@@ -773,6 +807,7 @@ class Controller extends AdminController
         $i->height = 0;
         $i->prefix = 'new';
         $i->insert(Model::getTable('ImageSize'), 1, array(), 0);
+        $this->clearCache();
         $this->redirect('admin/dsection/image_sizes');
     }
 
@@ -807,6 +842,7 @@ class Controller extends AdminController
                 $c = Model::load('Container');
                 $c->update($index, $value);
             }
+            $this->clearCache();
             $this->redirect('admin/dsection');
         }
 
@@ -824,6 +860,7 @@ class Controller extends AdminController
         $i = Model::load('ImageSize');
         $i->id = $_GET['id'];
         $i->delete();
+        $this->clearCache();
         $this->redirect('admin/dsection/image_sizes');
     }
 
@@ -865,6 +902,7 @@ class Controller extends AdminController
         $u = new ImageUpload('', false, $d);
         set_time_limit(300);
         $u->resize($images);
+        $this->clearCache();
         $this->redirect('admin/dsection/image_sizes');
     }
 
