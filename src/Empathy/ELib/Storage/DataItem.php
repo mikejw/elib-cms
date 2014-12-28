@@ -58,7 +58,8 @@ class DataItem extends Entity
                 array_push($data_set, array('id' => $d)); 
             }
         } else {
-            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id);            
+            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id
+                .' and hidden != 1');
         }
 
         if ($recursive) {
@@ -90,6 +91,7 @@ class DataItem extends Entity
     {
         $ids = array();
         $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE section_id = '.$section_id
+            .' and hidden != 1'
             .' ORDER BY label';
         $error = 'Could not get data item id based on section id.';
         $result = $this->query($sql, $error);
