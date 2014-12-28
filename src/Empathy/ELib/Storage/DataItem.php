@@ -4,7 +4,7 @@ namespace Empathy\ELib\Storage;
 
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
-
+use Empathy\ELib\User\CurrentUser;
 
 
 class DataItem extends Entity
@@ -109,6 +109,18 @@ class DataItem extends Entity
     }
 
 
+    public function convertToMarkdown()
+    {
+        $output = array();
+        $tmp_file = DOC_ROOT.'/tmp/content.md';
+        if (!is_writable($tmp_file)) {
+            throw new \Exception('Could not write to md cache file.');
+        }
+        file_put_contents($tmp_file, $this->body);
+        exec("Markdown.pl $tmp_file", $output);
+        $this->body = implode("\n", $output);
+    }
+
     public function find($data, $type, $pattern=null, $options=array())
     {
         $item = null;
@@ -125,14 +137,7 @@ class DataItem extends Entity
                     if (isset($d->body)) {
                         $item = $d;
                         if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
-                            $output = array();
-                            $tmp_file = DOC_ROOT.'/tmp/content.md';
-                            if (!is_writable($tmp_file)) {
-                                throw new \Exception('Could not write to md cache file.');
-                            }
-                            file_put_contents($tmp_file, $item->body);
-                            exec("Markdown.pl $tmp_file", $output);
-                            $item->body = implode("\n", $output);
+                            $item->convertToMarkdown();
                         }
                     }
                     break;
@@ -152,6 +157,13 @@ class DataItem extends Entity
                 $item = $this->find($data->data, $type, $pattern, $options);
         }
         if (in_array(self::FIND_OPT_UNPACK, $options) && isset($item->data)) {
+            if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+                foreach ($item->data as $d) {
+                    if (isset($d->body)) {
+                        $d->convertToMarkdown();
+                    }
+                }
+            }
             return $item->data;
         } else {
             return $item;
@@ -296,5 +308,15 @@ class DataItem extends Entity
 
         return $id;
     }
+
+
+    public function insert($table, $id, $format, $sanitize, $force_id=false)
+    {
+        $this->user_id = CurrentUser::getUserID();
+        parent::insert($table, $id, $format, $sanitize, $force_id);
+    }
+
+
+
 
 }
