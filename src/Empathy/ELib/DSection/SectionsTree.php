@@ -12,43 +12,48 @@ class SectionsTree extends Tree
     private $section_ancestors;
     private $data_item_ancestors;
 
-    public function __construct($section, $data_item, $current_is_section, $collapsed)
+    public function __construct($section, $data_item=NULL, $current_is_section=NULL, $collapsed=NULL)
     {
         $this->section = $section;
-        $this->data_item = $data_item;
-        if ($current_is_section) {
-            $current_id = $section->id;
-            $parent_id = $section->section_id;
-            $active_section = $current_id;
-        } else {
-            $current_id = $data_item->id;
-            $parent_id = $data_item->data_item_id;
-        }
 
-        $this->section_ancestors = array(0);
-        $this->data_item_ancestors = array();
-        if (!$current_is_section) {
-            if (!$collapsed) {
-                array_push($this->data_item_ancestors, $current_id);
-            }
-            if (is_numeric($data_item->section_id)) {
-                $active_section = $data_item->section_id;
+        // allow tree use without building markup
+        if ($data_item !== NULL) {
+            
+            $this->data_item = $data_item;
+            if ($current_is_section) {
+                $current_id = $section->id;
+                $parent_id = $section->section_id;
+                $active_section = $current_id;
             } else {
-                $active_section = $this->data_item->findLastSection($parent_id);
+                $current_id = $data_item->id;
+                $parent_id = $data_item->data_item_id;
             }
-        }
-        if ($current_id != 0) {
-            $this->section_ancestors = $this->section->getAncestorIDs($active_section, $this->section_ancestors);
-        }
-        if (!$current_is_section) {
-            $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
-        }
-        if (!$collapsed || !$current_is_section) {
-            array_push($this->section_ancestors, $active_section);
-        }
 
-        $this->data = $this->buildTree(0, 1, $this);
-        $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0, 0, $current_is_section);
+            $this->section_ancestors = array(0);
+            $this->data_item_ancestors = array();
+            if (!$current_is_section) {
+                if (!$collapsed) {
+                    array_push($this->data_item_ancestors, $current_id);
+                }
+                if (is_numeric($data_item->section_id)) {
+                    $active_section = $data_item->section_id;
+                } else {
+                    $active_section = $this->data_item->findLastSection($parent_id);
+                }
+            }
+            if ($current_id != 0) {
+                $this->section_ancestors = $this->section->getAncestorIDs($active_section, $this->section_ancestors);
+            }
+            if (!$current_is_section) {
+                $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
+            }
+            if (!$collapsed || !$current_is_section) {
+                array_push($this->section_ancestors, $active_section);
+            }
+
+            $this->data = $this->buildTree(0, 1, $this);
+            $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0, 0, $current_is_section);
+        }
     }
 
     public function buildTree($id, $is_section, $tree)
@@ -132,4 +137,9 @@ class SectionsTree extends Tree
         return $markup;
     }
 
+
+    public function getDataItem()
+    {
+        return $this->data_item;
+    }
 }

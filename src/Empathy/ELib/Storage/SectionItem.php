@@ -95,10 +95,10 @@ class SectionItem extends Entity
     }
 
     public function buildTree($current, $tree)
-    {
+    {        
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
         $error = 'Could not get child sections.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -106,23 +106,27 @@ class SectionItem extends Entity
                 $id = $row['id'];
                 $nodes[$i]['id'] = $id;
                 $nodes[$i]['data'] = 0;
+                $nodes[$i]['hidden'] = $row['hidden'];
                 $nodes[$i]['label'] = $row['label'];
                 $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
                 $i++;
             }
         }
 
-        $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current;
-        $error = 'Could not get child data items.';
-        $result = $this->query($sql, $error);
-        if ($result->rowCount() > 0) {
-            foreach ($result as $row) {
-                $id = $row['id'];
-                $nodes[$i]['id'] = $id;
-                $nodes[$i]['data'] = 1;
-                $nodes[$i]['label'] = $row['label'];
-                $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
-                $i++;
+        if ($tree->getDataItem() !== NULL) {
+
+            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current;
+            $error = 'Could not get child data items.';
+            $result = $this->query($sql, $error);
+            if ($result->rowCount() > 0) {
+                foreach ($result as $row) {
+                    $id = $row['id'];
+                    $nodes[$i]['id'] = $id;
+                    $nodes[$i]['data'] = 1;
+                    $nodes[$i]['label'] = $row['label'];
+                    $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
+                    $i++;
+                }
             }
         }
 
