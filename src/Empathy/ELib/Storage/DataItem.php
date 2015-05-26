@@ -6,16 +6,20 @@ use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 use Empathy\ELib\User\CurrentUser;
 
+define('PERLBIN', '/opt/local/bin/perl');
+define('MD', '/opt/local/bin/Markdown.pl');
+
 
 class DataItem extends Entity
 {
     const TABLE = 'data_item';
 
-    const FIND_BY_LABEL = 1;
+    const FIND_LABEL = 1;
     const FIND_BODY = 2;
     const FIND_IMAGE = 3;
     const FIND_OPT_UNPACK = 4;
     const FIND_OPT_CONVERT_MD = 5;
+    const FIND_OPT_MATCH_META = 6;
 
 
     public $id;
@@ -64,6 +68,9 @@ class DataItem extends Entity
 
         if ($recursive) {
             foreach ($data_set as $index => $item) {
+
+                
+
                 $data = Model::load('DataItem');
                 $data->id = $item['id'];
                 $data->load();                
@@ -119,20 +126,31 @@ class DataItem extends Entity
             throw new \Exception('Could not write to md cache file.');
         }
         file_put_contents($tmp_file, $this->body);
-        exec("Markdown.pl $tmp_file", $output);
+        exec(PERLBIN.' '.MD.' '.$tmp_file, $output);
         $this->body = implode("\n", $output);
     }
 
-    public function find($data, $type, $pattern=null, $options=array())
+    public function find($data, $type, $pattern = NULL, $options = array())
     {
         $item = null;
         foreach ($data as $d) {
+
+            if ($pattern !== NULL) {
+                if (isset($d->label)) {
+                    $match_to = $d->label;   
+                }                
+                if (isset($d->meta) && in_array(self::FIND_OPT_MATCH_META, $options)) {
+                    $match_to = $d->meta;
+                }
+                if (isset($match_to) && !preg_match($pattern, $match_to)) {
+                    continue;
+                }                
+            }
+
             switch ($type) {
-                case self::FIND_BY_LABEL:                  
+                case self::FIND_LABEL:                  
                     if (isset($d->label)) {
-                        if (isset($pattern) && $pattern == $d->label) {
-                            $item = $d;
-                        }
+                        $item = $d;
                     }
                     break;
                 case self::FIND_BODY:
