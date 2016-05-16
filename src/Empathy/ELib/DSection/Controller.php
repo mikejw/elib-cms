@@ -93,7 +93,8 @@ class Controller extends AdminController
             $d->hidden = 'DEFAULT';
             $su = Model::load('SectionItem');
             $u = new SectionsUpdate($su, $d->section_id);
-            $id = $d->insert(Model::getTable('DataItem'), 1, array(), 0);            
+            $id = $d->insert(Model::getTable('DataItem'), 1, array(), 0);
+
             $this->clearCache();
         }
         $this->redirect('admin/dsection/data_item/'.$id);

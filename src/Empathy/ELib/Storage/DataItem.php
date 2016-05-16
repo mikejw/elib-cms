@@ -5,6 +5,7 @@ namespace Empathy\ELib\Storage;
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\Config;
 
 define('PERLBIN', '/opt/local/bin/perl');
 define('MD', '/opt/local/bin/Markdown.pl');
@@ -121,7 +122,7 @@ class DataItem extends Entity
     public function convertToMarkdown()
     {
         $output = array();
-        $tmp_file = DOC_ROOT.'/tmp/content.md';
+        $tmp_file = Config::get('DOC_ROOT').'/tmp/content.md';
         if (!is_writable($tmp_file)) {
             throw new \Exception('Could not write to md cache file.');
         }
@@ -333,7 +334,7 @@ class DataItem extends Entity
     public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
         $this->user_id = CurrentUser::getUserID();
-        parent::insert($table, $id, $format, $sanitize, $force_id);
+        return parent::insert($table, $id, $format, $sanitize, $force_id);
     }
 
 

@@ -2,7 +2,9 @@
 
 namespace Empathy\ELib\DSection;
 
+
 use Empathy\ELib\Tree;
+use Empathy\MVC\Config;
 
 class SectionsTree extends Tree
 {
@@ -20,11 +22,13 @@ class SectionsTree extends Tree
         if ($data_item !== NULL) {
             
             $this->data_item = $data_item;
+
             if ($current_is_section) {
                 $current_id = $section->id;
                 $parent_id = $section->section_id;
                 $active_section = $current_id;
             } else {
+
                 $current_id = $data_item->id;
                 $parent_id = $data_item->data_item_id;
             }
@@ -113,7 +117,7 @@ class SectionsTree extends Tree
             }
             $markup .= ">\n";
             if ($children > 0) {
-                $markup .= "<a class=\"toggle\" href=\"http://".WEB_ROOT.PUBLIC_DIR."/admin/$url/".$value['id'];
+                $markup .= "<a class=\"toggle\" href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'];
                 if ($toggle == '-') {
                     $markup .= '/?collapsed=1';
                 }
@@ -121,11 +125,11 @@ class SectionsTree extends Tree
             } else {
                 $markup .= "<span class=\"toggle\">&nbsp;</span>";
             }
-            $markup .= "<img src=\"http://".WEB_ROOT.PUBLIC_DIR."/elib/$folder\" alt=\"\" />\n";
+            $markup .= "<img src=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/elib/$folder\" alt=\"\" />\n";
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= "<span class=\"label current\">".$value['label']."</span>";
             } else {
-                $markup .= "<span class=\"label\"><a href=\"http://".WEB_ROOT.PUBLIC_DIR."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
+                $markup .= "<span class=\"label\"><a href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
             }
             if ($children > 0) {
                 $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id'], $value['data'], $current_is_section);
