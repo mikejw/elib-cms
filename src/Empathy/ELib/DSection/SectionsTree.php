@@ -111,7 +111,13 @@ class SectionsTree extends Tree
                 $value['label'] = $this->truncate($value['label'], 10); // trunc
             }
             $children = sizeof($value['children']);
-            $markup .= "<li data-id=\"".$value['id']."\"";
+            $markup .= "<li ";
+            // if current is section
+            if (!$value['data']) {
+                $markup .= "data-section=\"".$value['id']."\"";    
+            } else {
+                $markup .= "data-data=\"".$value['id']."\"";    
+            }            
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= " class=\"current\"";
             }
@@ -134,7 +140,7 @@ class SectionsTree extends Tree
             if ($children > 0) {
                 $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id'], $value['data'], $current_is_section);
             }
-            $markup .= "</li>\n";
+            $markup .= "<span class=\"clear\"/></li>\n";
         }
         $markup .= "</ul>\n";
 
