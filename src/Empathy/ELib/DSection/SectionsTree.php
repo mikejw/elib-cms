@@ -111,7 +111,7 @@ class SectionsTree extends Tree
                 $value['label'] = $this->truncate($value['label'], 10); // trunc
             }
             $children = sizeof($value['children']);
-            $markup .= "<li";
+            $markup .= "<li data-id=\"".$value['id']."\"";
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= " class=\"current\"";
             }
