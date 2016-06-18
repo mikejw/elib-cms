@@ -914,20 +914,21 @@ class Controller extends AdminController
         $position = 1;
 
 
-        foreach($_POST as $type) {
+        foreach($_POST as $type => $value) {
 
-             if (key($type) === 'section') {
-                $object = Model::load('SectionItem');
+            if ($type == 'section') {
+                $model = 'SectionItem';
             } else {
-                $object = Model::load('DataItem');
+                $model = 'DataItem';
             }
 
-            foreach ($type as $id) {
+            foreach ($value as $id) {
 
+                $object = Model::load($model);
                 $object->id = $id;
                 $object->load();
                 $object->position = $position;
-                $object->save();
+                $object->save(Model::getTable($model), array(), 0);
                 $position++;
             }
         }
