@@ -114,9 +114,9 @@ class SectionsTree extends Tree
             $markup .= "<li ";
             // if current is section
             if (!$value['data']) {
-                $markup .= "data-section=\"".$value['id']."\"";    
+                $markup .= "id=\"section_".$value['id']."\"";    
             } else {
-                $markup .= "data-data=\"".$value['id']."\"";    
+                $markup .= "id=\"data_".$value['id']."\"";    
             }            
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= " class=\"current\"";

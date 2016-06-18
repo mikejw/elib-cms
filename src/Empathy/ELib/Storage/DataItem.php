@@ -64,7 +64,7 @@ class DataItem extends Entity
             }
         } else {
             $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id
-                .' and hidden != 1');
+                .' and hidden != 1 order by position');
         }
 
         if ($recursive) {
@@ -266,7 +266,7 @@ class DataItem extends Entity
         $i = 0;
         $nodes = array();
         $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE data_item_id = '.$current
-            .' ORDER BY id';
+            .' ORDER BY position';
         $error = 'Could not get child data items.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {

@@ -98,7 +98,8 @@ class SectionItem extends Entity
     {        
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current
+            .' order by position';
         $error = 'Could not get child sections.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {

@@ -907,4 +907,32 @@ class Controller extends AdminController
         $this->redirect('admin/dsection/image_sizes');
     }
 
+
+
+    public function sort() {
+
+        $position = 1;
+
+        foreach($_POST as $type) {
+
+             if ($type == 'section') {
+                $object = Model::load('SectionItem');
+            } else {
+                $object = Model::load('DataItem');
+            }
+
+            foreach ($type as $id) {
+
+                $object->id = $id;
+                $object->load();
+                $object->position = $position;
+                $object->save();
+                $position++;
+            }
+        }
+
+        header('Content-type: application/json');
+        echo json_encode(1);
+        return false;
+    }
 }
