@@ -915,7 +915,7 @@ class Controller extends AdminController
 
         foreach($_POST as $type) {
 
-             if ($type == 'section') {
+             if (key($type) == 'section') {
                 $object = Model::load('SectionItem');
             } else {
                 $object = Model::load('DataItem');
