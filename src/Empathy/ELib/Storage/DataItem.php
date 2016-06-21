@@ -68,9 +68,7 @@ class DataItem extends Entity
         }
 
         if ($recursive) {
-            foreach ($data_set as $index => $item) {
-
-                
+            foreach ($data_set as $index => $item) {            
 
                 $data = Model::load('DataItem');
                 $data->id = $item['id'];
@@ -100,7 +98,7 @@ class DataItem extends Entity
         $ids = array();
         $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE section_id = '.$section_id
             .' and hidden != 1'
-            .' ORDER BY label';
+            .' ORDER BY position';
         $error = 'Could not get data item id based on section id.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {

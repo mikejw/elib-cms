@@ -116,7 +116,8 @@ class SectionItem extends Entity
 
         if ($tree->getDataItem() !== NULL) {
 
-            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current;
+            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current
+                .' order by position';
             $error = 'Could not get child data items.';
             $result = $this->query($sql, $error);
             if ($result->rowCount() > 0) {

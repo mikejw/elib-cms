@@ -928,7 +928,7 @@ class Controller extends AdminController
                 $object->id = $id;
                 $object->load();
                 $object->position = $position;
-                $object->save(Model::getTable($model), array(), 0);
+                $object->save();
                 $position++;
             }
         }
