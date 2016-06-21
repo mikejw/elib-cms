@@ -6,9 +6,8 @@ use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 use Empathy\ELib\User\CurrentUser;
 use Empathy\MVC\Config;
+use Michelf\Markdown;
 
-define('PERLBIN', '/opt/local/bin/perl');
-define('MD', '/opt/local/bin/Markdown.pl');
 
 
 class DataItem extends Entity
@@ -119,14 +118,7 @@ class DataItem extends Entity
 
     public function convertToMarkdown()
     {
-        $output = array();
-        $tmp_file = Config::get('DOC_ROOT').'/tmp/content.md';
-        if (!is_writable($tmp_file)) {
-            throw new \Exception('Could not write to md cache file.');
-        }
-        file_put_contents($tmp_file, $this->body);
-        exec(PERLBIN.' '.MD.' '.$tmp_file, $output);
-        $this->body = implode("\n", $output);
+        $this->body = Markdown::defaultTransform($this->body);
     }
 
     public function find($data, $type, $pattern = NULL, $options = array())
