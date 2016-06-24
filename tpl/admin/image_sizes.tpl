@@ -1,56 +1,29 @@
 {include file="elib:/admin/admin_header.tpl"}
 
-<div id="operations">
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey" style="padding:0.5em;">
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_image_size" method="get">
-<div><button type="submit" name="add" value="1">Add</button></div>
-</form>
 
 
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-</div>
+<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_image_size"
+ class="btn btn-sm btn-primary">Add</a>
 
 
 <p style="line-height: 0.5em;">&nbsp;</p>
 
 
-
-
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey">
-
-
-
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
+  {if isset($errors)}
+	<div class="alert alert-danger alert-dismissible" role="alert">
+  	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  	<strong>Error!</strong>
+  		{foreach from=$errors item=e} 
+  			<p>{$e}</p>
+  		{/foreach}
+	</div>
+    {/if}
 
 <div id="image_sizes">
 
 <form action="" method="post">
 
-<table>
+<table class="table">
 <tr>
 <th>Name</th><th>Prefix</th><th>Max Width</th><th>Max Height</th>
 <th>&nbsp;</th>
@@ -79,19 +52,8 @@
 </div>
 
 
-
-
 <p class="clear">&nbsp;</p>
 
-
-
-
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
 
 
 
