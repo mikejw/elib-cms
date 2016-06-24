@@ -77,15 +77,6 @@ Containers</a>
 
 <div class="col-md-6">
 
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
-
-
 
 {if $event eq 'rename'}
 {include file="elib:/admin/sections/rename_section.tpl"}
@@ -117,6 +108,19 @@ Containers</a>
 {elseif $event eq 'edit_containers'}
 {include file="elib:/admin/sections/edit_containers.tpl"}
 {/if}
+
+{if isset($errors)}
+<div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Error!</strong>
+        {foreach from=$errors item=e} 
+            <p>{$e}</p>
+        {/foreach}
+</div>
+{/if}
+
+
+
 
 </div>
 </div>
