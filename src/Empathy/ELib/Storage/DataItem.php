@@ -112,7 +112,9 @@ class DataItem extends Entity
     public function getSectionDataRecursive($section_id=null, $disconnect=true)
     {
         $this->getData(true, $section_id, $disconnect);
-        return $this->data;
+        if (isset($this->data)) {
+            return $this->data;
+        }
     }
 
 
