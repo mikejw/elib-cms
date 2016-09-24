@@ -8,7 +8,7 @@ friendly_url		VARCHAR(128)				NULL,
 template		CHAR(1)					NOT NULL DEFAULT 'A',
 position		INT(11)					NOT NULL, 
 hidden			BINARY(1)				NOT NULL DEFAULT 0,
-stamp			TIMESTAMP(10)				NOT NULL);
+stamp			TIMESTAMP				NOT NULL);
 
 CREATE TABLE 		data_item(
 id			INT(11)					AUTO_INCREMENT PRIMARY KEY,
@@ -24,7 +24,7 @@ user_id			INT(11)					NULL,
 position		INT(11)					NOT NULL,
 hidden			BINARY(1)				NOT NULL DEFAULT 0,
 meta			TEXT					NULL,
-stamp			TIMESTAMP(10)				NULL);
+stamp			TIMESTAMP				NULL);
 
 CREATE TABLE 		image_size(
 id			INT(11)					AUTO_INCREMENT PRIMARY KEY,
