@@ -67,6 +67,7 @@ class DataItem extends Entity
         }
 
         if ($recursive) {
+            $i = 0;
             foreach ($data_set as $index => $item) {            
 
                 $data = Model::load('DataItem');
@@ -85,7 +86,8 @@ class DataItem extends Entity
                 if ($disconnect) {                    
                     $data->dbDisconnect();
                 }            
-                $this->data[$data->id] = $data; 
+                $this->data[$i] = $data; 
+                $i++;
             }
         }
         return $data_set;
