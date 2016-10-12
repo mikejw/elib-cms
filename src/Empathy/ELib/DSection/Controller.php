@@ -322,7 +322,7 @@ class Controller extends AdminController
         $s->id = $_GET['id'];
         $s->load();
         $s->hidden = ($s->hidden)? 0 : 1;
-        $s->save(Model::getTable('SectionItem'), array(), 0);
+        $s->save(Model::getTable('SectionItem'), array(), 2);
         $this->clearCache();
         $this->redirect('admin/dsection/'.$s->id);
     }
