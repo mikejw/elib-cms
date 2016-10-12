@@ -322,6 +322,9 @@ class Controller extends AdminController
         $s->id = $_GET['id'];
         $s->load();
         $s->hidden = ($s->hidden)? 0 : 1;
+
+
+
         $s->save(Model::getTable('SectionItem'), array(), 2);
         $this->clearCache();
         $this->redirect('admin/dsection/'.$s->id);
@@ -463,7 +466,7 @@ class Controller extends AdminController
         $d->id = $_GET['id'];
         $d->load();
         $d->hidden = ($d->hidden)? 0 : 1;
-        $d->save(Model::getTable('DataItem'), array(), 0);
+        $d->save(Model::getTable('DataItem'), array(), 2);
         $this->clearCache();
         $this->redirect('admin/dsection/data_item/'.$d->id);
     }
