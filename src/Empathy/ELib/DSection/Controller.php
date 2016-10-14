@@ -617,9 +617,9 @@ class Controller extends AdminController
     public function data_add_data_video()
     {
         if (isset($_GET['iframe']) && $_GET['iframe'] == true) {
-            $this->setTemplate('video_upload.tpl');
+            $this->setTemplate('elib:/admin/video_upload.tpl');
         } else {
-            $this->setTemplate('section.tpl');
+            $this->setTemplate('elib:/admin/section.tpl');
         }
 
         if (isset($_POST['id'])) {

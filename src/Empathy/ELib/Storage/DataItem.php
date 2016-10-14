@@ -22,6 +22,8 @@ class DataItem extends Entity
     const FIND_OPT_MATCH_META = 6;
 
 
+
+
     public $id;
     public $data_item_id;
     public $section_id;
@@ -151,7 +153,7 @@ class DataItem extends Entity
                 case self::FIND_BODY:
                     if (isset($d->body)) {
                         $item = $d;
-                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {                            
                             $item->convertToMarkdown();
                         }
                     }
@@ -169,7 +171,7 @@ class DataItem extends Entity
             }
         }
         if ($item === null && isset($data->data)) {
-                $item = $this->find($data->data, $type, $pattern, $options);
+            $item = $this->find($data->data, $type, $pattern, $options);
         }
         if (in_array(self::FIND_OPT_UNPACK, $options) && isset($item->data)) {
             if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
