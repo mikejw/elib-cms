@@ -187,6 +187,17 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         }
     }
 
+    public function findContainers(&$found = array()) {
+
+        foreach ($this as $d) {
+            if ($d->isContainer()) {
+                $found[] = $d;
+            }
+            $d->findContainers($found);
+        }
+    }
+
+
 
     public function find($type, $pattern = NULL, $options = array())
     {
