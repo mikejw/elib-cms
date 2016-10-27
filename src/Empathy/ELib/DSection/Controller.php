@@ -161,24 +161,36 @@ class Controller extends AdminController
         if (isset($_POST['save'])) {
 
             $_GET['id'] = $_POST['id'];
-            $u = new ImageUpload('data', true, array());
 
-            if ($u->error != '') {
-                $this->presenter->assign('error', $u->error);
+            $images = array(); 
+            if (!is_array($_FILES['file']['name'])) {
+                 
+                $images[0] = $_FILES['file'];
             } else {
-                $d = Model::load('DataItem');
-                $d->label = $u->getFileEncoded();
-                $d->section_id = $_GET['id'];
-                $d->image = $u->getFile();
-                $d->position = 'DEFAULT';
-                $d->hidden = 'DEFAULT';
-                $su = Model::load('SectionItem');
-                $u = new SectionsUpdate($su, $d->section_id);
-                $id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
-                $this->clearCache();
-                $this->redirect('admin/dsection/data_item/'.$id);
+                $images = ImageUpload::reArrayFiles($_FILES['file']);                
             }
-            
+           
+            foreach($images as $img) {
+                $_FILES['file'] = $img;
+
+                $u = new ImageUpload('data', true, array());
+
+                if ($u->error != '') {
+                    $this->presenter->assign('error', $u->error);
+                } else {
+                    $d = Model::load('DataItem');
+                    $d->label = $u->getFileEncoded();
+                    $d->section_id = $_GET['id'];
+                    $d->image = $u->getFile();
+                    $d->position = 'DEFAULT';
+                    $d->hidden = 'DEFAULT';
+                    $su = Model::load('SectionItem');
+                    $u = new SectionsUpdate($su, $d->section_id);
+                    $id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                    $this->clearCache();
+                }
+            }
+            $this->redirect('admin/dsection/data_item/'.$id);
 
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/'.$_POST['id']);
@@ -618,10 +630,10 @@ class Controller extends AdminController
                     $d->hidden = 'DEFAULT';
                     $new_id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
                     // $this->update_timestamps($d->data_item_id);
-                    // $this->clearCache();
-                    //$this->redirect('admin/dsection/data_item/'.$new_id);
-                }
+                    // $this->clearCache();                    
+                }                
             }
+            $this->redirect('admin/dsection/data_item/'.$new_id);
             
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/data_item/'.$_GET['id']);
