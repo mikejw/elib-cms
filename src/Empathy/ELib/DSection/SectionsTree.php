@@ -142,7 +142,7 @@ class SectionsTree extends Tree
             }
             $markup .= "<span class=\"clear\"/></li>\n";
         }
-        $markup .= "</ul>\n";
+        $markup .= "</ul><div class=\"clear\">&nbsp;</div>\n";
 
         return $markup;
     }
