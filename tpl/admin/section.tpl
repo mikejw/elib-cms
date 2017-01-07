@@ -93,7 +93,7 @@ Containers</a>
 {include file="elib:/admin/sections/add_data_body.tpl"}
 {elseif $event eq 'add_data_image'}
 {include file="elib:/admin/sections/add_data_image.tpl"}
-{elseif $event eq 'add_data_video'}
+{elseif $event eq 'add_data_video' || $event eq 'data_add_data_video'}
 {include file="elib:/admin/sections/add_data_video.tpl"}
 {elseif $event eq 'data_item'}
 {include file="elib:/admin/sections/data_item.tpl"}

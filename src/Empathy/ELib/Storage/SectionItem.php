@@ -95,12 +95,19 @@ class SectionItem extends Entity
     }
 
     public function buildTree($current, $tree)
-    {        
+    { 
+
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current
-            .' order by position';
+        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+
+        if ($tree->getDetectHidden()) {
+            $sql .= ' and hidden != true';
+        }
+
+        $sql .= ' order by position';
         $error = 'Could not get child sections.';
+
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {

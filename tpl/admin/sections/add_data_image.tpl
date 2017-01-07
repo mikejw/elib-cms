@@ -11,7 +11,8 @@
 <legend>Add Image</legend>
 <p>
 <label>File</label>
-<input type="file" id="file" name="file" />
+<input type="file" id="file" name="file[]" multiple="multiple" accept="image/*" />
+<!-- <input type="file" id="file" name="file" /> -->
 </p>
 <p>
 <label>&nbsp;</label>

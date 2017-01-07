@@ -9,8 +9,7 @@ use Empathy\MVC\Config;
 use Michelf\Markdown;
 
 
-
-class DataItem extends Entity
+class DataItem extends Entity implements \JsonSerializable, \Iterator
 {
     const TABLE = 'data_item';
 
@@ -36,6 +35,54 @@ class DataItem extends Entity
     public $hidden;
     public $meta;
     public $stamp;
+
+    private $data;
+
+
+    public function __construct()
+    {
+        parent::__construct();
+        $this->data = array();
+    }
+
+    public function rewind()
+    {
+        reset($this->data);
+    }
+  
+    public function current()
+    {
+        return current($this->data);
+    }
+  
+    public function key() 
+    {
+        return key($this->data);
+    }
+  
+    public function next() 
+    {
+        return next($this->data);
+    }
+  
+    public function valid()
+    {
+        $key = key($this->data);
+        $var = ($key !== null && $key !== false);
+        return $var;
+    }
+
+    public function hasData()
+    {
+        return sizeof($this->data);
+    }
+
+
+    public function jsonSerialize()
+    {
+        return get_object_vars($this);
+    }
+
 
     public function isContainer()
     {
@@ -65,8 +112,10 @@ class DataItem extends Entity
             $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id
                 .' and hidden != 1 order by position');
         }
-
+ 
         if ($recursive) {
+
+            $i = 0;
             foreach ($data_set as $index => $item) {            
 
                 $data = Model::load('DataItem');
@@ -85,7 +134,8 @@ class DataItem extends Entity
                 if ($disconnect) {                    
                     $data->dbDisconnect();
                 }            
-                $this->data[$data->id] = $data; 
+                $this->data[$i] = $data; 
+                $i++;
             }
         }
         return $data_set;
@@ -112,6 +162,10 @@ class DataItem extends Entity
     public function getSectionDataRecursive($section_id=null, $disconnect=true)
     {
         $this->getData(true, $section_id, $disconnect);
+
+        if ($disconnect) {
+            $this->dbDisconnect();
+        }
         if (isset($this->data)) {
             return $this->data;
         }
@@ -123,10 +177,32 @@ class DataItem extends Entity
         $this->body = Markdown::defaultTransform($this->body);
     }
 
-    public function find($data, $type, $pattern = NULL, $options = array())
+
+    public function findAndConvertAllToMD() {
+        foreach ($this as $d) {
+            if (isset($d->body)) {
+                $d->convertToMarkdown();
+            }
+            $d->findAndConvertAllToMD();
+        }
+    }
+
+    public function findContainers(&$found = array()) {
+
+        foreach ($this as $d) {
+            if ($d->isContainer()) {
+                $found[] = $d;
+            }
+            $d->findContainers($found);
+        }
+    }
+
+
+
+    public function find($type, $pattern = NULL, $options = array())
     {
         $item = null;
-        foreach ($data as $d) {
+        foreach ($this as $d) {
 
             if ($pattern !== NULL) {
                 if (isset($d->label)) {
@@ -149,7 +225,7 @@ class DataItem extends Entity
                 case self::FIND_BODY:
                     if (isset($d->body)) {
                         $item = $d;
-                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {                            
                             $item->convertToMarkdown();
                         }
                     }
@@ -160,31 +236,37 @@ class DataItem extends Entity
                     }
                     break;                    
                 default:
-                    break;
+                    throw new \Exception('No valid find type.');
             }
+
             if ($item !== null) {
                 break;
             }
         }
-        if ($item === null && isset($data->data)) {
-                $item = $this->find($data->data, $type, $pattern, $options);
+        if ($item === null) {
+            if ($d->hasData()) {
+                $item = $d->find($type, $pattern, $options);
+            }
         }
-        if (in_array(self::FIND_OPT_UNPACK, $options) && isset($item->data)) {
+        if ($item !== null && in_array(self::FIND_OPT_UNPACK, $options) && $item->hasData()) {
             if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
-                foreach ($item->data as $d) {
+                foreach ($item as $d) {
                     if (isset($d->body)) {
                         $d->convertToMarkdown();
                     }
                 }
             }
-            return $item->data;
+            return $item->getLocalData();
         } else {
-            return $item;
+            return $item;            
         }
     }
 
 
-
+    public function getLocalData()
+    {
+        return $this->data;
+    }
 
 
     public function validates()

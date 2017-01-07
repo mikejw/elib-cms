@@ -13,9 +13,17 @@ class SectionsTree extends Tree
     private $data;
     private $section_ancestors;
     private $data_item_ancestors;
+    private $detect_hidden;
 
-    public function __construct($section, $data_item=NULL, $current_is_section=NULL, $collapsed=NULL)
-    {
+    public function __construct(
+        $section,
+        $data_item=NULL,
+        $current_is_section=NULL,
+        $collapsed=NULL,
+        $detect_hidden=NULL) {
+        
+        $this->detect_hidden = $detect_hidden;
+
         $this->section = $section;
 
         // allow tree use without building markup
@@ -138,7 +146,15 @@ class SectionsTree extends Tree
                 $markup .= "<span class=\"label\"><a href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
             }
             if ($children > 0) {
-                $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id'], $value['data'], $current_is_section);
+                $markup .= $this->buildMarkup(
+                    $value['children'],
+                    $level,
+                    $current_id,
+                    $value['id'],
+                    $value['data'],
+                    $current_is_section,
+                    $this->detect_hidden
+                );
             }
             $markup .= "<span class=\"clear\"/></li>\n";
         }
@@ -152,4 +168,10 @@ class SectionsTree extends Tree
     {
         return $this->data_item;
     }
+
+    public function getDetectHidden() {
+        return $this->detect_hidden;
+    }
+
+
 }
