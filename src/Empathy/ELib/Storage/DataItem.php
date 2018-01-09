@@ -241,13 +241,13 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
             if ($item !== null) {
                 break;
+            } else {        
+                if ($d->hasData()) {
+                    $item = $d->find($type, $pattern, $options);
+                }
             }
         }
-        if ($item === null) {
-            if ($d->hasData()) {
-                $item = $d->find($type, $pattern, $options);
-            }
-        }
+
         if ($item !== null && in_array(self::FIND_OPT_UNPACK, $options) && $item->hasData()) {
             if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
                 foreach ($item as $d) {
