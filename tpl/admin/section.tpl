@@ -1,63 +1,63 @@
 {include file="elib:/admin/admin_header.tpl"}
 
 
-<div id="op_right">
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/containers" class="btn btn-sm btn-primary{if $event eq 'edit_containers'} disabled{/if}">
-Containers</a>
+<div class="form-group">
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/containers" class="btn btn-sm btn-primary{if $event eq 'edit_containers'} disabled{/if}">
+    Containers</a>
 
 
-<a class="btn btn-sm btn-primary{if $event eq 'edit_image_sizes'} disabled{/if}" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/image_sizes">Image Sizes</a>
+    <a class="btn btn-sm btn-primary{if $event eq 'edit_image_sizes'} disabled{/if}" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/image_sizes">Image Sizes</a>
 
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_section/{$section_id}"
- class="btn btn-sm btn-primary{if $class eq 'dsection' && $event eq 'data_item'} disabled{/if}">Add Section</a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_section/{$section_id}"
+     class="btn btn-sm btn-primary{if $class eq 'dsection' && $event eq 'data_item'} disabled{/if}">Add Section</a>
 
 
-{if $class eq 'dsection' && $event neq 'data_item'}
+    {if $class eq 'dsection' && $event neq 'data_item'}
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_data/{$section_id}"
- class="btn btn-sm btn-primary{if $event eq 'add_data'} disabled{/if}">Add Data</a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_data/{$section_id}"
+     class="btn btn-sm btn-primary{if $event eq 'add_data'} disabled{/if}">Add Data</a>
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete/{$section_id}"
- class="confirm btn btn-sm btn-primary{if $section_id eq 0} disabled{/if}">Delete</a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete/{$section_id}"
+     class="confirm btn btn-sm btn-primary{if $section_id eq 0} disabled{/if}">Delete</a>
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename/{$section_id}"
- class="btn btn-sm btn-primary{if $section->id eq 0 || $event eq 'rename'} disabled{/if}">Rename</a>
-
-
-{else}
-
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}"
- class="btn btn-sm btn-primary{if $event eq 'add_data' || !$is_container} disabled{/if}">Add Data</a>
-
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete_data_item/{$data_item_id}"
- class="confirm btn btn-sm btn-primary">Delete</a>
-
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename_data_item/{$data_item_id}"
- class="btn btn-sm btn-primary{if $event eq 'rename'} disabled{/if}">Rename</a>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename/{$section_id}"
+     class="btn btn-sm btn-primary{if $section->id eq 0 || $event eq 'rename'} disabled{/if}">Rename</a>
 
 
-{/if}
+    {else}
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event eq 'add_data' || !$is_container} disabled{/if}">Add Data</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete_data_item/{$data_item_id}"
+     class="confirm btn btn-sm btn-primary">Delete</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename_data_item/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event eq 'rename'} disabled{/if}">Rename</a>
 
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/change_template/{$section_id}"
- class="btn btn-sm btn-primary{if $class eq 'data_item' || $event eq 'change_template' || $section_id eq 0} disabled{/if}">Change Template</a>
-
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_data_item_meta/{$data_item_id}"
- class="btn btn-sm btn-primary{if $event neq 'data_item'} disabled{/if}">Edit Meta</a>
+    {/if}
 
 
-{if $event eq 'data_item'}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/change_template/{$section_id}"
+     class="btn btn-sm btn-primary{if $class eq 'data_item' || $event eq 'change_template' || $section_id eq 0} disabled{/if}">Change Template</a>
 
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_item_toggle_hidden/{$data_item_id}"
- class="btn btn-sm btn-primary">{if $data_item->hidden}Show{else}Hide{/if}</a>
-
-{elseif $class eq 'dsection' && $section_id > 0}
-<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/toggle_hidden/{$section_id}"
- class="btn btn-sm btn-primary">{if $section->hidden}Show{else}Hide{/if}</a>
-{/if}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_data_item_meta/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event neq 'data_item'} disabled{/if}">Edit Meta</a>
 
 
+    {if $event eq 'data_item'}
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_item_toggle_hidden/{$data_item_id}"
+     class="btn btn-sm btn-primary">{if $data_item->hidden}Show{else}Hide{/if}</a>
+
+    {elseif $class eq 'dsection' && $section_id > 0}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/toggle_hidden/{$section_id}"
+     class="btn btn-sm btn-primary">{if $section->hidden}Show{else}Hide{/if}</a>
+    {/if}
+
+</div>
 
 
 <p style="line-height: 0.5em;">&nbsp;</p>
@@ -65,17 +65,19 @@ Containers</a>
 
 <div class="row">
 
-<div class="col-md-4">
+<div class="col-md-5">
 
 {if $section_id != 0}
 <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/0">Top Level</a></p>
+{else}
+    <p>&nbsp;</p>
 {/if}
 
 {$sections}
 
 </div>
 
-<div class="col-md-6">
+<div class="col-md-7">
 
 
 {if $event eq 'rename'}
@@ -120,9 +122,6 @@ Containers</a>
 {/if}
 
 
-
-
-</div>
 </div>
 
 
