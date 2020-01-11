@@ -630,10 +630,10 @@ class Controller extends AdminController
                     $d->hidden = 'DEFAULT';
                     $new_id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
                     // $this->update_timestamps($d->data_item_id);
-                    // $this->clearCache();                    
+                    // $this->clearCache();
+                    $this->redirect('admin/dsection/data_item/'.$new_id);
                 }                
             }
-            $this->redirect('admin/dsection/data_item/'.$new_id);
             
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/data_item/'.$_GET['id']);
