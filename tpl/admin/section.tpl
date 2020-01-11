@@ -1,7 +1,7 @@
 {include file="elib:/admin/admin_header.tpl"}
 
 
-<div class="form-group">
+<div class="form-group cms-actions">
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/containers" class="btn btn-sm btn-primary{if $event eq 'edit_containers'} disabled{/if}">
     Containers</a>
 
@@ -58,9 +58,6 @@
     {/if}
 
 </div>
-
-
-<p style="line-height: 0.5em;">&nbsp;</p>
 
 
 <div class="row">
