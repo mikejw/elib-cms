@@ -384,7 +384,7 @@ class Controller extends AdminController
     public function delete_data_item()
     {
         $this->assertID();
-        $this->setTemplate('section.tpl');
+        $this->setTemplate('elib:/admin/section.tpl');
         $s = Model::load('SectionItem');
         $d = Model::load('DataItem');
         $d->id = $_GET['id'];
@@ -392,6 +392,7 @@ class Controller extends AdminController
         $this->update_timestamps($d->id);
         $sd = new SectionsDelete($s, $d, 0);
         $this->clearCache();
+
         if (!is_numeric($d->data_item_id)) {
             $this->redirect('admin/dsection/'.$d->section_id);
         } else {
