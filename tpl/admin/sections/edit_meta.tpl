@@ -6,7 +6,7 @@
 <p>
 <label>Meta Text</label>
 {*<textarea name="meta" rows="" cols="">{$data_item->meta|replace:'</p><p>':"\r\n"|replace:'<p>':""|replace:'</p>':""}</textarea>*}
-<textarea name="meta" rows="" cols="">{$data_item->meta|escape}</textarea>
+<textarea class="raw form-control" name="meta" rows="10" cols="">{$data_item->meta|escape}</textarea>
 </p>
 <p>
 <label>&nbsp;</label>
