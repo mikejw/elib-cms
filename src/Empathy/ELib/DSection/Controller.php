@@ -476,6 +476,36 @@ class Controller extends AdminController
         $this->presenter->assign('data_item', $d);
     }
 
+    public function edit_section_item_meta()
+    {
+        if (isset($_POST['save'])) {
+            $s = Model::load('SectionItem');
+            $s->id = $_POST['id'];
+            $s->load();
+            $s->meta = $_POST['meta'];
+
+            $s->validates();
+            //if($d->hasValErrors())
+            if (0) {
+                $this->presenter->assign('section_item', $s);
+                $this->presenter->assign('errors', $s->getValErrors());
+            } else {
+                $s->save(Model::getTable('SectionItem'), array(), 1);
+                $this->clearCache();
+                $this->redirect('admin/dsection/'.$s->id);
+            }
+        } elseif (isset($_POST['cancel'])) {
+            $this->redirect('admin/dsection/'.$_POST['id']);
+        }
+
+        $this->buildNav();
+        $this->setTemplate('elib:/admin/section.tpl');
+        $s = Model::load('SectionItem');
+        $s->id = $_GET['id'];
+        $s->load();
+        $this->presenter->assign('section_item', $s);
+    }
+
     public function data_item_toggle_hidden()
     {
         $d = Model::load('DataItem');

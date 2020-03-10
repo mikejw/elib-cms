@@ -19,6 +19,7 @@ class SectionItem extends Entity
     public $position;
     public $hidden;
     public $stamp;
+    public $meta;
 
     public function updateTimeStamps($update)
     {
@@ -99,7 +100,7 @@ class SectionItem extends Entity
 
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $sql = 'SELECT id,label, hidden, meta FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
 
         if ($tree->getDetectHidden()) {
             $sql .= ' and hidden != true';
@@ -116,6 +117,7 @@ class SectionItem extends Entity
                 $nodes[$i]['data'] = 0;
                 $nodes[$i]['hidden'] = $row['hidden'];
                 $nodes[$i]['label'] = $row['label'];
+                $nodes[$i]['meta'] = $row['meta'];
                 $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
                 $i++;
             }

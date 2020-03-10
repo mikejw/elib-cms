@@ -43,9 +43,13 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/change_template/{$section_id}"
      class="btn btn-sm btn-primary{if $class eq 'data_item' || $event eq 'change_template' || $section_id eq 0} disabled{/if}">Change Template</a>
 
+    {if $event eq 'default_event'|| $event eq 'edit_section_item_meta'}
+     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_section_item_meta/{$section_id}"
+     class="btn btn-sm btn-primary{if $event eq 'edit_section_item_meta'} disabled{/if}">Edit Meta</a>
+    {elseif $event eq 'data_item' || $event eq 'edit_meta'}
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_data_item_meta/{$data_item_id}"
-     class="btn btn-sm btn-primary{if $event neq 'data_item'} disabled{/if}">Edit Meta</a>
-
+     class="btn btn-sm btn-primary{if $event eq 'edit_meta'} disabled{/if}">Edit Meta</a>
+    {/if}
 
     {if $event eq 'data_item'}
 
@@ -104,6 +108,8 @@
 {include file="elib:/admin/sections/change_template.tpl"}
 {elseif $event eq 'edit_meta'}
 {include file="elib:/admin/sections/edit_meta.tpl"}
+{elseif $event eq 'edit_section_item_meta'}
+{include file="elib:/admin/sections/edit_section_item_meta.tpl"}
 {elseif $event eq 'edit_containers'}
 {include file="elib:/admin/sections/edit_containers.tpl"}
 {/if}
