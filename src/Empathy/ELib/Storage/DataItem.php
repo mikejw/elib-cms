@@ -45,6 +45,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         $this->data = array();
     }
 
+    public function setData($data) {
+        $this->data = $data;
+    }
+
     public function rewind()
     {
         reset($this->data);
