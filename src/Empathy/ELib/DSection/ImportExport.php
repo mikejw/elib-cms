@@ -16,25 +16,19 @@ class ImportExport
         $section->id = $section_id;
         $section->load();
 
-        $data = Model::load('DataItem');
-
         $sections = $section->buildTree($section->id, new SectionsTree(
             $section,
-            $data,
+            null,
             true,
             null,
             true
         ));
 
-        if (!count($sections)) {
-            $sections = $section->buildTree($section->id, new SectionsTree(
-                $section,
-                null,
-                true,
-                null,
-                true,
-                false
-            ));
+        if (sizeof($sections) < 1) {
+            $sections = $section->getAllCustom(
+                Model::getTable('SectionItem'),
+                ' where id = ' . $section_id
+             );
         }
 
         foreach ($sections as &$item) {
@@ -42,7 +36,7 @@ class ImportExport
             $data = Model::load('DataItem');
             $item['data'] = $data->getSectionDataRecursive($item['id']);
 
-            if (sizeof($item['children'])) {
+            if (isset($item['children']) && sizeof($item['children'])) {
                 $item['children'] = $this->load($item['id']);
             }
             $sectionsData[] = $item;
