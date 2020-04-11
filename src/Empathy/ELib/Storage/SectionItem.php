@@ -63,8 +63,9 @@ class SectionItem extends Entity
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
-            $section_id = $row['section_id'];
+            $section_id = (int) $row['section_id'];
         }
+
         if ($section_id != 0) {
             array_push($ancestors, $section_id);
             $ancestors = $this->getAncestorIDs($section_id, $ancestors);
@@ -96,8 +97,7 @@ class SectionItem extends Entity
     }
 
     public function buildTree($current, $tree)
-    { 
-
+    {
         $i = 0;
         $nodes = array();
         $sql = 'SELECT id,label, hidden, meta FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;

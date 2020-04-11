@@ -337,9 +337,6 @@ class Controller extends AdminController
         $s->id = $_GET['id'];
         $s->load();
         $s->hidden = ($s->hidden)? 0 : 1;
-
-
-
         $s->save(Model::getTable('SectionItem'), array(), 2);
         $this->clearCache();
         $this->redirect('admin/dsection/'.$s->id);
@@ -971,13 +968,8 @@ class Controller extends AdminController
         $this->redirect('admin/dsection/image_sizes');
     }
 
-
-
     public function sort() {
-
         $position = 1;
-
-
         foreach($_POST as $type => $value) {
 
             if ($type == 'section') {
@@ -1000,5 +992,24 @@ class Controller extends AdminController
         header('Content-type: application/json');
         echo json_encode(1);
         return false;
+    }
+
+    public function export_section() {
+        $this->buildNav();
+        $output = '';
+        $target_id = $_GET['id'];
+
+        if (isset($_POST['submit'])) {
+            $ie = new ImportExport();
+            $output = $ie->export($_POST['target_id']);
+            $target_id = $_POST['target_id'];
+        }
+
+        $this->assign('target_id', $target_id);
+        $this->assign('output', $output);
+    }
+
+    public function import_section() {
+        $this->buildNav();
     }
 }

@@ -24,6 +24,11 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename/{$section_id}"
      class="btn btn-sm btn-primary{if $section->id eq 0 || $event eq 'rename'} disabled{/if}">Rename</a>
 
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/export_section/{$section_id}"
+       class="btn btn-sm btn-primary">Export</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_section/{$section_id}"
+       class="btn btn-sm btn-primary">Import</a>
 
     {else}
 
@@ -112,6 +117,10 @@
 {include file="elib:/admin/sections/edit_section_item_meta.tpl"}
 {elseif $event eq 'edit_containers'}
 {include file="elib:/admin/sections/edit_containers.tpl"}
+{elseif $event eq 'export_section'}
+{include file="elib:/admin/sections/import_export.tpl"}
+{elseif $event eq 'import_section'}
+{include file="elib:/admin/sections/import_export.tpl"}
 {/if}
 
 {if isset($errors)}
