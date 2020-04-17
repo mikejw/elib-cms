@@ -6,6 +6,7 @@ use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Config;
+use Empathy\ELib\User\CurrentUser;
 
 class ImportExport
 {
@@ -55,11 +56,15 @@ class ImportExport
         if ($parent_id) {
             $section->section_id = $parent_id;
         } else {
-            $section->section_id = $target->section_id;
+            if ($target->secttion_id = 0) {
+                $section->section_id = 0;
+            } else {
+                $section->section_id = $target->section_id;
+            }
         }
 
         $section->label = $target->label;
-        $section->user_id = $target->user_id;
+        $section->user_id = CurrentUser::getUserID();
         $section->hidden = $target->hidden;
         $section->template = $target->template;
         $section->position = $target->position;
@@ -146,10 +151,23 @@ class ImportExport
         return json_encode($sectionsData, JSON_PRETTY_PRINT);
     }
 
-    public function import($target_id)
+    public function import($target_parent_id, $sectionsData)
     {
-        $root_parent_id = $this->insertSection($target_id);
-        populate(json_decode($sectionsData), $root_parent_id);
+        // insert root section
+        $root = Model::load('SectionItem');
+        $root->section_id = $target_parent_id;
+        $root->label = 'New Section';
+        $root->user_id = CurrentUser::getUserID();
+        $root->hidden = 0;
+        $root->template = 'A';
+        $root->position = 0;
+
+        $root_id = $root->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
+
+
+
+        //$root_parent_id = $this->insertSection($target_id);
+        $this->populate(json_decode($sectionsData), $root_id);
     }
 }
 

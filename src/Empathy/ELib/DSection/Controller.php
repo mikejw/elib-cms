@@ -1011,5 +1011,19 @@ class Controller extends AdminController
 
     public function import_section() {
         $this->buildNav();
+        $this->assertID();
+        $content = '';
+        $parent_id = $_GET['id'];
+
+        if (isset($_POST['submit'])) {
+            $parent_id = $_POST['parent_id'];
+            $ie = new ImportExport();
+            $content = $_POST['content'];
+            $ie->import($parent_id, $content);
+        }
+
+        $this->assign('parent_id', $parent_id);
+        $this->assign('content', $content);
+
     }
 }
