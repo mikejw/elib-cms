@@ -5,6 +5,7 @@ namespace ESuite\Storage;
 use ESuite\ESuiteTest;
 use Empathy\ELib\Model;
 use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\DSection\SectionsTree;
 
 
 class SectionItemTest extends ESuiteTest
@@ -21,15 +22,17 @@ class SectionItemTest extends ESuiteTest
         $this->assertInstanceOf(SectionItem::class, $s);
     }
 
-    public function testHasUser()
+    public function testHasSection()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
-//        $u = Model::load('UserItem');
-//        $u->id = 1;
-//        $u->load();
-//        print_r($u);
-//        ob_flush();
+        $s = Model::load('SectionItem');
+        $s->id = 1;
+        $s->load();
 
-        $this->assertEquals(1, 1);
+        $sections = $s->buildTree($s->id, new SectionsTree(
+            $s, null, null, null, true
+        ));
+
+        $this->assertEquals(1, sizeof($sections));
     }
 }

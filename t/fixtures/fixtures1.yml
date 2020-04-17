@@ -18,10 +18,19 @@ Empathy\ELib\Storage\UserItem:
     registered: 'MYSQLTIME'
     activated: 'MYSQLTIME'
 
-
 Empathy\ELib\Storage\SectionItem:
   section1:
     section_id: 0
+    label: 'New Section'
+    friendly_url: null
+    template: 'A'
+    position: 0
+    hidden: 0
+    stamp: 'MYSQLTIME'
+    meta: null
+    user_id: "@user1"
+  section2:
+    section_id: "@section1"
     label: 'New Section'
     friendly_url: null
     template: 'A'
