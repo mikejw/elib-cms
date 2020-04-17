@@ -29,10 +29,25 @@ class SectionItemTest extends ESuiteTest
         $s->id = 1;
         $s->load();
 
-        $sections = $s->buildTree($s->id, new SectionsTree(
+        $tree = new SectionsTree(
             $s, null, null, null, true
-        ));
+        );
+        $sections = $s->buildTree($s->id, $tree);
+        $this->assertEquals(1, sizeof($sections));
+    }
 
+    public function testHasSectionAndData()
+    {
+        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
+        $s = Model::load('SectionItem');
+        $s->id = 1;
+        $s->load();
+
+        $tree = new SectionsTree(
+            $s, null, null, null, true
+        );
+
+        $sections = $s->buildTree($s->id, $tree);
         $this->assertEquals(1, sizeof($sections));
     }
 }

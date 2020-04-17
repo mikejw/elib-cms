@@ -2,13 +2,13 @@
 
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\AdminController,
-//use Empathy\ELib\File\GImage as ImageUpload;
-    Empathy\ELib\File\Image as ImageUpload,
-    Empathy\ELib\DSection\SectionsUpdate,
-    Empathy\ELib\DSection\SectionsDelete,
-    Empathy\ELib\DSection\SectionsTree,
-    Empathy\ELib\Model;
+use Empathy\ELib\AdminController;
+
+use Empathy\ELib\File\Image as ImageUpload;
+use Empathy\ELib\DSection\SectionsUpdate;
+use Empathy\ELib\DSection\SectionsDelete;
+use Empathy\ELib\DSection\SectionsTree;
+use Empathy\ELib\Model;
 
 
 class Controller extends AdminController
