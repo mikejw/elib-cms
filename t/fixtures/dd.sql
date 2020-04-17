@@ -22,7 +22,7 @@ id                      INT(11)                 AUTO_INCREMENT PRIMARY KEY,
 user_profile_id         INT(11)                 NOT NULL,
 email                   VARCHAR(128)            NOT NULL,
 auth                    TINYINT(1)              NOT NULL DEFAULT 0,
-username                VARCHAR(8)              NOT NULL,
+username                VARCHAR(32)              NOT NULL,
 password                VARCHAR(32)             NOT NULL,
 reg_code                VARCHAR(32)             NOT NULL,
 active                  TINYINT(1)              NOT NULL DEFAULT 0,
@@ -41,7 +41,8 @@ template		CHAR(1)					NOT NULL DEFAULT 'A',
 position		INT(11)					NOT NULL DEFAULT 0,
 hidden			BINARY(1)				NOT NULL DEFAULT 0,
 stamp			TIMESTAMP				NOT NULL,
-meta			TEXT					NULL);
+meta			TEXT					NULL,
+user_id			INT(11)					NULL);
 
 CREATE TABLE 		data_item(
 id			INT(11)					AUTO_INCREMENT PRIMARY KEY,

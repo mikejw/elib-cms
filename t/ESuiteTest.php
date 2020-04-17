@@ -2,9 +2,9 @@
 
 namespace ESuite;
 
-
-use Empathy\MVC\Config as EmpConfig;
-use Empathy\MVC\DI;
+use Empathy\MVC\EntityManager;
+use Empathy\MVC\EntityPopulator;
+use Nelmio\Alice\Fixtures\Loader;
 
 
 abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
@@ -12,66 +12,8 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
    
     protected function setUp()
     {
-        $this->makeFakeBootstrap();
+        \ESuite\Util\DB::loadDefDBCreds();
     }
-
-    protected function makeFakeBootstrap($persistentMode=true)
-    {
-        // use eaa archive as root
-        $doc_root = realpath(dirname(realpath(__FILE__)).'/../eaa/');
-
-        $this->setConfig('NAME', 'empathytest');
-        $this->setConfig('TITLE', 'empathy testing');
-        $this->setConfig('DOC_ROOT', $doc_root);
-        $this->setConfig('WEB_ROOT' , 'localhost/empathytest');
-        $this->setConfig('PUBLIC_DIR', '/public_html');
-
-        $dummyBootOptions = array(
-            'default_module' => 'front',
-            'dynamic_module' => false,
-            'debug_mode' => false,
-            'environment' => 'dev',
-            'handle_errors' => false
-        );
-        $plugins = array(
-            array(
-                'name' => 'ELibs',
-                'version' => '1.0',
-                'config' => '{ "testing": true }'
-            ),
-            array(
-                'name' => 'Smarty',
-                'version' => '1.0',
-                'class_path' => 'Smarty/Smarty.class.php',
-                'class_name' => '\Smarty',
-                'loader' => ''
-            )
-        );
-
-        $container = DI::init($doc_root, $persistentMode);
-        $empathy = $container->get('Empathy');
-        $empathy->setBootOptions($dummyBootOptions);
-        $empathy->setPlugins($plugins);
-        $empathy->init();
-
-        $bootstrap = $container->get('Bootstrap');
-        return $bootstrap;
-    }
-
-    protected function setConfig($key, $value)
-    {
-        EmpConfig::store($key, $value);
-    }
-
-
-    protected function tearDown()
-    {
-        global $suite;
-        if (Util\Config::get('reset_db')) {
-            $suite->dbReset();
-        }
-    }
-
 
     public static function setUpBeforeClass()
     {
@@ -82,4 +24,19 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     {
         //
     }
+
+    protected function loadFixtures($reset, $file)
+    {
+        $populator = new EntityPopulator();
+        \ESuite\Util\DB::reset($reset);
+        $objectManager = new EntityManager();
+
+        $file = \ESuite\Util\Config::get('base').$file;
+        $loader = new Loader();
+        $loader->addPopulator($populator);
+
+        $objects = $loader->load($file);
+        $objectManager->persist($objects);
+    }
+
 }

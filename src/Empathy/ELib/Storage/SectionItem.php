@@ -20,6 +20,7 @@ class SectionItem extends Entity
     public $hidden;
     public $stamp;
     public $meta;
+    public $user_id;
 
     public function updateTimeStamps($update)
     {
