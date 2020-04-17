@@ -1,6 +1,5 @@
 
 
-
 Empathy\ELib\Storage\UserProfile:
   profile{1..5}:
     fullname: <firstName()>
@@ -30,13 +29,22 @@ Empathy\ELib\Storage\SectionItem:
     stamp: 'MYSQLTIME'
     meta: null
     user_id: "@user1"
-  section2:
+
+Empathy\ELib\Storage\DataItem:
+  data1:
     section_id: "@section1"
-    label: 'New Section'
-    friendly_url: null
-    template: 'A'
+    label: 'New Data'
+    data_item_id: null
+    container_id: null
+    heading: "This is a data item."
+    body: null
+    image: null
+    video: null
+    user_id: "@user1"
     position: 0
     hidden: 0
-    stamp: 'MYSQLTIME'
     meta: null
-    user_id: "@user1"
+    stamp: 'MYSQLTIME'
+
+
+

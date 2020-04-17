@@ -28,26 +28,42 @@ class SectionItemTest extends ESuiteTest
         $s = Model::load('SectionItem');
         $s->id = 1;
         $s->load();
+        $d = Model::load('DataItem');
 
         $tree = new SectionsTree(
-            $s, null, null, null, true
+            $s, $d, true, null, true
         );
         $sections = $s->buildTree($s->id, $tree);
         $this->assertEquals(1, sizeof($sections));
+    }
+
+    public function testRootIsSection()
+    {
+        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+        $s = Model::load('SectionItem');
+        $s->id = 0;
+        $d = Model::load('DataItem');
+
+        $tree = new SectionsTree(
+            $s, $d, true, null, true
+        );
+        $sections = $s->buildTree($s->id, $tree);
+        $this->assertTrue(sizeof($sections[0]['children']) === 1);
     }
 
     public function testHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
         $s = Model::load('SectionItem');
-        $s->id = 1;
+        $s->id = 0;
         $s->load();
+        $d = Model::load('DataItem');
 
         $tree = new SectionsTree(
-            $s, null, null, null, true
+            $s, $d, true, null, true
         );
 
         $sections = $s->buildTree($s->id, $tree);
-        $this->assertEquals(1, sizeof($sections));
+        $this->assertEquals('New Data', $sections[0]['children'][0]['label']);
     }
 }

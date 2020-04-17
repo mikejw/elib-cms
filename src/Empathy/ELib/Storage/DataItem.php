@@ -416,7 +416,9 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
-        $this->user_id = CurrentUser::getUserID();
+        if ($this->user_id === null) {
+            $this->user_id = CurrentUser::getUserID();
+        }
         return parent::insert($table, $id, $format, $sanitize, $force_id);
     }
 
