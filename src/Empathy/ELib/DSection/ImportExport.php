@@ -165,9 +165,8 @@ class ImportExport
         $root_id = $root->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
 
 
-
         //$root_parent_id = $this->insertSection($target_id);
-        $this->populate(json_decode($sectionsData), $root_id);
+        //$this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $root_id);
     }
 }
 
