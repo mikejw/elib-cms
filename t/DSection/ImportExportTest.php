@@ -53,17 +53,13 @@ class ImportExportTest extends ESuiteTest
         $ie = new ImportExport();
         $output = $ie->export(1);
         $ie->import(0, $output);
-
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
-
-        print_r($output);
-        ob_flush();
-
-        $this->assertEquals(2, sizeof($output));
+        $this->assertEquals(1, sizeof($output['children']));
     }
 
-
-/*
+    /*
+     * needs more work!
+     */
     public function testPopulateSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -72,11 +68,9 @@ class ImportExportTest extends ESuiteTest
         $ie = new ImportExport();
         $output = $ie->export(1);
         $ie->import(0, $output);
-
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
 
-        $this->assertEquals(2, sizeof($output));
+        $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
     }
-    */
 
 }

@@ -172,17 +172,6 @@ class ImportExport
 
     public function import($target_parent_id, $sectionsData)
     {
-        // insert root section
-        $root = Model::load('SectionItem');
-        $root->section_id = $target_parent_id;
-        $root->label = 'New Section';
-        $root->user_id = CurrentUser::getUserID();
-        $root->hidden = 0;
-        $root->template = 'A';
-        $root->position = 0;
-
-        $root_id = $root->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
-
 
         //$root_parent_id = $this->insertSection($target_id);
         //$this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $root_id);
