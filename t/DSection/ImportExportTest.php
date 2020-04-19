@@ -16,14 +16,15 @@ class ImportExportTest extends ESuiteTest
         parent::setUp();
     }
 
-/*
+
     public function testSectionRootHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
-        $this->assertEquals('New Section', $output[0]['label']);
-        $this->assertEquals('This is a data item.', $output[0]['data'][0]['heading']);
+
+        $this->assertEquals('New Section', $output['label']);
+        $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
     }
 
     public function testHasSectionAndData()
@@ -31,8 +32,9 @@ class ImportExportTest extends ESuiteTest
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
-        $this->assertEquals('New Section', $output[0]['label']);
-        $this->assertEquals('This is a data item.', $output[0]['data'][0]['heading']);
+
+        $this->assertEquals('New Section', $output['label']);
+        $this->assertEquals('This is a data item.', $output['data'][0]['heading']);
     }
 
     public function testHasSection()
@@ -40,9 +42,8 @@ class ImportExportTest extends ESuiteTest
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
-        $this->assertEquals('New Section', $output[0]['label']);
+        $this->assertEquals('New Section', $output['label']);
     }
-
 
     public function testPopulateSection()
     {
@@ -54,11 +55,15 @@ class ImportExportTest extends ESuiteTest
         $ie->import(0, $output);
 
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
-        
+
+        print_r($output);
+        ob_flush();
+
         $this->assertEquals(2, sizeof($output));
     }
-    */
 
+
+/*
     public function testPopulateSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -72,4 +77,6 @@ class ImportExportTest extends ESuiteTest
 
         $this->assertEquals(2, sizeof($output));
     }
+    */
+
 }
