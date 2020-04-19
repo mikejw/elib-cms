@@ -16,7 +16,7 @@ class ImportExportTest extends ESuiteTest
         parent::setUp();
     }
 
-    
+/*
     public function testSectionRootHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -55,6 +55,21 @@ class ImportExportTest extends ESuiteTest
 
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
         
+        $this->assertEquals(2, sizeof($output));
+    }
+    */
+
+    public function testPopulateSectionAndData()
+    {
+        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
+        CurrentUser::detectUser();
+        CurrentUser::setUserID(1);
+        $ie = new ImportExport();
+        $output = $ie->export(1);
+        $ie->import(0, $output);
+
+        $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
+
         $this->assertEquals(2, sizeof($output));
     }
 }
