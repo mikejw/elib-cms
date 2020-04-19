@@ -142,12 +142,31 @@ class ImportExport
 
     public function export($target_id)
     {
+        $target_id = (int) $target_id;
         $target = Model::load('SectionItem');
         $target->id = $target_id;
         $target->load();
         $target_parent_id = $target->section_id;
 
         $sectionsData = $this->load($target_id);
+
+        if ($target_id === 0) {
+            $sectionsData = array(
+               'section_id' => null,
+               'label' => 'New Section',
+               'friendly_url' => null,
+               'template' => 'A',
+               'position' => 0,
+               'hidden' => false,
+               'stamp' => null,
+               'meta' => null,
+               'user_id' => null,
+               'children' => $sectionsData
+            );
+        } else {
+            $sectionsData = $sectionsData[0];
+        }
+
         return json_encode($sectionsData, JSON_PRETTY_PRINT);
     }
 
