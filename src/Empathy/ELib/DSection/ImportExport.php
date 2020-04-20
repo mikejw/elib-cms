@@ -51,46 +51,39 @@ class ImportExport
         return $s->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
-    private function insertData($target_id, $parent_id, $sectionParent = false)
+    private function insertData($parent_id, $data, $sectionParent = false)
     {
-        $target = Model::load('DataItem');
-        $target->id = $target_id;
-        $target->load();
-
-        $data = Model::load('DataItem');
-
+        $d = Model::load('DataItem');
         if ($sectionParent) {
-            $data->section_id = $parent_id;
+            $d->section_id = $parent_id;
         } else {
-            $data->data_item_id = $parent_id;
+            $d->data_item_id = $parent_id;
         }
 
-        $data->label = $target->label;
-        $data->user_id = $target->user_id;
-        $data->hidden = $target->hidden;
+        $d->label = $data['label'];
+        $d->user_id = $data['user_id'];
+        $d->hidden = $data['hidden'];
 
-        if ($target->image) {
+        if ($data['image']) {
             $attempt = 1;
             $success = false;
             $path = Config::get('DOC_ROOT') . '/public_html/uploads';
             while ($success === false) {
-                $name = $attempt . '___' . $target->image;
-                $success = copy($path . '/' . $target->image, $path . '/' . $name);
+                $name = $attempt . '___' . $data['image'];
+                $success = copy($path . '/' . $data['image'], $path . '/' . $name);
                 $attempt++;
             }
-            copy($path . '/' . 'l_' . $target->image, $path . '/' . 'l_' . $name);
-            copy($path . '/' . 'mid_' . $target->image, $path . '/' . 'mid_' . $name);
-            copy($path . '/' . 'tn_' . $target->image, $path . '/' . 'tn_' . $name);
+            copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
+            copy($path . '/' . 'mid_' . $data['image'], $path . '/' . 'mid_' . $name);
+            copy($path . '/' . 'tn_' . $data['image'], $path . '/' . 'tn_' . $name);
 
-            $data->image = $name;
-            $data->label = $name;
-        } else {
-            $data->image = $target->image;
+            $d->image = $name;
+            $d->label = $name;
         }
 
-        $data->body = $target->body;
-        $data->position = $target->position;
-        return $data->insert(Model::getTable('DataItem'), true, array(), Entity::SANITIZE_NO_POST);
+        $d->body = $data['body'];
+        $d->position = $data['position'];
+        return $d->insert(Model::getTable('DataItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
     private function populate($sectionsData, $parent_id)
@@ -108,13 +101,13 @@ class ImportExport
         }
     }
 
-    private function populateData($data, $parent_id, $sectionParent = false)
+    private function populateData($data, $parent_id)
     {
         foreach ($data as $item) {
-            $id = $this->insertData($item->id, $parent_id, $sectionParent);
+            $id = $this->insertData($item, $parent_id, false);
 
-            if (sizeof($item->data)) {
-                $this->populateData($item->data, $id);
+            if (sizeof($item['data'])) {
+                $this->populateData($item, $id, true);
             }
         }
     }
@@ -123,9 +116,10 @@ class ImportExport
     {
         $target_id = (int) $target_id;
         $target = Model::load('SectionItem');
+        $data = Model::load('DataItem');
         $target->id = $target_id;
         $target->load();
-        $target_parent_id = $target->section_id;
+
 
         $sectionsData = $this->load($target_id);
 
@@ -153,7 +147,8 @@ class ImportExport
                 'stamp' => $target->stamp,
                 'meta' => $target->meta,
                 'user_id' => $target->user_id,
-                'children' => $sectionsData
+                'children' => $sectionsData,
+                'data' => $data->getSectionDataRecursive($target->id)
             );
         }
         

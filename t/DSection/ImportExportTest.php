@@ -16,7 +16,6 @@ class ImportExportTest extends ESuiteTest
         parent::setUp();
     }
 
-    /*
     public function testSectionRootHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -32,7 +31,6 @@ class ImportExportTest extends ESuiteTest
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
-
         $this->assertEquals('New Section', $output['label']);
         $this->assertEquals('This is a data item.', $output['data'][0]['heading']);
     }
@@ -42,14 +40,11 @@ class ImportExportTest extends ESuiteTest
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
-        $this->assertEquals('New Section', $output['label']);
+        $this->assertEquals('New Test Section', $output['label']);
     }
-    */
 
-    /*
-     * needs more work!
-    */
-    public function testPopulateSection()
+
+    public function testPopulateSectionFromRoot()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
         CurrentUser::detectUser();
@@ -58,17 +53,12 @@ class ImportExportTest extends ESuiteTest
         $output = $ie->export(0);
         $ie->import(0, $output);
         $output = json_decode($ie->export(2), JSON_OBJECT_AS_ARRAY);
-
-        print_r($output);
-        ob_flush();
-
-        //$this->assertEquals(1, sizeof($output['children']));
+        $this->assertEquals('New Test Section', $output['children'][0]['label']);
     }
 
     /*
      * needs more work!
      */
-    /*
     public function testPopulateSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -79,8 +69,10 @@ class ImportExportTest extends ESuiteTest
         $ie->import(0, $output);
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
 
-        $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
+        print_r($output);
+        ob_flush();
+
+       // $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
     }
-    */
 
 }
