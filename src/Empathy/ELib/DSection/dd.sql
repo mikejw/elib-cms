@@ -9,7 +9,8 @@ template		CHAR(1)					NOT NULL DEFAULT 'A',
 position		INT(11)					NOT NULL, 
 hidden			BINARY(1)				NOT NULL DEFAULT 0,
 stamp			TIMESTAMP				NOT NULL,
-meta			TEXT					NULL);
+meta			TEXT					NULL,
+user_id			INT(11)					NULL);
 
 CREATE TABLE 		data_item(
 id			INT(11)					AUTO_INCREMENT PRIMARY KEY,
