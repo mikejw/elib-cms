@@ -150,8 +150,21 @@ class ImportExport
                'children' => $sectionsData
             );
         } else {
-            $sectionsData = $sectionsData[0];
+            $sectionsData = array(
+                'section_id' => $target['section_id'],
+                'label' => $target['label'],
+                'friendly_url' => $target['friendly_url'],
+                'template' => $target['template'],
+                'position' => $target['position'],
+                'hidden' => $target['hidden'],
+                'stamp' => $target['stamp'],
+                'meta' => $target['meta'],
+                'user_id' => $target['user_id'],
+                'children' => $sectionsData
+            );
         }
+        
+//   $sectionsData = $sectionsData[0];
 
         return json_encode($sectionsData, JSON_PRETTY_PRINT);
     }
