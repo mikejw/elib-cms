@@ -132,16 +132,17 @@ class ImportExport
 
         if ($target_id === 0) {
             $sectionsData = array(
-               'section_id' => null,
-               'label' => 'New Section',
-               'friendly_url' => null,
-               'template' => 'A',
-               'position' => 0,
-               'hidden' => 0,
-               'stamp' => null,
-               'meta' => null,
-               'user_id' => null,
-               'children' => $sectionsData
+                'section_id' => null,
+                'label' => 'New Section',
+                'friendly_url' => null,
+                'template' => 'A',
+                'position' => 0,
+                'hidden' => 0,
+                'stamp' => null,
+                'meta' => null,
+                'user_id' => null,
+                'children' => $sectionsData,
+                'data' => $data->getSectionDataRecursive(0)
             );
         } else {
             $sectionsData = array(
