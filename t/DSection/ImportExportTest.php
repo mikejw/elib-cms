@@ -15,7 +15,7 @@ class ImportExportTest extends ESuiteTest
     {
         parent::setUp();
     }
-
+    
     public function testSectionRootHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -43,7 +43,6 @@ class ImportExportTest extends ESuiteTest
         $this->assertEquals('New Test Section', $output['label']);
     }
 
-
     public function testPopulateSectionFromRoot()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
@@ -56,9 +55,7 @@ class ImportExportTest extends ESuiteTest
         $this->assertEquals('New Test Section', $output['children'][0]['label']);
     }
 
-    /*
-     * needs more work!
-     */
+
     public function testPopulateSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
@@ -69,10 +66,6 @@ class ImportExportTest extends ESuiteTest
         $ie->import(0, $output);
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
 
-        print_r($output);
-        ob_flush();
-
         $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
     }
-
 }
