@@ -72,7 +72,7 @@ class ImportExportTest extends ESuiteTest
         print_r($output);
         ob_flush();
 
-       // $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
+        $this->assertEquals('This is a data item.', $output['children'][0]['data'][0]['heading']);
     }
 
 }

@@ -118,7 +118,6 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         }
  
         if ($recursive) {
-
             $i = 0;
             foreach ($data_set as $index => $item) {            
 
@@ -126,12 +125,6 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 $data->id = $item['id'];
                 $data->load();                
 
-                $props = $data->getProperties();
-                foreach ($props as $p) {
-                    if ($data->$p === null || $data->$p == '0') {
-                        unset($data->$p);
-                    }
-                }
                 if ($data->isContainer()) {
                     $data->getData(true);
                 }

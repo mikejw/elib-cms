@@ -51,7 +51,7 @@ class ImportExport
         return $s->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
-    private function insertData($parent_id, $data, $sectionParent = false)
+    private function insertData($parent_id, $data, $sectionParent)
     {
         $d = Model::load('DataItem');
         if ($sectionParent) {
@@ -63,6 +63,14 @@ class ImportExport
         $d->label = $data['label'];
         $d->user_id = $data['user_id'];
         $d->hidden = $data['hidden'];
+        $d->container_id = $data['container_id'];
+        $d->heading = $data['heading'];
+        $d->body = $data['body'];
+        $d->position = $data['position'];
+        $d->video = $data['video'];
+        $d->positino = $data['position'];
+        $d->meta = $data['meta'];
+        $d->stamp = $data['stamp'];
 
         if ($data['image']) {
             $attempt = 1;
@@ -80,9 +88,6 @@ class ImportExport
             $d->image = $name;
             $d->label = $name;
         }
-
-        $d->body = $data['body'];
-        $d->position = $data['position'];
         return $d->insert(Model::getTable('DataItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
@@ -101,13 +106,13 @@ class ImportExport
         }
     }
 
-    private function populateData($data, $parent_id)
+    private function populateData($data, $parent_id, $sectionParent = true)
     {
         foreach ($data as $item) {
-            $id = $this->insertData($item, $parent_id, false);
+            $id = $this->insertData($parent_id, $item, $sectionParent);
 
             if (sizeof($item['data'])) {
-                $this->populateData($item, $id, true);
+                $this->populateData($id, $item['data'],false);
             }
         }
     }
