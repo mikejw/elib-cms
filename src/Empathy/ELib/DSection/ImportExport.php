@@ -45,31 +45,17 @@ class ImportExport
         return $sectionsData;
     }
 
-    private function insertSection($target_id, $parent_id = null)
+    private function insertSection($parent_id, $section)
     {
-        $target = Model::load('SectionItem');
-        $target->id = $target_id;
-        $target->load();
-
-        $section = Model::load('SectionItem');
-
-        if ($parent_id) {
-            $section->section_id = $parent_id;
-        } else {
-            if ($target->secttion_id = 0) {
-                $section->section_id = 0;
-            } else {
-                $section->section_id = $target->section_id;
-            }
-        }
-
-        $section->label = $target->label;
-        $section->user_id = CurrentUser::getUserID();
-        $section->hidden = $target->hidden;
-        $section->template = $target->template;
-        $section->position = $target->position;
-        $section->meta = $target->meta;
-        return $section->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
+        $s = Model::load('SectionItem');
+        $s->section_id = $parent_id;
+        $s->label = $section['label'];
+        $s->user_id = CurrentUser::getUserID();
+        $s->hidden = $section['hidden'];
+        $s->template = $section['template'];
+        $s->position = $section['position'];
+        $s->meta = $section['meta'];
+        return $s->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
     private function insertData($target_id, $parent_id, $sectionParent = false)
@@ -117,14 +103,14 @@ class ImportExport
     private function populate($sectionsData, $parent_id)
     {
         foreach ($sectionsData as $item) {
-            $id = $this->insertSection($item->id, $parent_id);
+            $id = $this->insertSection($parent_id, $item);
 
-            if (sizeof($item->children)) {
-                $this->populate($item->children, $id);
+            if (isset($item['children']) && sizeof($item['children'])) {
+                $this->populate($item['children'], $id);
             }
 
-            if (sizeof($item->data)) {
-                $this->populateData($item->data, $id, true);
+            if (isset($item['data']) && sizeof($item['data'])) {
+                $this->populateData($item['data'], $id);
             }
         }
     }
@@ -157,7 +143,7 @@ class ImportExport
                'friendly_url' => null,
                'template' => 'A',
                'position' => 0,
-               'hidden' => false,
+               'hidden' => 0,
                'stamp' => null,
                'meta' => null,
                'user_id' => null,
@@ -172,9 +158,8 @@ class ImportExport
 
     public function import($target_parent_id, $sectionsData)
     {
-
-        //$root_parent_id = $this->insertSection($target_id);
-        //$this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $root_id);
+        $sectionsData = '[' . $sectionsData . ']';
+        $this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $target_parent_id);
     }
 }
 

@@ -101,7 +101,7 @@ class SectionItem extends Entity
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label, hidden, meta FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $sql = 'SELECT id,label, position, template, hidden, meta FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
 
         if ($tree->getDetectHidden()) {
             $sql .= ' and hidden != true';
@@ -119,6 +119,8 @@ class SectionItem extends Entity
                 $nodes[$i]['hidden'] = $row['hidden'];
                 $nodes[$i]['label'] = $row['label'];
                 $nodes[$i]['meta'] = $row['meta'];
+                $nodes[$i]['template'] = $row['template'];
+                $nodes[$i]['position'] = $row['position'];
                 $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
                 $i++;
             }

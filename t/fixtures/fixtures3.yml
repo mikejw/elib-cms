@@ -21,7 +21,7 @@ Empathy\ELib\Storage\UserItem:
 Empathy\ELib\Storage\SectionItem:
   section1:
     section_id: 0
-    label: 'New Section'
+    label: 'New Test Section'
     friendly_url: null
     template: 'A'
     position: 0
