@@ -25,13 +25,6 @@ class ImportExport
             true
         ));
 
-        if (sizeof($sections) < 1) {
-            $sections = $section->getAllCustom(
-                Model::getTable('SectionItem'),
-                ' where id = ' . $section_id
-             );
-        }
-
         foreach ($sections as &$item) {
             $item['type'] = 'section';
             $data = Model::load('DataItem');
@@ -163,9 +156,7 @@ class ImportExport
                 'children' => $sectionsData
             );
         }
-
-//   $sectionsData = $sectionsData[0];
-
+        
         return json_encode($sectionsData, JSON_PRETTY_PRINT);
     }
 
