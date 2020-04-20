@@ -71,11 +71,12 @@ class ImportExport
         $d->positino = $data['position'];
         $d->meta = $data['meta'];
         $d->stamp = $data['stamp'];
+        $d->image = $data['image'];
 
-        if ($data['image']) {
+        $path = Config::get('DOC_ROOT') . '/public_html/uploads';
+        if (file_exists($path . '/' . $data['image'])) {
             $attempt = 1;
             $success = false;
-            $path = Config::get('DOC_ROOT') . '/public_html/uploads';
             while ($success === false) {
                 $name = $attempt . '__' . $data['image'];
                 if (!file_exists($path . '/' . $name)) {
@@ -86,7 +87,6 @@ class ImportExport
             copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
             copy($path . '/' . 'mid_' . $data['image'], $path . '/' . 'mid_' . $name);
             copy($path . '/' . 'tn_' . $data['image'], $path . '/' . 'tn_' . $name);
-
             $d->image = $name;
             $d->label = $name;
         }
