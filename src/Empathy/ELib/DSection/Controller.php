@@ -1020,6 +1020,7 @@ class Controller extends AdminController
             $ie = new ImportExport();
             $content = $_POST['content'];
             $ie->import($parent_id, $content);
+            $this->redirect('admin/dsection');
         }
 
         $this->assign('parent_id', $parent_id);

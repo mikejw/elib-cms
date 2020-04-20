@@ -77,8 +77,10 @@ class ImportExport
             $success = false;
             $path = Config::get('DOC_ROOT') . '/public_html/uploads';
             while ($success === false) {
-                $name = $attempt . '___' . $data['image'];
-                $success = copy($path . '/' . $data['image'], $path . '/' . $name);
+                $name = $attempt . '__' . $data['image'];
+                if (!file_exists($path . '/' . $name)) {
+                    $success = copy($path . '/' . $data['image'], $path . '/' . $name);
+                }
                 $attempt++;
             }
             copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
