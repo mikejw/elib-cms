@@ -100,7 +100,7 @@ class ImportExport
                 $this->populate($item['children'], $id);
             }
 
-            if (isset($item['data']) && sizeof($item['data'])) {
+            if (isset($item['data']) && is_array($item['data'])) {
                 $this->populateData($item['data'], $id);
             }
         }
@@ -112,7 +112,7 @@ class ImportExport
             $id = $this->insertData($parent_id, $item, $sectionParent);
 
             if (sizeof($item['data'])) {
-                $this->populateData($id, $item['data'],false);
+                $this->populateData($item['data'], $id, false);
             }
         }
     }
