@@ -75,18 +75,25 @@ class ImportExport
 
         $path = Config::get('DOC_ROOT') . '/public_html/uploads';
         if ($data['image'] && file_exists($path . '/' . $data['image'])) {
-            $attempt = 1;
+            $attempt = 0;
             $success = false;
             while ($success === false) {
+                $attempt++;
                 $name = $attempt . '__' . $data['image'];
                 if (!file_exists($path . '/' . $name)) {
                     $success = copy($path . '/' . $data['image'], $path . '/' . $name);
                 }
-                $attempt++;
             }
-            copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
-            copy($path . '/' . 'mid_' . $data['image'], $path . '/' . 'mid_' . $name);
-            copy($path . '/' . 'tn_' . $data['image'], $path . '/' . 'tn_' . $name);
+            if (file_exists($path . '/' . 'l_' . $data['image'])) {
+                copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
+            }
+            if (file_exists($path . '/' . 'mid_' . $data['image'])) {
+                copy($path . '/' . 'mid_' . $data['image'], $path . '/' . 'mid_' . $name);
+            }
+            if (file_exists($path . '/' . 'tn_' . $data['image'])) {
+                copy($path . '/' . 'tn_' . $data['image'], $path . '/' . 'tn_' . $name);
+            }
+
             $d->image = $name;
             $d->label = $name;
         }
