@@ -130,7 +130,12 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 }
                 if ($disconnect) {                    
                     $data->dbDisconnect();
-                }            
+                }
+
+                if ($data->body) {
+                    $data->body = str_replace("\r\n", '\n', $data->body);
+                }
+
                 $this->data[$i] = $data; 
                 $i++;
             }
