@@ -74,7 +74,7 @@ class ImportExport
         $d->image = $data['image'];
 
         $path = Config::get('DOC_ROOT') . '/public_html/uploads';
-        if (file_exists($path . '/' . $data['image'])) {
+        if ($data['image'] && file_exists($path . '/' . $data['image'])) {
             $attempt = 1;
             $success = false;
             while ($success === false) {
