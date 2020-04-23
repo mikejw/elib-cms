@@ -37,12 +37,18 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public $stamp;
 
     private $data;
-
+    private $export;
 
     public function __construct()
     {
         parent::__construct();
         $this->data = array();
+        $this->export = false;
+    }
+
+    public function setExporting()
+    {
+        $this->export = true;
     }
 
     public function setData($data) {
@@ -122,6 +128,9 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             foreach ($data_set as $index => $item) {            
 
                 $data = Model::load('DataItem');
+                if ($this->export) {
+                    $data->setExporting();
+                }
                 $data->id = $item['id'];
                 $data->load();                
 
@@ -132,14 +141,15 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                     $data->dbDisconnect();
                 }
 
-                if ($data->body) {
-                    $data->body = preg_replace("!\r?\n!", "\n", $data->body);
-                    $data->body = preg_replace("!&nbsp;!", "", $data->body);
-                }
-
-                if ($data->meta) {
-                    $data->meta = preg_replace("!\r?\n!", "\n", $data->meta);
-                    $data->meta = preg_replace("!&nbsp;!", "", $data->meta);
+                if ($this->export) {
+                    if ($data->body) {
+                        $data->body = preg_replace("!\r?\n!", "\n", $data->body);
+                        $data->body = preg_replace("!&nbsp;!", "", $data->body);
+                    }
+                    if ($data->meta) {
+                        $data->meta = preg_replace("!\r?\n!", "\n", $data->meta);
+                        $data->meta = preg_replace("!&nbsp;!", "", $data->meta);
+                    }
                 }
 
                 $this->data[$i] = $data; 

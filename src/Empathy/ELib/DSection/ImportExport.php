@@ -28,6 +28,7 @@ class ImportExport
         foreach ($sections as &$item) {
             $item['type'] = 'section';
             $data = Model::load('DataItem');
+            $data->setExporting();
             $item['data'] = $data->getSectionDataRecursive($item['id']);
 
             if (isset($item['children']) && sizeof($item['children'])) {
@@ -72,6 +73,10 @@ class ImportExport
         $d->meta = $data['meta'];
         $d->stamp = $data['stamp'];
         $d->image = $data['image'];
+
+        if ($data['image']) {
+            $data['image'] = escapeshellarg($data['image']);
+        }
 
         $path = Config::get('DOC_ROOT') . '/public_html/uploads';
         if ($data['image'] && file_exists($path . '/' . $data['image'])) {
