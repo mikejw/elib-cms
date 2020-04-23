@@ -133,13 +133,13 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 }
 
                 if ($data->body) {
-                    $data->body = preg_replace("!\r?\n!", "", $data->body);
-                    $data->body = preg_replace('/\xc2\xa0/', '', $data->body);
+                    $data->body = preg_replace("!\r?\n!", "\n", $data->body);
+                    $data->body = preg_replace("!&nbsp;!", "", $data->body);
                 }
 
                 if ($data->meta) {
-                    $data->meta = preg_replace("!\r?\n!", "", $data->meta);
-                    $data->meta = preg_replace('/\xc2\xa0/', '', $data->meta);
+                    $data->meta = preg_replace("!\r?\n!", "\n", $data->meta);
+                    $data->meta = preg_replace("!&nbsp;!", "", $data->meta);
                 }
 
                 $this->data[$i] = $data; 
