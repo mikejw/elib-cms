@@ -2,8 +2,9 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\ELib\Model;
+use Empathy\MVC\Entity;
+
 
 
 
@@ -49,8 +50,8 @@ class SectionItem extends Entity
 
     public function validates()
     {
-        if ($this->label == '' || !ctype_alnum(str_replace(' ', '', $this->label))) {
-            $this->addValError('Invalid label');
+        if ($this->label == '' || !ctype_alnum(str_replace(array(' ', '-'), '', $this->label))) {
+           $this->addValError('Invalid label');
         }
     }
 
