@@ -324,7 +324,35 @@ class Controller extends AdminController
             $s->id = $_GET['id'];
             $s->load();
 
-            $t = array('0' => '0', 'A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F');
+            $t = array(
+                '0' => '0',
+                'A' => 'A',
+                'B' => 'B',
+                'C' => 'C',
+                'D' => 'D',
+                'E' => 'E',
+                'F' => 'F',
+                'G' => 'G',
+                'H' => 'H',
+                'I' => 'I',
+                'J' => 'J',
+                'K' => 'K',
+                'L' => 'L',
+                'M' => 'M',
+                'N' => 'N',
+                'O' => 'O',
+                'P' => 'P',
+                'Q' => 'Q',
+                'R' => 'R',
+                'S' => 'S',
+                'T' => 'T',
+                'U' => 'U',
+                'V' => 'V',
+                'W' => 'W',
+                'X' => 'X',
+                'Y' => 'Y',
+                'Z' => 'Z'
+            );
 
             $this->presenter->assign('templates', $t);
             $this->presenter->assign('section', $s);
