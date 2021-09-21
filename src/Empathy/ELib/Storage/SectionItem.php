@@ -97,17 +97,25 @@ class SectionItem extends Entity
         $this->query($sql, $error);
     }
 
-    public function buildTree($current, $tree)
+    public function buildTree($current, $tree, $order=array(), $asc=true)
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label, position, template, hidden, meta FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $sql = 'SELECT id,label, position, template, hidden, meta, UNIX_TIMESTAMP(stamp) as stamp FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
 
         if ($tree->getDetectHidden()) {
             $sql .= ' and hidden != true';
         }
 
-        $sql .= ' order by position';
+        if (sizeof($order)) {
+            $orderBy = implode(',', $order);
+        } else {
+            $orderBy = 'position';
+        }
+        $sql .= ' order by '.$orderBy;
+
+        $sql .= $asc ? ' ASC' : ' DESC';
+
         $error = 'Could not get child sections.';
 
         $result = $this->query($sql, $error);
@@ -119,6 +127,7 @@ class SectionItem extends Entity
                 $nodes[$i]['hidden'] = $row['hidden'];
                 $nodes[$i]['label'] = $row['label'];
                 $nodes[$i]['meta'] = $row['meta'];
+                $nodes[$i]['stamp'] = $row['stamp'];
                 $nodes[$i]['template'] = $row['template'];
                 $nodes[$i]['position'] = $row['position'];
                 $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
