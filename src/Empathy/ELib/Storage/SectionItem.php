@@ -130,7 +130,7 @@ class SectionItem extends Entity
                 $nodes[$i]['stamp'] = $row['stamp'];
                 $nodes[$i]['template'] = $row['template'];
                 $nodes[$i]['position'] = $row['position'];
-                $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
+                $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree, $order, $asc);
                 $i++;
             }
         }
@@ -147,7 +147,7 @@ class SectionItem extends Entity
                     $nodes[$i]['id'] = $id;
                     $nodes[$i]['data'] = 1;
                     $nodes[$i]['label'] = $row['label'];
-                    $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
+                    $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree, $order, $asc);
                     $i++;
                 }
             }
