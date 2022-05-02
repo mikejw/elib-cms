@@ -360,12 +360,21 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         $this->query($sql, $error);
     }
 
-    public function buildTree($current, $tree)
+    public function buildTree($current, $tree, $order=array(), $asc=true)
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE data_item_id = '.$current
-            .' ORDER BY position';
+        $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE data_item_id = '.$current;
+
+        if (sizeof($order)) {
+            $orderBy = implode(',', $order);
+        } else {
+            $orderBy = 'position';
+        }
+        $sql .= ' order by '.$orderBy;
+
+        $sql .= $asc ? ' ASC' : ' DESC';
+
         $error = 'Could not get child data items.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -374,11 +383,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 $nodes[$i]['id'] = $id;
                 $nodes[$i]['data'] = 1;
                 $nodes[$i]['label'] = $row['label'];
-                $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
+                $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree, $order, $asc);
                 $i++;
             }
         }
-
         return $nodes;
     }
 
