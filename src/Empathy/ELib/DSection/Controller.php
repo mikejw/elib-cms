@@ -169,7 +169,7 @@ class Controller extends AdminController
             } else {
                 $images = ImageUpload::reArrayFiles($_FILES['file']);                
             }
-           
+
             foreach($images as $img) {
                 $_FILES['file'] = $img;
 
@@ -182,6 +182,8 @@ class Controller extends AdminController
                     $d->label = $u->getFileEncoded();
                     $d->section_id = $_GET['id'];
                     $d->image = $u->getFile();
+                    $d->image_width = $u->getDimensions()[0];
+                    $d->image_height = $u->getDimensions()[1];
                     $d->position = 'DEFAULT';
                     $d->hidden = 'DEFAULT';
                     $su = Model::load('SectionItem');
@@ -654,6 +656,8 @@ class Controller extends AdminController
                     $d->label = $u->getFileEncoded();
                     $d->data_item_id = $_GET['id'];
                     $d->image = $u->getFile();
+                    $d->image_width = $u->getDimensions()[0];
+                    $d->image_height = $u->getDimensions()[1];
                     $d->position = 'DEFAULT';
                     $d->hidden = 'DEFAULT';
                     $new_id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);

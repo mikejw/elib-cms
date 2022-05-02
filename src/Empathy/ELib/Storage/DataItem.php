@@ -29,6 +29,8 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public $heading;
     public $body;
     public $image;
+    public $image_width;
+    public $image_height;
     public $video;
     public $user_id;
     public $position;
