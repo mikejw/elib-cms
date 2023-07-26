@@ -6,7 +6,7 @@ use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Config;
-use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\DI;
 
 class ImportExport
 {
@@ -44,7 +44,7 @@ class ImportExport
         $s = Model::load('SectionItem');
         $s->section_id = $parent_id;
         $s->label = $section['label'];
-        $s->user_id = CurrentUser::getUserID();
+        $s->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         $s->hidden = $section['hidden'];
         $s->template = $section['template'];
         $s->position = $section['position'];

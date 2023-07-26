@@ -4,7 +4,7 @@ namespace Empathy\ELib\Storage;
 
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
-use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\DI;
 use Empathy\MVC\Config;
 use Michelf\Markdown;
 
@@ -441,7 +441,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function insert($table, $id, $format, $sanitize, $force_id=false)
     {
         if ($this->user_id === null) {
-            $this->user_id = CurrentUser::getUserID();
+            $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         }
         return parent::insert($table, $id, $format, $sanitize, $force_id);
     }
