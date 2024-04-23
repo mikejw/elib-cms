@@ -57,27 +57,28 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         $this->data = $data;
     }
 
-    public function rewind()
+    public function rewind(): void
     {
         reset($this->data);
     }
   
-    public function current()
+    public function current(): mixed
     {
         return current($this->data);
     }
   
-    public function key() 
+    public function key(): mixed 
     {
         return key($this->data);
     }
-  
-    public function next() 
+
+    #[\ReturnTypeWillChange]
+    public function next()
     {
         return next($this->data);
     }
   
-    public function valid()
+    public function valid(): bool
     {
         $key = key($this->data);
         $var = ($key !== null && $key !== false);
@@ -90,7 +91,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return get_object_vars($this);
     }
