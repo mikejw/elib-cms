@@ -161,7 +161,7 @@ class Controller extends AdminController
         if (isset($_POST['save'])) {
 
             $_GET['id'] = $_POST['id'];
-
+	    
             $images = array(); 
             if (!is_array($_FILES['file']['name'])) {
                  
@@ -253,6 +253,7 @@ class Controller extends AdminController
             $s->template = 'DEFAULT';
             $s->position = 'DEFAULT';
             $s->hidden = 'DEFAULT';
+	    $s->stamp = 'MYSQLTIME';
             $s->insert(Model::getTable('SectionItem'), 1, array(), 0);
             $this->clearCache();
         }
@@ -642,7 +643,8 @@ class Controller extends AdminController
             } else {
                 $images = ImageUpload::reArrayFiles($_FILES['file']);                
             }
-           
+
+	    $new_id = null;
             foreach($images as $img) {
                 $_FILES['file'] = $img;
 
@@ -660,12 +662,15 @@ class Controller extends AdminController
                     $d->image_height = $u->getDimensions()[1];
                     $d->position = 'DEFAULT';
                     $d->hidden = 'DEFAULT';
-                    $new_id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+                    $id = $d->insert(Model::getTable('DataItem'), 1, array(), 1);
+		    if ($new_id === null) {
+		       $new_id = $id;
+		    }
                     // $this->update_timestamps($d->data_item_id);
                     // $this->clearCache();
-                    $this->redirect('admin/dsection/data_item/'.$new_id);
-                }                
+                }
             }
+	    $this->redirect('admin/dsection/data_item/'.$new_id);
             
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/data_item/'.$_GET['id']);
