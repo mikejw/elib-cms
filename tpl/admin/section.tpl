@@ -30,6 +30,11 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_section/{$section_id}"
        class="btn btn-sm btn-primary">Import</a>
 
+        {if $section_id > 0}        
+            <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_container/{$section_id}?section=true"
+            class="btn btn-sm btn-primary">Import Data</a>
+         {/if}
+
     {else}
 
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}"
@@ -41,6 +46,14 @@
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename_data_item/{$data_item_id}"
      class="btn btn-sm btn-primary{if $event eq 'rename'} disabled{/if}">Rename</a>
 
+      {if $is_container}
+
+        <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/export_container/{$data_item_id}"
+             class="btn btn-sm btn-primary">Export</a>
+
+        <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_container/{$data_item_id}"
+             class="btn btn-sm btn-primary">Import</a>
+      {/if}
 
     {/if}
 
@@ -121,6 +134,12 @@
 {include file="elib:/admin/sections/import_export.tpl"}
 {elseif $event eq 'import_section'}
 {include file="elib:/admin/sections/import_export.tpl"}
+
+{elseif $event eq 'export_container'}
+{include file="elib:/admin/sections/import_export_container.tpl"}
+{elseif $event eq 'import_container'}
+{include file="elib:/admin/sections/import_export_container.tpl"}
+
 {/if}
 
 {if isset($errors)}

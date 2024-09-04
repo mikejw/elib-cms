@@ -1034,6 +1034,50 @@ class Controller extends AdminController
 
         $this->assign('parent_id', $parent_id);
         $this->assign('content', $content);
+    }
 
+
+    public function export_container() {
+        $this->buildNavData();
+        $this->setTemplate('elib:/admin/section.tpl');
+        $output = '';
+        $target_id = $_GET['id'];
+
+        if (isset($_POST['submit'])) {
+            $ie = new ImportExport();
+            $output = $ie->exportContainer($_POST['target_id']);
+            $target_id = $_POST['target_id'];
+        }
+
+        $this->assign('target_id', $target_id);
+        $this->assign('output', $output);
+    }
+
+    public function import_container() {
+
+        $topLevelSection = false;
+        if (isset($_GET['section']) && $_GET['section']) {
+            $topLevelSection = true;
+            $this->buildNav();
+        } else {
+            $this->buildNavData();    
+        }
+
+        
+        $this->setTemplate('elib:/admin/section.tpl');
+        $this->assertID();
+        $content = '';
+        $parent_id = $_GET['id'];
+
+        if (isset($_POST['submit'])) {
+            $parent_id = $_POST['parent_id'];
+            $ie = new ImportExport();
+            $content = $_POST['content'];
+            $ie->importContainer($parent_id, $content, $topLevelSection);
+            $this->redirect('admin/dsection');
+        }
+
+        $this->assign('parent_id', $parent_id);
+        $this->assign('content', $content);
     }
 }
