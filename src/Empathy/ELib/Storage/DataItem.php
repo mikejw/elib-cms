@@ -122,7 +122,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 array_push($data_set, array('id' => $d)); 
             }
         } else {
-            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id
+            $data_set = $this->getAllCustom(self::TABLE, ' where data_item_id = '.$this->id
                 .' and hidden != 1 order by position');
         }
  
@@ -251,9 +251,6 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 case self::FIND_BODY:
                     if (isset($d->body)) {
                         $item = $d;
-                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {                            
-                            $item->convertToMarkdown();
-                        }
                     }
                     break;
                 case self::FIND_IMAGE:
@@ -263,6 +260,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                     break;                    
                 default:
                     throw new \Exception('No valid find type.');
+            }
+
+            if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {                            
+                $item->convertToMarkdown();
             }
 
             if ($item !== null) {
@@ -446,8 +447,5 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         }
         return parent::insert($table, $id, $format, $sanitize, $force_id);
     }
-
-
-
 
 }
