@@ -195,7 +195,9 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function convertToMarkdown()
     {
-        $this->body = Markdown::defaultTransform($this->body);
+        if ($this->body) {
+            $this->body = Markdown::defaultTransform($this->body);    
+        }
     }
 
 
