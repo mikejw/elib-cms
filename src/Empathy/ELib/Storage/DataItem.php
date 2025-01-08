@@ -20,6 +20,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     const FIND_OPT_CONVERT_MD = 5;
     const FIND_OPT_MATCH_META = 6;
     const FIND_HEADING = 7;
+    const FIND_ALL = 8;
 
     public $id;
     public $data_item_id;
@@ -242,7 +243,15 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             switch ($type) {
                 case self::FIND_LABEL:                  
                     if (isset($d->label)) {
-                        $item = $d;
+                        if (in_array(self::FIND_ALL, $options)) {
+                          if (!is_array($item)) {
+                            $item = array();
+                          }
+                          array_push($item, $d);
+                          continue 2;
+                        } else {
+                          $item = $d;
+                        }
                     }
                     break;
                 case self::FIND_HEADING:
