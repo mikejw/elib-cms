@@ -75,7 +75,6 @@ class ImportExport
         $d->body = $data['body'];
         $d->position = $data['position'];
         $d->video = $data['video'];
-        $d->positino = $data['position'];
         $d->meta = $data['meta'];
         $d->stamp = $data['stamp'];
         $d->image = $data['image'];
