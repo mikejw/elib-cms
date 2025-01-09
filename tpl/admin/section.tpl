@@ -10,7 +10,7 @@
 
 
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_section/{$section_id}"
-     class="btn btn-sm btn-primary{if $class eq 'dsection' && $event eq 'data_item'} disabled{/if}">Add Section</a>
+     class="btn btn-sm btn-primary{if $class eq 'data_item' or ($class eq 'dsection' && $event eq 'data_item')} disabled{/if}">Add Section</a>
 
 
     {if $class eq 'dsection' && $event neq 'data_item'}
@@ -38,7 +38,7 @@
     {else}
 
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}"
-     class="btn btn-sm btn-primary{if $event eq 'add_data' || !$is_container} disabled{/if}">Add Data</a>
+     class="btn btn-sm btn-primary{if $event eq 'add_data' || $event eq 'data_add_data' || !$is_container} disabled{/if}">Add Data</a>
 
     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete_data_item/{$data_item_id}"
      class="confirm btn btn-sm btn-primary">Delete</a>
@@ -112,8 +112,10 @@
 {include file="elib:/admin/sections/add_data_heading.tpl"}
 {elseif $event eq 'add_data_body' || $event eq 'data_add_data_body'}
 {include file="elib:/admin/sections/add_data_body.tpl"}
-{elseif $event eq 'add_data_image'}
+{elseif $event eq 'add_data_image' || $event eq 'data_add_data_image'}
 {include file="elib:/admin/sections/add_data_image.tpl"}
+{elseif $event eq 'add_data_audio'|| $event eq 'data_add_data_audio'}
+{include file="elib:/admin/sections/add_data_audio.tpl"}
 {elseif $event eq 'add_data_video' || $event eq 'data_add_data_video'}
 {include file="elib:/admin/sections/add_data_video.tpl"}
 {elseif $event eq 'data_item'}
