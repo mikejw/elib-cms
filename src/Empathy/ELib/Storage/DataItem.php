@@ -21,6 +21,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     const FIND_OPT_MATCH_META = 6;
     const FIND_HEADING = 7;
     const FIND_ALL = 8;
+    const FIND_DEEP_ALL = 9;
 
     public $id;
     public $data_item_id;
@@ -246,7 +247,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             switch ($type) {
                 case self::FIND_LABEL:
                     if (isset($d->label)) {
-                        if (in_array(self::FIND_ALL, $options)) {
+                        if (
+                            in_array(self::FIND_ALL, $options) ||
+                            in_array(self::FIND_DEEP_ALL, $options)
+                        ) {
                             if (!is_array($item)) {
                                 $item = array();
                             }
@@ -282,10 +286,15 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
             if ($item !== null) {
                 break;
-            } else {
-                if ($d->hasData()) {
-                    $item = $d->find($type, $pattern, $options);
-                }
+            } else if ($d->hasData()) {
+                $item = $d->find($type, $pattern, $options);
+            }
+        }
+
+        if (in_array(self::FIND_DEEP_ALL, $options) && $d->hasData()) {
+            $deepItem = $d->find($type, $pattern, $options);
+            if ($deepItem !== null) {
+                $item = array_merge($item, $deepItem);
             }
         }
 
@@ -475,6 +484,11 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         if ($this->user_id === null) {
             $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         }
+
+        if ($this->stamp === null) {
+            $this->stamp = 'MYSQLTIME';
+        }
+
         return parent::insert($table, $id, $format, $sanitize, $force_id);
     }
 
