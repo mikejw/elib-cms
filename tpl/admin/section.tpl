@@ -86,7 +86,7 @@
 
 <div class="col-md-5">
 
-{if $section_id != 0}
+{if $section_id != 0 || $data_item_id != 0}
 <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/0">Top Level</a></p>
 {else}
     <p>&nbsp;</p>
