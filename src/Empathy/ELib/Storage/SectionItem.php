@@ -4,7 +4,7 @@ namespace Empathy\ELib\Storage;
 
 use Empathy\ELib\Model,
     Empathy\MVC\Entity;
-
+use Empathy\MVC\DI;
 
 
 class SectionItem extends Entity
@@ -211,4 +211,11 @@ class SectionItem extends Entity
         return $sections;
     }
 
+    public function insert($table, $id, $format, $sanitize, $force_id = false)
+    {
+        if ($this->user_id === null) {
+            $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
+        }
+        return parent::insert($table, $id, $format, $sanitize, $force_id);
+    }
 }

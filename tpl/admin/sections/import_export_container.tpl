@@ -1,9 +1,9 @@
 
-{if $event eq 'export_section'}
+{if $event eq 'export_container'}
 
 <form action="" method="post">
     <fieldset>
-        <legend>Export Section</legend>
+        <legend>Export Data Item Container</legend>
         <p>
             <label>Target ID:</label>
             <input class="form-control" type="text" name="target_id" value="{$target_id}" />
@@ -17,11 +17,11 @@
     </fieldset>
 </form>
 
-{elseif $event eq 'import_section'}
+{elseif $event eq 'import_container'}
 
     <form action="" method="post">
         <fieldset>
-            <legend>Import Section</legend>
+            <legend>Import Data Item Container</legend>
             <p>
                 <label>Parent ID:</label>
                 <input class="form-control" type="text" name="parent_id" value="{$parent_id}" />

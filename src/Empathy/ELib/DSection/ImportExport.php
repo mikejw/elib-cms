@@ -49,13 +49,19 @@ class ImportExport
         $s->template = $section['template'];
         $s->position = $section['position'];
         $s->meta = $section['meta'];
+        $s->stamp = $section['stamp'] ?
+            is_numeric($section['stamp']) ?
+                date('Y-m-d H:i:s', $section['stamp'])
+                : $section['stamp']
+            : 'MYSQLTIME';
+
         return $s->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
-    private function insertData($parent_id, $data, $sectionParent)
+    private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
     {
         $d = Model::load('DataItem');
-        if ($sectionParent) {
+        if ($sectionParent || $topLevelSection) {
             $d->section_id = $parent_id;
         } else {
             $d->data_item_id = $parent_id;
@@ -69,13 +75,12 @@ class ImportExport
         $d->body = $data['body'];
         $d->position = $data['position'];
         $d->video = $data['video'];
-        $d->positino = $data['position'];
         $d->meta = $data['meta'];
         $d->stamp = $data['stamp'];
         $d->image = $data['image'];
 
         if ($data['image']) {
-            $data['image'] = escapeshellarg($data['image']);
+            $data['image'] = trim(escapeshellarg($data['image']), '\'');
         }
 
         $path = Config::get('DOC_ROOT') . '/public_html/uploads';
@@ -105,17 +110,24 @@ class ImportExport
         return $d->insert(Model::getTable('DataItem'), true, array(), Entity::SANITIZE_NO_POST);
     }
 
-    private function populate($sectionsData, $parent_id)
+    private function populate($sectionsData, $parent_id, $sectionParent = false, $topLevelSection = false)
     {
         foreach ($sectionsData as $item) {
-            $id = $this->insertSection($parent_id, $item);
+
+            if ($sectionParent) {
+                $id = $this->insertSection($parent_id, $item);
+            } else {
+                $id = $this->insertData($parent_id, $item, $sectionParent, $topLevelSection);
+            }
+            
 
             if (isset($item['children']) && sizeof($item['children'])) {
-                $this->populate($item['children'], $id);
+                $this->populate($item['children'], $id, true);
             }
 
+
             if (isset($item['data']) && is_array($item['data'])) {
-                $this->populateData($item['data'], $id);
+                $this->populateData($item['data'], $id, $sectionParent);
             }
         }
     }
@@ -136,6 +148,7 @@ class ImportExport
         $target_id = (int) $target_id;
         $target = Model::load('SectionItem');
         $data = Model::load('DataItem');
+        $data->setExporting();
         $target->id = $target_id;
         $target->load();
 
@@ -178,8 +191,30 @@ class ImportExport
     public function import($target_parent_id, $sectionsData)
     {
         $sectionsData = '[' . $sectionsData . ']';
-        $this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $target_parent_id);
+        $this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $target_parent_id, true);
     }
+
+
+    public function exportContainer($target_id)
+    {
+        $target_id = (int) $target_id;
+        $data = Model::load('DataItem');
+
+        $data->id = $target_id;
+        $data->load();   
+        $data->setExporting(); 
+        $data->getSectionDataRecursive();
+        
+        
+        return json_encode($data, JSON_PRETTY_PRINT);
+    }
+
+    public function importContainer($target_parent_id, $data, $topLevelSection)
+    {
+        $data = '[' . $data . ']';
+        $this->populate(json_decode($data, JSON_OBJECT_AS_ARRAY), $target_parent_id, false, $topLevelSection);
+    }
+
 }
 
 
