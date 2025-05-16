@@ -126,7 +126,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 array_push($data_set, array('id' => $d));
             }
         } else {
-            $data_set = $this->getAllCustom(self::TABLE, ' where data_item_id = ' . $this->id
+            $data_set = $this->getAllCustom(' where data_item_id = ' . $this->id
                 . ' and hidden != 1 order by position');
         }
 

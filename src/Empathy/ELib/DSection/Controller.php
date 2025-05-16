@@ -66,7 +66,7 @@ class Controller extends AdminController
             $this->presenter->assign('data_types', $this->getDataTypes());
 
             $c = Model::load('Container');
-            $containers = $c->getAllCustom('', Model::getTable('Container'));
+            $containers = $c->getAll();
             $containers_arr = array();
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
@@ -613,7 +613,7 @@ class Controller extends AdminController
             $this->presenter->assign('data_types', $this->getDataTypes());
 
             $c = Model::load('Container');
-            $containers = $c->getAllCustom('', Model::getTable('Container'));
+            $containers = $c->getAll();
             $containers_arr = array();
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
@@ -1013,7 +1013,7 @@ class Controller extends AdminController
 
         $i = Model::load('ImageSize');
         $sql = ' ORDER BY name';
-        $image_sizes = $i->getAllCustom(Model::getTable('ImageSize'), $sql);
+        $image_sizes = $i->getAllCustom($sql);
 
         $this->presenter->assign('image_sizes', $image_sizes);
     }
