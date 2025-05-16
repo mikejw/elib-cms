@@ -97,28 +97,37 @@ class SectionItem extends Entity
         $this->query($sql, $error);
     }
 
-    public function buildTree($current, $tree, $order=array(), $asc=true)
+    public function buildTree($current, $tree, $order = [], $asc = true)
     {
         $i = 0;
-        $nodes = array();
-        $sql = 'SELECT id,label, position, template, hidden, meta, UNIX_TIMESTAMP(stamp) as stamp FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $nodes = [];
+        $params = [];
+        $sql = 'SELECT id,label, position, template, hidden, meta, UNIX_TIMESTAMP(stamp) as stamp FROM '
+            .Model::getTable('SectionItem').' WHERE section_id = ?';
+        $params[] = $current;
 
         if ($tree->getDetectHidden()) {
             $sql .= ' and hidden != true';
         }
 
+        $orderParams = [];
         if (sizeof($order)) {
-            $orderBy = implode(',', $order);
+            foreach ($order as $key => $value) {
+                $orderParams[] = '?';
+                $params[] = $value;
+            }
+            $orderBy = implode(',', $orderParams);
+
         } else {
             $orderBy = 'position';
         }
-        $sql .= ' order by '.$orderBy;
+        $sql .= " order by $orderBy";
 
         $sql .= $asc ? ' ASC' : ' DESC';
 
         $error = 'Could not get child sections.';
 
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];
@@ -137,10 +146,12 @@ class SectionItem extends Entity
 
         if ($tree->getDataItem() !== NULL) {
 
-            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current
+            $params = [];
+            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = ?'
                 .' order by position';
+            $params[] = $current;
             $error = 'Could not get child data items.';
-            $result = $this->query($sql, $error);
+            $result = $this->query($sql, $error, $params);
             if ($result->rowCount() > 0) {
                 foreach ($result as $row) {
                     $id = $row['id'];

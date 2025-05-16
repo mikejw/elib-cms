@@ -16,8 +16,7 @@ class BaseTemplate extends EController
         $this->section = Model::load('SectionItem');
         $this->data_item = Model::load('DataItem');
 
-        $this->section->id = $_GET['section'];
-        $this->section->load();
+        $this->section->load($_GET['section']);
         $this->assign('template', $this->section->template);
     }
 
