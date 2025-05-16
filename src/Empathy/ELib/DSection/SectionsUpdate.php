@@ -22,7 +22,7 @@ class SectionsUpdate
         // current section
         $this->section->load();
         $this->section->stamp = date('Y-m-d H:i:s', time());
-        $this->section->save(Model::getTable('SectionItem'), array(), 2);
+        $this->section->save();
 
         // ancestors => make optional?
         $ancestors = array();

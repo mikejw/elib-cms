@@ -211,11 +211,11 @@ class SectionItem extends Entity
         return $sections;
     }
 
-    public function insert($table, $id, $format, $sanitize, $force_id = false)
+    public function insert()
     {
         if ($this->user_id === null) {
             $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         }
-        return parent::insert($table, $id, $format, $sanitize, $force_id);
+        return parent::insert();
     }
 }

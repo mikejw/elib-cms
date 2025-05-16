@@ -54,7 +54,7 @@ class ImportExport
                 : $section['stamp']
             : 'MYSQLTIME';
 
-        return $s->insert(Model::getTable('SectionItem'), true, array(), Entity::SANITIZE_NO_POST);
+        return $s->insert();
     }
 
     private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
@@ -106,7 +106,7 @@ class ImportExport
             $d->image = $name;
             $d->label = $name;
         }
-        return $d->insert(Model::getTable('DataItem'), true, array(), Entity::SANITIZE_NO_POST);
+        return $d->insert();
     }
 
     private function populate($sectionsData, $parent_id, $sectionParent = false, $topLevelSection = false)
