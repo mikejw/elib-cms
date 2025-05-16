@@ -26,8 +26,7 @@ class SectionItemTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
         $s = Model::load('SectionItem');
-        $s->id = 1;
-        $s->load();
+        $s->load(1);
         $d = Model::load('DataItem');
 
         $tree = new SectionsTree(
@@ -55,8 +54,7 @@ class SectionItemTest extends ESuiteTest
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
         $s = Model::load('SectionItem');
-        $s->id = 0;
-        $s->load();
+        $s->load(0);
         $d = Model::load('DataItem');
 
         $tree = new SectionsTree(

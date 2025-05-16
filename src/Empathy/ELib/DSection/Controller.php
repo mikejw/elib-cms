@@ -60,8 +60,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection/' . $_GET['id']);
         } else {
             $s = Model::load('SectionItem');
-            $s->id = $_GET['id'];
-            $s->load();
+            $s->load($_GET['id']);
             $this->presenter->assign('section_item', $s);
             $this->presenter->assign('section_item_id', $s->id);
             $this->presenter->assign('data_types', $this->getDataTypes());
@@ -305,9 +304,7 @@ class Controller extends AdminController
             $collapsed = 0;
         }
 
-        $s->id = $_GET['id'];
-        $s->load();
-
+        $s->load($_GET['id']);
         $st = new SectionsTree($s, $d, 1, $collapsed);
         $this->presenter->assign('sections', $st->getMarkup());
         $this->presenter->assign('section', $s);
@@ -334,8 +331,7 @@ class Controller extends AdminController
         $this->assertID();
         $s = Model::load('SectionItem');
         $d = Model::load('DataItem');
-        $s->id = $_GET['id'];
-        $s->load();
+        $s->load($_GET['id']);
         $sd = new SectionsDelete($s, $d, 1);
         $this->clearCache();
         $this->redirect('admin/dsection/' . $s->section_id);
@@ -346,8 +342,7 @@ class Controller extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $s = Model::load('SectionItem');
-            $s->id = $_POST['id'];
-            $s->load();
+            $s->load($_POST['id']);
             $s->label = $_POST['label'];
             $s->validates();
             if ($s->hasValErrors()) {
@@ -364,8 +359,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection/' . $_POST['id']);
         } else {
             $s = Model::load('SectionItem');
-            $s->id = $_GET['id'];
-            $s->load();
+            $s->load($_GET['id']);
             $this->presenter->assign('section', $s);
         }
     }
@@ -375,8 +369,7 @@ class Controller extends AdminController
         $this->buildNav();
         if (isset($_POST['save'])) {
             $s = Model::load('SectionItem');
-            $s->id = $_POST['id'];
-            $s->load();
+            $s->load($_POST['id']);
             $s->template = $_POST['template'];
             $s->validates();
             if ($s->hasValErrors()) {
@@ -393,8 +386,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection/' . $_POST['id']);
         } else {
             $s = Model::load('SectionItem');
-            $s->id = $_GET['id'];
-            $s->load();
+            $s->load($_GET['id']);
 
             $t = array('0' => '0', 'A' => 'A', 'B' => 'B', 'C' => 'C', 'D' => 'D', 'E' => 'E', 'F' => 'F');
 
@@ -406,8 +398,7 @@ class Controller extends AdminController
     public function toggle_hidden()
     {
         $s = Model::load('SectionItem');
-        $s->id = $_GET['id'];
-        $s->load();
+        $s->load($_GET['id']);
         $s->hidden = ($s->hidden) ? 0 : 1;
         $s->save(Model::getTable('SectionItem'), array(), 2);
         $this->clearCache();
@@ -422,8 +413,7 @@ class Controller extends AdminController
         $s = Model::load('SectionItem');
         $d = Model::load('DataItem');
 
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $is_section = 0;
         if (isset($_GET['collapsed']) && $_GET['collapsed'] == 1) {
             $collapsed = 1;
@@ -456,8 +446,7 @@ class Controller extends AdminController
         $this->setTemplate('elib:/admin/section.tpl');
         $s = Model::load('SectionItem');
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $this->update_timestamps($d->id);
         $sd = new SectionsDelete($s, $d, 0);
         $this->clearCache();
@@ -480,7 +469,7 @@ class Controller extends AdminController
         } else {
             $d->id = $id;
         }
-        $d->load();
+        $d->load($d->id);
         $u = new SectionsUpdate(Model::load('SectionItem'), $d->section_id);
     }
 
@@ -488,8 +477,7 @@ class Controller extends AdminController
     {
         if (isset($_POST['save'])) {
             $d = Model::load('DataItem');
-            $d->id = $_POST['id'];
-            $d->load();
+            $d->load($_POST['id']);
             $d->label = $_POST['label'];
             $d->validates();
             if ($d->hasValErrors()) {
@@ -509,8 +497,7 @@ class Controller extends AdminController
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $this->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
     }
@@ -520,8 +507,7 @@ class Controller extends AdminController
         $this->assign('event', 'edit_meta');
         if (isset($_POST['save'])) {
             $d = Model::load('DataItem');
-            $d->id = $_POST['id'];
-            $d->load();
+            $d->load($_POST['id']);
             $d->meta = $_POST['meta'];
 
             $d->validates();
@@ -543,8 +529,7 @@ class Controller extends AdminController
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $this->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
     }
@@ -553,8 +538,7 @@ class Controller extends AdminController
     {
         if (isset($_POST['save'])) {
             $s = Model::load('SectionItem');
-            $s->id = $_POST['id'];
-            $s->load();
+            $s->load($_POST['id']);
             $s->meta = $_POST['meta'];
 
             $s->validates();
@@ -573,8 +557,7 @@ class Controller extends AdminController
 
         $this->buildNav();
         $s = Model::load('SectionItem');
-        $s->id = $_GET['id'];
-        $s->load();
+        $s->load($_GET['id']);
         $this->assign('section_item', $s);
         $this->assign('section_id', $s->id);
     }
@@ -582,8 +565,7 @@ class Controller extends AdminController
     public function data_item_toggle_hidden()
     {
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $d->hidden = ($d->hidden) ? 0 : 1;
         $d->save(Model::getTable('DataItem'), array(), 2);
         $this->clearCache();
@@ -623,8 +605,7 @@ class Controller extends AdminController
             }
         } else {
             $d = Model::load('DataItem');
-            $d->id = $_GET['id'];
-            $d->load();
+            $d->load($_GET['id']);
             $this->presenter->assign('class', 'data_item');
             $this->presenter->assign('data_item', $d);
             $this->presenter->assign('data_item_id', $d->id);
@@ -707,8 +688,7 @@ class Controller extends AdminController
             $_GET['id'] = $_POST['id'];
 
             $p = Model::load('DataItem');
-            $p->id = $_GET['id'];
-            $p->load();
+            $p->load($_GET['id']);
 
             if (is_numeric($p->container_id)) {
                 $c = Model::load('ContainerImageSize');
@@ -857,8 +837,7 @@ class Controller extends AdminController
     {
         if (isset($_POST['save'])) {
             $d = Model::load('DataItem');
-            $d->id = $_POST['id'];
-            $d->load();
+            $d->load($_POST['id']);
             $d->heading = $_POST['heading'];
             $d->validates();
             if ($d->hasValErrors()) {
@@ -877,8 +856,7 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->setTemplate('elib:/admin/section.tpl');
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $this->presenter->assign('data_item', $d);
     }
 
@@ -886,8 +864,7 @@ class Controller extends AdminController
     {
         if (isset($_POST['save'])) {
             $d = Model::load('DataItem');
-            $d->id = $_POST['id'];
-            $d->load();
+            $d->load($_POST['id']);
             $d->body = $_POST['body'];
             $d->validates();
             if ($d->hasValErrors()) {
@@ -907,8 +884,7 @@ class Controller extends AdminController
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load('DataItem');
-        $d->id = $_GET['id'];
-        $d->load();
+        $d->load($_GET['id']);
         $this->presenter->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
     }
@@ -948,7 +924,7 @@ class Controller extends AdminController
         $containers = $c->getAll();
         $this->assign('containers', $containers);
         $i = Model::load('ImageSize');
-        $image_sizes = $i->loadAsOptions(Model::getTable('ImageSize'), 'name');
+        $image_sizes = $i->loadAsOptions('name');
         $this->presenter->assign('image_sizes', $image_sizes);
     }
 
@@ -968,8 +944,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection/containers');
         } elseif (isset($_POST['save'])) {
             $c = Model::load('Container');
-            $c->id = $_GET['id'];
-            $c->load();
+            $c->load($_GET['id']);
             $c->name = $_POST['name'];
             $c->validates();
             if (!$c->hasValErrors()) {
@@ -982,8 +957,7 @@ class Controller extends AdminController
             }
         } else {
             $c = Model::load('Container');
-            $c->id = $_GET['id'];
-            $c->load();
+            $c->load($_GET['id']);
             $this->assign('container', $c);
         }
     }
@@ -1007,8 +981,7 @@ class Controller extends AdminController
             $return_code = 1;
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
                 $i = Model::load('ImageSize');
-                $i->id = $_POST['id'];
-                $i->load();
+                $i->load($_POST['id']);
                 $field = $_POST['field'];
                 $i->$field = $_POST['value'];
                 $i->validates();
@@ -1084,8 +1057,7 @@ class Controller extends AdminController
     public function update_image_sizes()
     {
         $i = Model::load('ImageSize');
-        $i->id = $_GET['id'];
-        $i->load();
+        $i->load($_GET['id']);
         $images = $i->getDataFiles();
 
         $d = array(array($i->prefix . '_', $i->width, $i->height));
@@ -1108,10 +1080,8 @@ class Controller extends AdminController
             }
 
             foreach ($value as $id) {
-
                 $object = Model::load($model);
-                $object->id = $id;
-                $object->load();
+                $object->load($id);
                 $object->position = $position;
                 $object->save();
                 $position++;

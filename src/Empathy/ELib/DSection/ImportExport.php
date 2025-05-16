@@ -14,8 +14,7 @@ class ImportExport
     {
         $sectionsData = [];
         $section = Model::load('SectionItem');
-        $section->id = $section_id;
-        $section->load();
+        $section->load($section_id);
 
         $sections = $section->buildTree($section->id, new SectionsTree(
             $section,
@@ -149,8 +148,7 @@ class ImportExport
         $target = Model::load('SectionItem');
         $data = Model::load('DataItem');
         $data->setExporting();
-        $target->id = $target_id;
-        $target->load();
+        $target->load($target_id);
 
 
         $sectionsData = $this->load($target_id);
@@ -194,17 +192,14 @@ class ImportExport
         $this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $target_parent_id, true);
     }
 
-
     public function exportContainer($target_id)
     {
         $target_id = (int) $target_id;
         $data = Model::load('DataItem');
 
-        $data->id = $target_id;
-        $data->load();   
+        $data->load($target_id);
         $data->setExporting(); 
         $data->getSectionDataRecursive();
-        
         
         return json_encode($data, JSON_PRETTY_PRINT);
     }
@@ -214,7 +209,6 @@ class ImportExport
         $data = '[' . $data . ']';
         $this->populate(json_decode($data, JSON_OBJECT_AS_ARRAY), $target_parent_id, false, $topLevelSection);
     }
-
 }
 
 

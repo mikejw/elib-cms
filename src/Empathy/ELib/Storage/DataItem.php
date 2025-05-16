@@ -138,8 +138,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 if ($this->export) {
                     $data->setExporting();
                 }
-                $data->id = $item['id'];
-                $data->load();
+                $data->load($item['id']);
 
                 if ($data->isContainer()) {
                     $data->getData(true);
