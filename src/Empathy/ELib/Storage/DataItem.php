@@ -478,7 +478,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-    public function insert()
+    public function insert($filter = [], $id = true)
     {
         if ($this->user_id === null) {
             $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
@@ -488,7 +488,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             $this->stamp = 'MYSQLTIME';
         }
 
-        return parent::insert();
+        return parent::insert($filter, $id);
     }
 
 }
