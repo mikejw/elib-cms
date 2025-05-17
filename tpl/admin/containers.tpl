@@ -2,67 +2,35 @@
 
 
 {if $event neq 'rename_container'}
-<div id="operations">
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey" style="padding:0.5em;">
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_container" method="get">
-<div><button type="submit" name="add" value="1">Add</button></div>
-</form>
 
 
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-</div>
+<a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_container"
+ class="btn btn-sm btn-primary">Add</a>
 
 
 <p style="line-height: 0.5em;">&nbsp;</p>
 {/if}
 
 
-
-
-
-
-
-
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
-
-<div class="grey">
-
-
-
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
-
+  {if isset($errors)}
+	<div class="alert alert-danger alert-dismissible" role="alert">
+  	<button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+  	<strong>Error!</strong>
+  		{foreach from=$errors item=e} 
+  			<p>{$e}</p>
+  		{/foreach}
+	</div>
+  {/if}
 
 {if $event eq 'rename_container'}
 <fieldset><legend>Rename Container</legend>
 <form action="" method="post">
 <p><label>Name</label>
-<input type="text" value="{$container->name}" name="name" />
+<input class="form-control" type="text" value="{$container->name}" name="name" />
 </p>
 <p><label>&nbsp;</label>
-<button type="submit" name="save">Save</button> 
-<button type="submit" name="cancel">Cancel</button>
+<button class="btn btn-sm btn-primary" type="submit" name="save">Save</button> 
+<button class="btn btn-sm btn-primary" type="submit" name="cancel">Cancel</button>
 </p>
 </form>
 </fieldset>
@@ -83,8 +51,10 @@
 
 
 <p class="clear">
-<label>Image Size</label>
+<label>Image Size:</label>
+</p>
 
+<p>
 <span class="radios">
 {html_checkboxes name="image_size[$id]" options=$image_sizes separator="<br />" selected=$container.image_size_ids}
 </span>
@@ -130,8 +100,8 @@
 {/foreach}
 
 <p>
-<button type="submit" name="save">Save</button> 
-<button type="submit" name="cancel">Cancel</button>
+<button class="btn btn-sm btn-primary" type="submit" name="save">Save</button> 
+<button class="btn btn-sm btn-primary" type="submit" name="cancel">Cancel</button>
 </p>
 </form>
 </div>
@@ -140,16 +110,6 @@
 
 
 <p class="clear">&nbsp;</p>
-
-
-
-
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
 
 
 

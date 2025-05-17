@@ -1,121 +1,102 @@
 {include file="elib:/admin/admin_header.tpl"}
 
-<div id="operations">
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
-</div>
 
-<div class="grey" style="padding:0.5em;">
-
-<div id="op_right">
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/containers" method="get">
-<div><button type="submit" name="edit_containers" value="1"{if $event eq 'edit_containers'} disabled="disabled"{/if}>Containers</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/image_sizes" method="get">
-<div><button type="submit" name="edit_image_sizes" value="1"{if $event eq 'edit_image_sizes'} disabled="disabled"{/if}>Image Sizes</button></div>
-</form>
-</div>
+<div class="form-group cms-actions">
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/containers" class="btn btn-sm btn-primary{if $event eq 'edit_containers'} disabled{/if}">
+    Containers</a>
 
 
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_section/{$section_id}" method="get">
-<div><button type="submit" name="add_section" value="1"{if $class eq 'data_item'} disabled="disabled"{/if}>Add Section</button></div>
-</form>
-
-{if $class eq 'dsection' && $event neq 'data_item'}
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_data/{$section_id}" method="get">
-<div><button type="submit" name="add_data_item" value="1"{if $event eq 'add_data'} disabled="disabled"{/if}>Add Data</button></div>
-</form>
-<form class="confirm" action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete/{$section_id}" method="get">
-<div><button type="submit" name="delete_section" value="1"{if $section_id eq 0} disabled="disabled"{/if}>Delete</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename/{$section_id}" method="get">
-<div><button type="submit" name="rename" value="1"{if $section->id eq 0 || $event eq 'rename'} disabled="disabled"{/if}>Rename</button></div>
-</form>
-
-{else}
-
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}" method="get">
-<div><button type="submit" name="add_data_item" value="1"{if $event eq 'add_data' || !$is_container} disabled="disabled"{/if}>Add Data</button></div>
-</form>
-<form class="confirm" action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete_data_item/{$data_item_id}" method="get">
-<div><button type="submit" name="delete_data_item" value="1">Delete</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename_data_item/{$data_item_id}" method="get">
-<div><button type="submit" name="rename" value="1"{if $event eq 'rename'} disabled="disabled"{/if}>Rename</button></div>
-</form>
-
-{/if}
+    <a class="btn btn-sm btn-primary{if $event eq 'edit_image_sizes'} disabled{/if}" href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/image_sizes">Image Sizes</a>
 
 
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/change_template/{$section_id}" method="get">
-<div><button type="submit" name="change_template" value="1"{if $class eq 'data_item' || $event eq 'change_template' || $section_id eq 0} disabled="disabled"{/if}>Change Template</button></div>
-</form>
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_data_item_meta/{$data_item_id}" method="get">
-<div><button type="submit" name="edit_meta" value="1"{if $event neq 'data_item'} disabled="disabled"{/if}>Edit Meta</button></div>
-</form>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_section/{$section_id}"
+     class="btn btn-sm btn-primary{if $class eq 'data_item' or ($class eq 'dsection' && $event eq 'data_item')} disabled{/if}">Add Section</a>
 
 
-{if $event eq 'data_item'}
+    {if $class eq 'dsection' && $event neq 'data_item'}
 
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_item_toggle_hidden/{$data_item_id}" method="get">
-<div><button type="submit" name="hide" value="1">{if $data_item->hidden}Show{else}Hide{/if}</button></div>
-</form>
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/add_data/{$section_id}"
+     class="btn btn-sm btn-primary{if $event eq 'add_data'} disabled{/if}">Add Data</a>
 
-{elseif $class eq 'dsection' && $section_id > 0}
-<form action="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/toggle_hidden/{$section_id}" method="get">
-<div><button type="submit" name="hide" value="1">{if $section->hidden}Show{else}Hide{/if}</button></div>
-</form>
-{/if}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete/{$section_id}"
+     class="confirm btn btn-sm btn-primary{if $section_id eq 0} disabled{/if}">Delete</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename/{$section_id}"
+     class="btn btn-sm btn-primary{if $section->id eq 0 || $event eq 'rename'} disabled{/if}">Rename</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/export_section/{$section_id}"
+       class="btn btn-sm btn-primary">Export</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_section/{$section_id}"
+       class="btn btn-sm btn-primary">Import</a>
+
+        {if $section_id > 0}        
+            <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_container/{$section_id}?section=true"
+            class="btn btn-sm btn-primary">Import Data</a>
+         {/if}
+
+    {else}
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_add_data/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event eq 'add_data' || $event eq 'data_add_data' || !$is_container} disabled{/if}">Add Data</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/delete_data_item/{$data_item_id}"
+     class="confirm btn btn-sm btn-primary">Delete</a>
+
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/rename_data_item/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event eq 'rename'} disabled{/if}">Rename</a>
+
+      {if $is_container}
+
+        <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/export_container/{$data_item_id}"
+             class="btn btn-sm btn-primary">Export</a>
+
+        <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/import_container/{$data_item_id}"
+             class="btn btn-sm btn-primary">Import</a>
+      {/if}
+
+    {/if}
 
 
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/change_template/{$section_id}"
+     class="btn btn-sm btn-primary{if $class eq 'data_item' || $event eq 'change_template' || $section_id eq 0} disabled{/if}">Change Template</a>
 
+    {if $event eq 'default_event'|| $event eq 'edit_section_item_meta'}
+     <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_section_item_meta/{$section_id}"
+     class="btn btn-sm btn-primary{if $event eq 'edit_section_item_meta'} disabled{/if}">Edit Meta</a>
+    {elseif $event eq 'data_item' || $event eq 'edit_meta'}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/edit_data_item_meta/{$data_item_id}"
+     class="btn btn-sm btn-primary{if $event eq 'edit_meta'} disabled{/if}">Edit Meta</a>
+    {/if}
 
-</div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-</div>
+    {if $event eq 'data_item'}
 
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/data_item_toggle_hidden/{$data_item_id}"
+     class="btn btn-sm btn-primary">{if $data_item->hidden}Show{else}Hide{/if}</a>
 
-<p style="line-height: 0.5em;">&nbsp;</p>
+    {elseif $class eq 'dsection' && $section_id > 0}
+    <a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/toggle_hidden/{$section_id}"
+     class="btn btn-sm btn-primary">{if $section->hidden}Show{else}Hide{/if}</a>
+    {/if}
 
-
-
-
-
-
-<div class="grey_top">
-<div class="top_right">
-<div class="top_left"></div>
-</div>
 </div>
 
-<div class="grey clear">
 
+<div class="row">
 
-{if $section_id != 0}
+<div class="col-md-5">
+
+{if $section_id != 0 || $data_item_id != 0}
 <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/dsection/0">Top Level</a></p>
+{else}
+    <p>&nbsp;</p>
 {/if}
 
 {$sections}
 
+</div>
 
-
-<div id="right">
-
-{if sizeof($errors) > 0}
-<ul id="error">
-{foreach from=$errors item=error}
-<li>{$error}</li>
-{/foreach}
-</ul>
-{/if}
-
+<div class="col-md-7">
 
 
 {if $event eq 'rename'}
@@ -131,9 +112,11 @@
 {include file="elib:/admin/sections/add_data_heading.tpl"}
 {elseif $event eq 'add_data_body' || $event eq 'data_add_data_body'}
 {include file="elib:/admin/sections/add_data_body.tpl"}
-{elseif $event eq 'add_data_image'}
+{elseif $event eq 'add_data_image' || $event eq 'data_add_data_image'}
 {include file="elib:/admin/sections/add_data_image.tpl"}
-{elseif $event eq 'add_data_video'}
+{elseif $event eq 'add_data_audio'|| $event eq 'data_add_data_audio'}
+{include file="elib:/admin/sections/add_data_audio.tpl"}
+{elseif $event eq 'add_data_video' || $event eq 'data_add_data_video'}
 {include file="elib:/admin/sections/add_data_video.tpl"}
 {elseif $event eq 'data_item'}
 {include file="elib:/admin/sections/data_item.tpl"}
@@ -145,22 +128,34 @@
 {include file="elib:/admin/sections/change_template.tpl"}
 {elseif $event eq 'edit_meta'}
 {include file="elib:/admin/sections/edit_meta.tpl"}
+{elseif $event eq 'edit_section_item_meta'}
+{include file="elib:/admin/sections/edit_section_item_meta.tpl"}
 {elseif $event eq 'edit_containers'}
 {include file="elib:/admin/sections/edit_containers.tpl"}
+{elseif $event eq 'export_section'}
+{include file="elib:/admin/sections/import_export.tpl"}
+{elseif $event eq 'import_section'}
+{include file="elib:/admin/sections/import_export.tpl"}
+
+{elseif $event eq 'export_container'}
+{include file="elib:/admin/sections/import_export_container.tpl"}
+{elseif $event eq 'import_container'}
+{include file="elib:/admin/sections/import_export_container.tpl"}
+
 {/if}
 
+{if isset($errors)}
+<div class="alert alert-danger alert-dismissible" role="alert">
+    <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+    <strong>Error!</strong>
+        {foreach from=$errors item=e} 
+            <p>{$e}</p>
+        {/foreach}
 </div>
-
-
+{/if}
 
 
 </div>
-<div class="grey_bottom">
-<div class="bottom_right">
-<div class="bottom_left"></div>
-</div>
-</div>
-
 
 
 {include file="elib:/admin/admin_footer.tpl"}

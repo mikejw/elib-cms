@@ -2,7 +2,9 @@
 
 namespace Empathy\ELib\DSection;
 
+
 use Empathy\ELib\Tree;
+use Empathy\MVC\Config;
 
 class SectionsTree extends Tree
 {
@@ -11,53 +13,70 @@ class SectionsTree extends Tree
     private $data;
     private $section_ancestors;
     private $data_item_ancestors;
+    private $detect_hidden;
 
-    public function __construct($section, $data_item, $current_is_section, $collapsed)
-    {
+    public function __construct(
+        $section,
+        $data_item=NULL,
+        $current_is_section=NULL,
+        $collapsed=NULL,
+        $detect_hidden=NULL,
+        $order=array(),
+        $asc=true) {
+        
+        $this->detect_hidden = $detect_hidden;
+
         $this->section = $section;
-        $this->data_item = $data_item;
-        if ($current_is_section) {
-            $current_id = $section->id;
-            $parent_id = $section->section_id;
-            $active_section = $current_id;
-        } else {
-            $current_id = $data_item->id;
-            $parent_id = $data_item->data_item_id;
-        }
 
-        $this->section_ancestors = array(0);
-        $this->data_item_ancestors = array();
-        if (!$current_is_section) {
-            if (!$collapsed) {
-                array_push($this->data_item_ancestors, $current_id);
-            }
-            if (is_numeric($data_item->section_id)) {
-                $active_section = $data_item->section_id;
+        // allow tree use without building markup
+        if ($data_item !== NULL) {
+            
+            $this->data_item = $data_item;
+
+            if ($current_is_section) {
+                $current_id = $section->id;
+                $parent_id = $section->section_id;
+                $active_section = $current_id;
             } else {
-                $active_section = $this->data_item->findLastSection($parent_id);
-            }
-        }
-        if ($current_id != 0) {
-            $this->section_ancestors = $this->section->getAncestorIDs($active_section, $this->section_ancestors);
-        }
-        if (!$current_is_section) {
-            $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
-        }
-        if (!$collapsed || !$current_is_section) {
-            array_push($this->section_ancestors, $active_section);
-        }
 
-        $this->data = $this->buildTree(0, 1, $this);
-        $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0, 0, $current_is_section);
+                $current_id = $data_item->id;
+                $parent_id = $data_item->data_item_id;
+            }
+
+            $this->section_ancestors = array(0);
+            $this->data_item_ancestors = array();
+            if (!$current_is_section) {
+                if (!$collapsed) {
+                    array_push($this->data_item_ancestors, $current_id);
+                }
+                if (is_numeric($data_item->section_id)) {
+                    $active_section = $data_item->section_id;
+                } else {
+                    $active_section = $this->data_item->findLastSection($parent_id);
+                }
+            }
+            if ($current_id != 0) {
+                $this->section_ancestors = $this->section->getAncestorIDs($active_section, $this->section_ancestors);
+            }
+            if (!$current_is_section) {
+                $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
+            }
+            if (!$collapsed || !$current_is_section) {
+                array_push($this->section_ancestors, $active_section);
+            }
+
+            $this->data = $this->buildTree(0, 1, $this, $order, $asc);
+            $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0, 0, $current_is_section);
+        }
     }
 
-    public function buildTree($id, $is_section, $tree)
+    public function buildTree($id, $is_section, $tree, $order, $asc)
     {
         $nodes = array();
         if ($is_section) {
-            $nodes = $tree->section->buildTree($id, $tree);
+            $nodes = $tree->section->buildTree($id, $tree, $order, $asc);
         } else {
-            $nodes = $tree->data_item->buildTree($id, $tree);
+            $nodes = $tree->data_item->buildTree($id, $tree, $order, $asc);
         }
 
         return $nodes;
@@ -73,17 +92,21 @@ class SectionsTree extends Tree
             $ancestors = $this->section_ancestors;
         }
 
+        $class = "clearfix";
         if (!in_array($last_id, $ancestors)) {
-            $markup .= " class=\"hidden_sections\"";
+            $class .= " hidden_sections";
         }
+        $markup .= " class=\"$class\"";
+
         if ($level == 0) {
             $markup .= " id=\"tree\"";
             $level++;
         }
         $markup .=">\n";
         foreach ($data as $index => $value) {
+
             $toggle = '+';
-            $folder = 't_folder_closed.gif';
+            $folder = '<i class="far fa-folder"></i>';
             $url = 'dsection';
 
             if ($value['data'] == 1) {
@@ -94,21 +117,35 @@ class SectionsTree extends Tree
 
             if (in_array($value['id'], $ancestors)) {
                 $toggle = '-';
-                $folder = 't_folder_open.gif';
+                $folder = '<i class="far fa-folder-open"></i>';
             }
             if ($value['data'] == 1) {
-                $folder = 'data.gif';
+                $folder = '<i class="far fa-file"></i>';
                 $url = 'dsection/data_item';
                 $value['label'] = $this->truncate($value['label'], 10); // trunc
             }
             $children = sizeof($value['children']);
-            $markup .= "<li";
+            $class = "clearfix";
+            $markup .= "<li ";
+            // if current is section
+            if (!$value['data']) {
+                $markup .= "id=\"section_".$value['id']."\"";    
+            } else {
+                $markup .= "id=\"data_".$value['id']."\"";    
+            }            
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
-                $markup .= " class=\"current\"";
+                $class .= " current";
             }
+
+            if (isset($value['hidden']) && $value['hidden']) {
+                $class .= " hidden";
+            }
+
+            $markup .= " class=\"$class\"";
+
             $markup .= ">\n";
             if ($children > 0) {
-                $markup .= "<a class=\"toggle\" href=\"http://".WEB_ROOT.PUBLIC_DIR."/admin/$url/".$value['id'];
+                $markup .= "<a class=\"toggle\" href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'];
                 if ($toggle == '-') {
                     $markup .= '/?collapsed=1';
                 }
@@ -116,14 +153,22 @@ class SectionsTree extends Tree
             } else {
                 $markup .= "<span class=\"toggle\">&nbsp;</span>";
             }
-            $markup .= "<img src=\"http://".WEB_ROOT.PUBLIC_DIR."/elib/$folder\" alt=\"\" />\n";
+            $markup .= $folder;
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= "<span class=\"label current\">".$value['label']."</span>";
             } else {
-                $markup .= "<span class=\"label\"><a href=\"http://".WEB_ROOT.PUBLIC_DIR."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
+                $markup .= "<span class=\"label\"><a href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
             }
             if ($children > 0) {
-                $markup .= $this->buildMarkup($value['children'], $level, $current_id, $value['id'], $value['data'], $current_is_section);
+                $markup .= $this->buildMarkup(
+                    $value['children'],
+                    $level,
+                    $current_id,
+                    $value['id'],
+                    $value['data'],
+                    $current_is_section,
+                    $this->detect_hidden
+                );
             }
             $markup .= "</li>\n";
         }
@@ -131,5 +176,16 @@ class SectionsTree extends Tree
 
         return $markup;
     }
+
+
+    public function getDataItem()
+    {
+        return $this->data_item;
+    }
+
+    public function getDetectHidden() {
+        return $this->detect_hidden;
+    }
+
 
 }

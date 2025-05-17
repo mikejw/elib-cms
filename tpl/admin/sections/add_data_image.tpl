@@ -11,13 +11,14 @@
 <legend>Add Image</legend>
 <p>
 <label>File</label>
-<input type="file" id="file" name="file" />
+<input type="file" id="file" name="file[]" multiple="multiple" accept="image/*" />
+<!-- <input type="file" id="file" name="file" /> -->
 </p>
 <p>
 <label>&nbsp;</label>
 <input type="hidden" name="id" value="{if $class eq 'data_item'}{$data_item->id}{else}{$section_id}{/if}" />
-<button type="submit" name="save">Submit</button> 
-<button type="submit" name="cancel">Cancel</button>
+<button class="btn btn-sm btn-primary" type="submit" name="save">Submit</button> 
+<button class="btn btn-sm btn-primary" type="submit" name="cancel">Cancel</button>
 </p>
 </fieldset>
 </form>
