@@ -51,8 +51,10 @@
 
 
 <p class="clear">
-<label>Image Size</label>
+<label>Image Size:</label>
+</p>
 
+<p>
 <span class="radios">
 {html_checkboxes name="image_size[$id]" options=$image_sizes separator="<br />" selected=$container.image_size_ids}
 </span>

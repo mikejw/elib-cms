@@ -4,7 +4,7 @@ namespace Empathy\ELib\Storage;
 
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
-use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\DI;
 use Empathy\MVC\Config;
 use Michelf\Markdown;
 
@@ -20,6 +20,8 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     const FIND_OPT_CONVERT_MD = 5;
     const FIND_OPT_MATCH_META = 6;
     const FIND_HEADING = 7;
+    const FIND_ALL = 8;
+    const FIND_DEEP_ALL = 9;
 
     public $id;
     public $data_item_id;
@@ -29,7 +31,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public $heading;
     public $body;
     public $image;
+    public $image_width;
+    public $image_height;
     public $video;
+    public $audio;
     public $user_id;
     public $position;
     public $hidden;
@@ -37,35 +42,47 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public $stamp;
 
     private $data;
-
+    private $export;
 
     public function __construct()
     {
         parent::__construct();
         $this->data = array();
+        $this->export = false;
     }
 
-    public function rewind()
+    public function setExporting()
+    {
+        $this->export = true;
+    }
+
+    public function setData($data)
+    {
+        $this->data = $data;
+    }
+
+    public function rewind(): void
     {
         reset($this->data);
     }
-  
-    public function current()
+
+    public function current(): mixed
     {
         return current($this->data);
     }
-  
-    public function key() 
+
+    public function key(): mixed
     {
         return key($this->data);
     }
-  
-    public function next() 
+
+    #[\ReturnTypeWillChange]
+    public function next()
     {
         return next($this->data);
     }
-  
-    public function valid()
+
+    public function valid(): bool
     {
         $key = key($this->data);
         $var = ($key !== null && $key !== false);
@@ -78,7 +95,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-    public function jsonSerialize()
+    public function jsonSerialize(): mixed
     {
         return get_object_vars($this);
     }
@@ -87,11 +104,11 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function isContainer()
     {
         $container = false;
-        if(!isset($this->heading) &&
-           !isset($this->body) &&
-           !isset($this->image) &&
-           !isset($this->video))
-        {
+        if (!isset($this->heading) &&
+            !isset($this->body) &&
+            !isset($this->image) &&
+            !isset($this->video) &&
+            !isset($this->audio)) {
             $container = true;
         }
 
@@ -100,41 +117,48 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
 
     // data is 'pseudo property'
-    public function getData($recursive=false, $section_id=null, $disconnect=true)
+    public function getData($recursive = false, $section_id = null, $disconnect = true)
     {
         if (is_numeric($section_id)) {
             $data_set = array();
             $data_set_sections = $this->getSectionData($section_id);
             foreach ($data_set_sections as $d) {
-                array_push($data_set, array('id' => $d)); 
+                array_push($data_set, array('id' => $d));
             }
         } else {
-            $data_set = $this->getAll(self::TABLE. ' where data_item_id = '.$this->id
-                .' and hidden != 1 order by position');
+            $data_set = $this->getAllCustom(' where data_item_id = ' . $this->id
+                . ' and hidden != 1 order by position');
         }
- 
-        if ($recursive) {
 
+        if ($recursive) {
             $i = 0;
-            foreach ($data_set as $index => $item) {            
+            foreach ($data_set as $index => $item) {
 
                 $data = Model::load('DataItem');
-                $data->id = $item['id'];
-                $data->load();                
-
-                $props = $data->getProperties();
-                foreach ($props as $p) {
-                    if ($data->$p === null || $data->$p == '0') {
-                        unset($data->$p);
-                    }
+                if ($this->export) {
+                    $data->setExporting();
                 }
+                $data->load($item['id']);
+
                 if ($data->isContainer()) {
                     $data->getData(true);
                 }
-                if ($disconnect) {                    
+                if ($disconnect) {
                     $data->dbDisconnect();
-                }            
-                $this->data[$i] = $data; 
+                }
+
+                if ($this->export) {
+                    if ($data->body) {
+                        $data->body = preg_replace("!\r?\n!", "\n", $data->body);
+                        $data->body = preg_replace("!&nbsp;!", "", $data->body);
+                    }
+                    if ($data->meta) {
+                        $data->meta = preg_replace("!\r?\n!", "\n", $data->meta);
+                        $data->meta = preg_replace("!&nbsp;!", "", $data->meta);
+                    }
+                }
+
+                $this->data[$i] = $data;
                 $i++;
             }
         }
@@ -145,9 +169,9 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getSectionData($section_id)
     {
         $ids = array();
-        $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE section_id = '.$section_id
-            .' and hidden != 1'
-            .' ORDER BY position';
+        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ' . $section_id
+            . ' and hidden != 1'
+            . ' ORDER BY position';
         $error = 'Could not get data item id based on section id.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -159,7 +183,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         return $ids;
     }
 
-    public function getSectionDataRecursive($section_id=null, $disconnect=true)
+    public function getSectionDataRecursive($section_id = null, $disconnect = true)
     {
         $this->getData(true, $section_id, $disconnect);
 
@@ -174,11 +198,14 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function convertToMarkdown()
     {
-        $this->body = Markdown::defaultTransform($this->body);
+        if ($this->body) {
+            $this->body = Markdown::defaultTransform($this->body);
+        }
     }
 
 
-    public function findAndConvertAllToMD() {
+    public function findAndConvertAllToMD()
+    {
         foreach ($this as $d) {
             if (isset($d->body)) {
                 $d->convertToMarkdown();
@@ -187,7 +214,8 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         }
     }
 
-    public function findContainers(&$found = array()) {
+    public function findContainers(&$found = array())
+    {
 
         foreach ($this as $d) {
             if ($d->isContainer()) {
@@ -198,7 +226,6 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-
     public function find($type, $pattern = NULL, $options = array())
     {
         $item = null;
@@ -206,20 +233,31 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
             if ($pattern !== NULL) {
                 if (isset($d->label)) {
-                    $match_to = $d->label;   
-                }                
+                    $match_to = $d->label;
+                }
                 if (isset($d->meta) && in_array(self::FIND_OPT_MATCH_META, $options)) {
                     $match_to = $d->meta;
                 }
                 if (isset($match_to) && !preg_match($pattern, $match_to)) {
                     continue;
-                }                
+                }
             }
 
             switch ($type) {
-                case self::FIND_LABEL:                  
+                case self::FIND_LABEL:
                     if (isset($d->label)) {
-                        $item = $d;
+                        if (
+                            in_array(self::FIND_ALL, $options) ||
+                            in_array(self::FIND_DEEP_ALL, $options)
+                        ) {
+                            if (!is_array($item)) {
+                                $item = array();
+                            }
+                            array_push($item, $d);
+                            continue 2;
+                        } else {
+                            $item = $d;
+                        }
                     }
                     break;
                 case self::FIND_HEADING:
@@ -230,26 +268,32 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 case self::FIND_BODY:
                     if (isset($d->body)) {
                         $item = $d;
-                        if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {                            
-                            $item->convertToMarkdown();
-                        }
                     }
                     break;
                 case self::FIND_IMAGE:
                     if (isset($d->image)) {
                         $item = $d;
                     }
-                    break;                    
+                    break;
                 default:
                     throw new \Exception('No valid find type.');
             }
 
+            if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+                $item->convertToMarkdown();
+            }
+
             if ($item !== null) {
                 break;
-            } else {        
-                if ($d->hasData()) {
-                    $item = $d->find($type, $pattern, $options);
-                }
+            } else if ($d->hasData()) {
+                $item = $d->find($type, $pattern, $options);
+            }
+        }
+
+        if (in_array(self::FIND_DEEP_ALL, $options) && $d->hasData()) {
+            $deepItem = $d->find($type, $pattern, $options);
+            if ($deepItem !== null) {
+                $item = array_merge($item, $deepItem);
             }
         }
 
@@ -263,7 +307,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             }
             return $item->getLocalData();
         } else {
-            return $item;            
+            return $item;
         }
     }
 
@@ -284,7 +328,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function findLastSection($id)
     {
         $section_id = 0;
-        $sql = 'SELECT id,section_id,data_item_id FROM '.Model::getTable('DataItem').' WHERE id = '.$id;
+        $sql = 'SELECT id,section_id,data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ' . $id;
         $error = 'Could not find last section.';
 
         $result = $this->query($sql, $error);
@@ -301,7 +345,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getAncestorIDs($id, $ancestors)
     {
         $data_item_id = 0;
-        $sql = 'SELECT data_item_id FROM '.Model::getTable('DataItem').' WHERE id = '.$id;
+        $sql = 'SELECT data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ' . $id;
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -319,9 +363,9 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function buildDelete($id, &$ids, $section_start)
     {
         if ($section_start) {
-            $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE section_id = '.$id;
+            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ' . $id;
         } else {
-            $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE data_item_id = '.$id;
+            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ' . $id;
             array_push($ids, $id);
         }
         $error = 'Could not find data items for deletion.';
@@ -335,17 +379,26 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function doDelete($ids)
     {
-        $sql = 'DELETE FROM '.Model::getTable('DataItem').' WHERE id IN'.$ids;
+        $sql = 'DELETE FROM ' . Model::getTable('DataItem') . ' WHERE id IN' . $ids;
         $error = 'Could not remove data item(s).';
         $this->query($sql, $error);
     }
 
-    public function buildTree($current, $tree)
+    public function buildTree($current, $tree, $order = array(), $asc = true)
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE data_item_id = '.$current
-            .' ORDER BY position';
+        $sql = 'SELECT id,label FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ' . $current;
+
+        if (sizeof($order)) {
+            $orderBy = implode(',', $order);
+        } else {
+            $orderBy = 'position';
+        }
+        $sql .= ' order by ' . $orderBy;
+
+        $sql .= $asc ? ' ASC' : ' DESC';
+
         $error = 'Could not get child data items.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -354,19 +407,18 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                 $nodes[$i]['id'] = $id;
                 $nodes[$i]['data'] = 1;
                 $nodes[$i]['label'] = $row['label'];
-                $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
+                $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree, $order, $asc);
                 $i++;
             }
         }
-
         return $nodes;
     }
 
     public function getImageFilenames($ids)
     {
         $images = array();
-        $sql = 'SELECT image FROM '.Model::getTable('DataItem').' WHERE image IS NOT NULL'
-            .' AND id IN'.$ids;
+        $sql = 'SELECT image FROM ' . Model::getTable('DataItem') . ' WHERE image IS NOT NULL'
+            . ' AND id IN' . $ids;
         $error = 'Could not get matching data item image filenames.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -381,8 +433,8 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getVideoFilenames($ids)
     {
         $videos = array();
-        $sql = 'SELECT video FROM '.Model::getTable('DataItem').' WHERE video IS NOT NULL'
-            .' AND id IN'.$ids;
+        $sql = 'SELECT video FROM ' . Model::getTable('DataItem') . ' WHERE video IS NOT NULL'
+            . ' AND id IN' . $ids;
         $error = 'Could not get matching data item video filenames.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -394,11 +446,27 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         return $videos;
     }
 
+    public function getAudioFilenames($ids)
+    {
+        $audioFiles = array();
+        $sql = 'SELECT audio FROM ' . Model::getTable('DataItem') . ' WHERE audio IS NOT NULL'
+            . ' AND id IN' . $ids;
+        $error = 'Could not get matching data item audio filenames.';
+        $result = $this->query($sql, $error);
+        if ($result->rowCount() > 0) {
+            foreach ($result as $row) {
+                array_push($audioFiles, $row['audio']);
+            }
+        }
+
+        return $audioFiles;
+    }
+
     public function getMostRecentVideoID()
-    // ammended to perform search by position value
+        // ammended to perform search by position value
     {
         $id = 0;
-        $sql = 'SELECT id FROM '.Model::getTable('DataItem').' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
+        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
         $error = 'Could not get most recent video.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
@@ -410,13 +478,17 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-    public function insert($table, $id, $format, $sanitize, $force_id=false)
+    public function insert($filter = [], $id = true)
     {
-        $this->user_id = CurrentUser::getUserID();
-        return parent::insert($table, $id, $format, $sanitize, $force_id);
+        if ($this->user_id === null) {
+            $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
+        }
+
+        if ($this->stamp === null) {
+            $this->stamp = 'MYSQLTIME';
+        }
+
+        return parent::insert($filter, $id);
     }
-
-
-
 
 }

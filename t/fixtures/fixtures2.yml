@@ -1,0 +1,50 @@
+
+
+Empathy\ELib\Storage\UserProfile:
+  profile{1..5}:
+    fullname: <firstName()>
+    picture: 'hello.gif'
+    about: 'I am a reguar user'
+
+Empathy\ELib\Storage\UserItem:
+  user{1..5}:
+    user_profile_id: "@profile<current()>"
+    email: '<username()>@gmail.com'
+    auth: 2
+    username: <username()>
+    password: 'd4f9c7bbf8fe68f4828f6849b6c2af8e'
+    reg_code: 1
+    active: true
+    registered: 'MYSQLTIME'
+    activated: 'MYSQLTIME'
+
+Empathy\ELib\Storage\SectionItem:
+  section1:
+    section_id: 0
+    label: 'New Section'
+    friendly_url: null
+    template: 'A'
+    position: 0
+    hidden: 0
+    stamp: 'MYSQLTIME'
+    meta: null
+    user_id: "@user1"
+
+Empathy\ELib\Storage\DataItem:
+  data1:
+    section_id: "@section1"
+    label: 'New Data'
+    data_item_id: null
+    container_id: null
+    heading: "This is a data item."
+    body: null
+    image: null
+    video: null
+    user_id: "@user1"
+    position: 0
+    hidden: 0
+    meta: null
+    stamp: 'MYSQLTIME'
+
+
+

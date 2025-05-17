@@ -20,7 +20,9 @@ class SectionsTree extends Tree
         $data_item=NULL,
         $current_is_section=NULL,
         $collapsed=NULL,
-        $detect_hidden=NULL) {
+        $detect_hidden=NULL,
+        $order=array(),
+        $asc=true) {
         
         $this->detect_hidden = $detect_hidden;
 
@@ -63,18 +65,18 @@ class SectionsTree extends Tree
                 array_push($this->section_ancestors, $active_section);
             }
 
-            $this->data = $this->buildTree(0, 1, $this);
+            $this->data = $this->buildTree(0, 1, $this, $order, $asc);
             $this->markup = $this->buildMarkup($this->data, 0, $current_id, 0, 0, $current_is_section);
         }
     }
 
-    public function buildTree($id, $is_section, $tree)
+    public function buildTree($id, $is_section, $tree, $order, $asc)
     {
         $nodes = array();
         if ($is_section) {
-            $nodes = $tree->section->buildTree($id, $tree);
+            $nodes = $tree->section->buildTree($id, $tree, $order, $asc);
         } else {
-            $nodes = $tree->data_item->buildTree($id, $tree);
+            $nodes = $tree->data_item->buildTree($id, $tree, $order, $asc);
         }
 
         return $nodes;
@@ -90,17 +92,21 @@ class SectionsTree extends Tree
             $ancestors = $this->section_ancestors;
         }
 
+        $class = "clearfix";
         if (!in_array($last_id, $ancestors)) {
-            $markup .= " class=\"hidden_sections\"";
+            $class .= " hidden_sections";
         }
+        $markup .= " class=\"$class\"";
+
         if ($level == 0) {
             $markup .= " id=\"tree\"";
             $level++;
         }
         $markup .=">\n";
         foreach ($data as $index => $value) {
+
             $toggle = '+';
-            $folder = 't_folder_closed.gif';
+            $folder = '<i class="far fa-folder"></i>';
             $url = 'dsection';
 
             if ($value['data'] == 1) {
@@ -111,14 +117,15 @@ class SectionsTree extends Tree
 
             if (in_array($value['id'], $ancestors)) {
                 $toggle = '-';
-                $folder = 't_folder_open.gif';
+                $folder = '<i class="far fa-folder-open"></i>';
             }
             if ($value['data'] == 1) {
-                $folder = 'data.gif';
+                $folder = '<i class="far fa-file"></i>';
                 $url = 'dsection/data_item';
                 $value['label'] = $this->truncate($value['label'], 10); // trunc
             }
             $children = sizeof($value['children']);
+            $class = "clearfix";
             $markup .= "<li ";
             // if current is section
             if (!$value['data']) {
@@ -127,8 +134,15 @@ class SectionsTree extends Tree
                 $markup .= "id=\"data_".$value['id']."\"";    
             }            
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
-                $markup .= " class=\"current\"";
+                $class .= " current";
             }
+
+            if (isset($value['hidden']) && $value['hidden']) {
+                $class .= " hidden";
+            }
+
+            $markup .= " class=\"$class\"";
+
             $markup .= ">\n";
             if ($children > 0) {
                 $markup .= "<a class=\"toggle\" href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'];
@@ -139,7 +153,7 @@ class SectionsTree extends Tree
             } else {
                 $markup .= "<span class=\"toggle\">&nbsp;</span>";
             }
-            $markup .= "<img src=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/elib/$folder\" alt=\"\" />\n";
+            $markup .= $folder;
             if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
                 $markup .= "<span class=\"label current\">".$value['label']."</span>";
             } else {
@@ -156,9 +170,9 @@ class SectionsTree extends Tree
                     $this->detect_hidden
                 );
             }
-            $markup .= "<span class=\"clear\"/></li>\n";
+            $markup .= "</li>\n";
         }
-        $markup .= "</ul><div class=\"clear\">&nbsp;</div>\n";
+        $markup .= "</ul>\n";
 
         return $markup;
     }

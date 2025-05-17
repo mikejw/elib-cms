@@ -19,9 +19,7 @@
 <p>&nbsp;</p>
 
 {$data_item->body}
-
-
-
+    
 {elseif $data_item->image neq ''}
 <img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/mid_{$data_item->image}" alt="" />
 
@@ -30,5 +28,13 @@
 <p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/admin/data_item/generate_thumb/{$data_item->id}">Generate New Thumbnail</a></p>
 <p>(You may need to refresh your browser before seeing new thumbnails.)</p>
 
+{elseif $data_item->audio neq ''}
+<audio controls>
+    <source src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$data_item->audio}" type="audio/mpeg">
+    Your browser does not support the audio tag.
+</audio>
+<p><a href="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$data_item->audio}">Download file</a></p>
+    
 {/if}
+
 </div>

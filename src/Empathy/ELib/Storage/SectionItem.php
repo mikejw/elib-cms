@@ -2,10 +2,16 @@
 
 namespace Empathy\ELib\Storage;
 
+<<<<<<< HEAD
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
 
 
+=======
+use Empathy\ELib\Model,
+    Empathy\MVC\Entity;
+use Empathy\MVC\DI;
+>>>>>>> bootstrap4
 
 
 class SectionItem extends Entity
@@ -20,6 +26,8 @@ class SectionItem extends Entity
     public $position;
     public $hidden;
     public $stamp;
+    public $meta;
+    public $user_id;
 
     public function updateTimeStamps($update)
     {
@@ -63,8 +71,9 @@ class SectionItem extends Entity
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
-            $section_id = $row['section_id'];
+            $section_id = (int) $row['section_id'];
         }
+
         if ($section_id != 0) {
             array_push($ancestors, $section_id);
             $ancestors = $this->getAncestorIDs($section_id, $ancestors);
@@ -95,21 +104,37 @@ class SectionItem extends Entity
         $this->query($sql, $error);
     }
 
-    public function buildTree($current, $tree)
-    { 
-
+    public function buildTree($current, $tree, $order = [], $asc = true)
+    {
         $i = 0;
-        $nodes = array();
-        $sql = 'SELECT id,label, hidden FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$current;
+        $nodes = [];
+        $params = [];
+        $sql = 'SELECT id,label, position, template, hidden, meta, UNIX_TIMESTAMP(stamp) as stamp FROM '
+            .Model::getTable('SectionItem').' WHERE section_id = ?';
+        $params[] = $current;
 
         if ($tree->getDetectHidden()) {
             $sql .= ' and hidden != true';
         }
 
-        $sql .= ' order by position';
+        $orderParams = [];
+        if (sizeof($order)) {
+            foreach ($order as $key => $value) {
+                $orderParams[] = '?';
+                $params[] = $value;
+            }
+            $orderBy = implode(',', $orderParams);
+
+        } else {
+            $orderBy = 'position';
+        }
+        $sql .= " order by $orderBy";
+
+        $sql .= $asc ? ' ASC' : ' DESC';
+
         $error = 'Could not get child sections.';
 
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];
@@ -117,24 +142,30 @@ class SectionItem extends Entity
                 $nodes[$i]['data'] = 0;
                 $nodes[$i]['hidden'] = $row['hidden'];
                 $nodes[$i]['label'] = $row['label'];
-                $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree);
+                $nodes[$i]['meta'] = $row['meta'];
+                $nodes[$i]['stamp'] = $row['stamp'];
+                $nodes[$i]['template'] = $row['template'];
+                $nodes[$i]['position'] = $row['position'];
+                $nodes[$i]['children'] = $tree->buildTree($id, 1, $tree, $order, $asc);
                 $i++;
             }
         }
 
         if ($tree->getDataItem() !== NULL) {
 
-            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = '.$current
+            $params = [];
+            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = ?'
                 .' order by position';
+            $params[] = $current;
             $error = 'Could not get child data items.';
-            $result = $this->query($sql, $error);
+            $result = $this->query($sql, $error, $params);
             if ($result->rowCount() > 0) {
                 foreach ($result as $row) {
                     $id = $row['id'];
                     $nodes[$i]['id'] = $id;
                     $nodes[$i]['data'] = 1;
                     $nodes[$i]['label'] = $row['label'];
-                    $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree);
+                    $nodes[$i]['children'] = $tree->buildTree($id, 0, $tree, $order, $asc);
                     $i++;
                 }
             }
@@ -198,4 +229,11 @@ class SectionItem extends Entity
         return $sections;
     }
 
+    public function insert($filter = [], $id = true)
+    {
+        if ($this->user_id === null) {
+            $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
+        }
+        return parent::insert($filter, $id);
+    }
 }

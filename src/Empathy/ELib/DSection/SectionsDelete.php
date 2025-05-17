@@ -2,9 +2,9 @@
 
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\DSection,
-//use Empathy\Model\SectionItem as SectionItem;
-    Empathy\ELib\File\Image as ImageUpload;
+use Empathy\ELib\DSection;
+use Empathy\ELib\File\Image as ImageUpload;
+use Empathy\ELib\File\Upload as AudioUpload;
 
 class SectionsDelete
 {
@@ -30,6 +30,7 @@ class SectionsDelete
             $ids_string = '('.implode(',', $ids).')';
             $images = $this->data_item->getImageFilenames($ids_string);
             $videos = $this->data_item->getVideoFilenames($ids_string);
+            $audioFiles = $this->data_item->getAudioFilenames($ids_string);
 
             $all_files = array();
             if (sizeof($videos) > 0) {
@@ -50,7 +51,16 @@ class SectionsDelete
                 $images_removed = $u->remove($all_files);
             }
 
-            if (sizeof($images) < 1 || $images_removed) {
+            $audioFiles_removed = false;
+            if (sizeof($audioFiles) > 0) {
+                $au = new AudioUpload(false);
+                $audioFiles_removed = $au->remove($audioFiles);
+            }
+
+            if (
+                (sizeof($images) < 1 || $images_removed) ||
+                (sizeof($audioFiles) < 1 || $audioFiles_removed)
+            ){
                 $this->data_item->doDelete($ids_string);
             }
         }
