@@ -5,7 +5,10 @@
     "keywords": [
         "lib"
     ],
+    "homepage": "http://empathyphp.co.uk",
+=======
     "homepage": "https://empathy.sh",
+>>>>>>> develop
     "license": "MIT",
     "authors": [
         {
@@ -14,7 +17,7 @@
         }
     ],
     "require": {
-        "mikejw/elib-base": "^2",
+        "mikejw/elib-base": "dev-master",
         "michelf/php-markdown": "1.9.1"
     },
     "require-dev": {
