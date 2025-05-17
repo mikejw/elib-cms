@@ -2,17 +2,9 @@
 
 namespace Empathy\ELib\Storage;
 
-<<<<<<< HEAD
 use Empathy\ELib\Model;
 use Empathy\MVC\Entity;
-
-
-=======
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
 use Empathy\MVC\DI;
->>>>>>> bootstrap4
-
 
 class SectionItem extends Entity
 {
