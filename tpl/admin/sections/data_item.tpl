@@ -21,7 +21,7 @@
 {$data_item->body}
     
 {elseif $data_item->image neq ''}
-<img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/mid_{$data_item->image}" alt="" />
+<img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/{$image_prefix}_{$data_item->image}" alt="" />
 
 {elseif $data_item->video neq ''}
 <img src="http://{$WEB_ROOT}{$PUBLIC_DIR}/uploads/tn_{$data_item->video}.jpg" alt="" />

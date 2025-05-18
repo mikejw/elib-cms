@@ -23,7 +23,7 @@ class ContainerImageSize extends Entity
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($sizes, array($row['prefix'].'_', $row['width'], $row['height']));
+                array_push($sizes, array($row['prefix'], $row['width'], $row['height']));
             }
         }
 

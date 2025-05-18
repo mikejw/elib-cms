@@ -66,7 +66,7 @@ class Controller extends AdminController
             $this->presenter->assign('data_types', $this->getDataTypes());
 
             $c = Model::load('Container');
-            $containers = $c->getAll();
+            $containers = $c->getAllCustom('');
             $containers_arr = array();
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
@@ -453,6 +453,7 @@ class Controller extends AdminController
         $this->presenter->assign('sections', $st->getMarkup());
         $this->presenter->assign('data_item', $d);
         $this->presenter->assign('is_container', $d->isContainer());
+        return $d;
     }
 
     public function data_item()
@@ -463,7 +464,25 @@ class Controller extends AdminController
             $_GET['id'] = 0;
         }
 
-        $this->buildNavData();
+        $d = $this->buildNavData();
+
+        $imagePrefix = 'mid';
+        if ($d->image != '') {
+            $parentId = $d->data_item_id;
+            if (isset($parentId)) {
+                $parent = Model::load('DataItem');
+                $parent->load($parentId);
+                if ($parent->isContainer()) {
+                    $c = Model::load('ContainerImageSize');
+                    $imageSizes = $c->getImageSizes($parent->container_id);
+                    if (count($imageSizes) > 0) {
+                        $imagePrefix = $imageSizes[0][0];
+                    }
+                }
+            }
+        }
+
+        $this->assign('image_prefix', $imagePrefix);
         $this->presenter->assign('data_item_id', $_GET['id']);
         $this->setTemplate('elib:/admin/section.tpl');
     }
@@ -641,7 +660,7 @@ class Controller extends AdminController
             $this->presenter->assign('data_types', $this->getDataTypes());
 
             $c = Model::load('Container');
-            $containers = $c->getAll();
+            $containers = $c->getAllCustom('');
             $containers_arr = array();
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
