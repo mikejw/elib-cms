@@ -472,7 +472,7 @@ class Controller extends AdminController
             if (isset($parentId)) {
                 $parent = Model::load('DataItem');
                 $parent->load($parentId);
-                if ($parent->isContainer()) {
+                if ($parent->isContainer() && isset($parent->container_id)) {
                     $c = Model::load('ContainerImageSize');
                     $imageSizes = $c->getImageSizes($parent->container_id);
                     if (count($imageSizes) > 0) {

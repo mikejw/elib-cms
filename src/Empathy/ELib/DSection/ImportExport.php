@@ -38,29 +38,33 @@ class ImportExport
         return $sectionsData;
     }
 
-    private function insertSection($parent_id, $section)
+    private function insertSection($parent_id, $data, $topLevelSection)
     {
-        $s = Model::load('SectionItem');
-        $s->section_id = $parent_id;
-        $s->label = $section['label'];
-        $s->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
-        $s->hidden = $section['hidden'];
-        $s->template = $section['template'];
-        $s->position = $section['position'];
-        $s->meta = $section['meta'];
-        $s->stamp = $section['stamp'] ?
-            is_numeric($section['stamp']) ?
-                date('Y-m-d H:i:s', $section['stamp'])
-                : $section['stamp']
-            : 'MYSQLTIME';
+        if (isset($data['template'])) {
+            $s = Model::load('SectionItem');
+            $s->section_id = $parent_id;
+            $s->label = $data['label'];
+            $s->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
+            $s->hidden = $data['hidden'];
+            $s->template = $data['template'];
+            $s->position = $data['position'];
+            $s->meta = $data['meta'];
+            $s->stamp = $data['stamp'] ?
+                is_numeric($data['stamp']) ?
+                    date('Y-m-d H:i:s', $data['stamp'])
+                    : $data['stamp']
+                : 'MYSQLTIME';
 
-        return $s->insert();
+            return [true, $s->insert()];
+        } else {
+            return [false, $this->insertData($parent_id, $data, true, $topLevelSection)];
+        }
     }
 
     private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
     {
         $d = Model::load('DataItem');
-        if ($sectionParent || $topLevelSection) {
+        if (($sectionParent || $topLevelSection) && !isset($data['data_item_id'])) {
             $d->section_id = $parent_id;
         } else {
             $d->data_item_id = $parent_id;
@@ -93,14 +97,26 @@ class ImportExport
                     $success = copy($path . '/' . $data['image'], $path . '/' . $name);
                 }
             }
-            if (file_exists($path . '/' . 'l_' . $data['image'])) {
-                copy($path . '/' . 'l_' . $data['image'], $path . '/' . 'l_' . $name);
+
+            $imagePrefixes = ['mid', 'l', 'tn'];
+            $parentId = $data['data_item_id'];
+            if (isset($parentId)) {
+                $parent = Model::load('DataItem');
+                $parent->load($parentId);
+                if ($parent->isContainer() && isset($parent->container_id)) {
+                    $c = Model::load('ContainerImageSize');
+                    $imageSizes = $c->getImageSizes($parent->container_id);
+                    if (count($imageSizes) > 0) {
+                        $imagePrefixes = array_map(function($item) {
+                            return $item[0];
+                        }, $imageSizes);
+                    }
+                }
             }
-            if (file_exists($path . '/' . 'mid_' . $data['image'])) {
-                copy($path . '/' . 'mid_' . $data['image'], $path . '/' . 'mid_' . $name);
-            }
-            if (file_exists($path . '/' . 'tn_' . $data['image'])) {
-                copy($path . '/' . 'tn_' . $data['image'], $path . '/' . 'tn_' . $name);
+            foreach ($imagePrefixes as $prefix) {
+                if (file_exists("$path/${prefix}_" . $data['image'])) {
+                    copy("$path/${prefix}_" . $data['image'], "$path/${prefix}_" . $name);
+                }
             }
 
             $d->image = $name;
@@ -114,7 +130,7 @@ class ImportExport
         foreach ($sectionsData as $item) {
 
             if ($sectionParent) {
-                $id = $this->insertSection($parent_id, $item);
+                list($sectionParent, $id) = $this->insertSection($parent_id, $item, $topLevelSection);
             } else {
                 $id = $this->insertData($parent_id, $item, $sectionParent, $topLevelSection);
             }
