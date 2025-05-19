@@ -35,21 +35,25 @@ class ImageSize extends Entity
 
     public function getDataFiles()
     {
-        $images = array();
-        $ids = array();
+        $images = [];
+        $ids = [];
+        $params = [];
         $sql = 'SELECT id from '.Model::getTable('DataItem').' d,'
-            .Model::getTable('ContainerImageSize').' c WHERE c.image_size_id = '.$this->id
+            .Model::getTable('ContainerImageSize')
+            .' c WHERE c.image_size_id = ?'
             .' AND c.container_id = d.container_id';
+        $params[] = $this->id;
         $error = 'Could not get data item containers that are using selected image size.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         foreach ($result as $row) {
             $ids[] = $row['id'];
         }
 
         if (sizeof($ids) > 0) {
-            $sql = 'SELECT image FROM '.Model::getTable('DataItem').' WHERE data_item_id IN'.$this->buildUnionString($ids);
+            list($unionString, $params) = $this->buildUnionString($ids);
+            $sql = 'SELECT image FROM '.Model::getTable('DataItem').' WHERE data_item_id IN '. $unionString;
             $error = 'Could not got images matching image size.';
-            $result = $this->query($sql, $error);
+            $result = $this->query($sql, $error, $params);
             foreach ($result as $row) {
                 $images[] = $row['image'];
             }

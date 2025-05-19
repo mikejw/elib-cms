@@ -328,10 +328,12 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function findLastSection($id)
     {
         $section_id = 0;
-        $sql = 'SELECT id,section_id,data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ' . $id;
+        $params = [];
+        $sql = 'SELECT id,section_id,data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ?';
+        $params[] = $id;
         $error = 'Could not find last section.';
 
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         $row = $result->fetch();
         if (!is_numeric($row['section_id'])) {
             $section_id = $this->findLastSection($row['data_item_id']);
@@ -345,9 +347,11 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getAncestorIDs($id, $ancestors)
     {
         $data_item_id = 0;
-        $sql = 'SELECT data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ' . $id;
+        $params = [];
+        $sql = 'SELECT data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ?';
+        $params[] = $id;
         $error = 'Could not get parent id.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             $data_item_id = $row['data_item_id'];
@@ -362,14 +366,17 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function buildDelete($id, &$ids, $section_start)
     {
+        $params = [];
         if ($section_start) {
-            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ' . $id;
+            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ?';
+            $params[] = $id;
         } else {
-            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ' . $id;
+            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ?';
+            $params[] = $id;
             array_push($ids, $id);
         }
         $error = 'Could not find data items for deletion.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $this->buildDelete($row['id'], $ids, 0);
@@ -377,30 +384,38 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         }
     }
 
-    public function doDelete($ids)
+    public function doDelete($idsString, $params)
     {
-        $sql = 'DELETE FROM ' . Model::getTable('DataItem') . ' WHERE id IN' . $ids;
+        $sql = 'DELETE FROM ' . Model::getTable('DataItem') . ' WHERE id IN ' . $idsString;
         $error = 'Could not remove data item(s).';
-        $this->query($sql, $error);
+        $this->query($sql, $error, $params);
     }
 
     public function buildTree($current, $tree, $order = array(), $asc = true)
     {
         $i = 0;
         $nodes = array();
-        $sql = 'SELECT id,label FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ' . $current;
+        $params = [];
+        $sql = 'SELECT id,label FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ?';
+        $params[] = $current;
 
+        $orderParams = [];
         if (sizeof($order)) {
-            $orderBy = implode(',', $order);
+            foreach ($order as $key => $value) {
+                $orderParams[] = '?';
+                $params[] = $value;
+            }
+            $orderBy = implode(',', $orderParams);
+
         } else {
             $orderBy = 'position';
         }
-        $sql .= ' order by ' . $orderBy;
+        $sql .= " order by $orderBy";
 
         $sql .= $asc ? ' ASC' : ' DESC';
 
         $error = 'Could not get child data items.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $id = $row['id'];
@@ -414,13 +429,13 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         return $nodes;
     }
 
-    public function getImageFilenames($ids)
+    public function getImageFilenames($sql, $params)
     {
         $images = array();
         $sql = 'SELECT image FROM ' . Model::getTable('DataItem') . ' WHERE image IS NOT NULL'
-            . ' AND id IN' . $ids;
+            . ' AND id IN' . $sql;
         $error = 'Could not get matching data item image filenames.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($images, $row['image']);
@@ -430,13 +445,13 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         return $images;
     }
 
-    public function getVideoFilenames($ids)
+    public function getVideoFilenames($sql, $params)
     {
         $videos = array();
         $sql = 'SELECT video FROM ' . Model::getTable('DataItem') . ' WHERE video IS NOT NULL'
-            . ' AND id IN' . $ids;
+            . ' AND id IN' . $sql;
         $error = 'Could not get matching data item video filenames.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($videos, $row['video']);
@@ -446,13 +461,13 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         return $videos;
     }
 
-    public function getAudioFilenames($ids)
+    public function getAudioFilenames($sql, $params)
     {
         $audioFiles = array();
         $sql = 'SELECT audio FROM ' . Model::getTable('DataItem') . ' WHERE audio IS NOT NULL'
-            . ' AND id IN' . $ids;
+            . ' AND id IN' . $sql;
         $error = 'Could not get matching data item audio filenames.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($audioFiles, $row['audio']);
@@ -466,7 +481,8 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         // ammended to perform search by position value
     {
         $id = 0;
-        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
+        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') .
+            ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
         $error = 'Could not get most recent video.';
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {

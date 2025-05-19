@@ -24,27 +24,29 @@ class SectionItem extends Entity
     public function updateTimeStamps($update)
     {
         $sql = 'UPDATE '.Model::getTable('SectionItem')
-            .' SET stamp = NOW() WHERE id IN'.$update;
+            .' SET stamp = NOW() WHERE id IN ' . $update[0];
         $error = 'Could not update timestamps.';
-        $this->query($sql, $error);
+        $this->query($sql, $error, $update[1]);
     }
 
     public function getContactCountries($section_id)
     {
-        $country = array();
-        $sql = 'SELECT  d1.label, d3.body FROM '.Model::getTable('DataItem').' d1, '.Model::getTable('DataItem').' d2, '.Model::getTable('DataItem').' d3,'
-            .' '.Model::getTable('SectionItem').' s WHERE s.id =  '.$section_id
+        $country = [];
+        $params = [];
+        $sql = 'SELECT  d1.label, d3.body FROM '.Model::getTable('DataItem').' d1, '
+            .Model::getTable('DataItem').' d2, '.Model::getTable('DataItem').' d3,'
+            .' '.Model::getTable('SectionItem').' s WHERE s.id =  ?'
             .' AND d2.section_id = s.id AND d1.data_item_id = d2.id'
             .' AND d3.data_item_id = d1.id'
             .' ORDER BY d1.label';
+        $params[] = $section_id;
         $error = 'Could not get counties data.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 array_push($country, $row);
             }
         }
-
         return $country;
     }
 
@@ -57,10 +59,12 @@ class SectionItem extends Entity
 
     public function getAncestorIDs($id, $ancestors)
     {
+        $params = [];
         $section_id = 0;
-        $sql = 'SELECT section_id FROM '.Model::getTable('SectionItem').' WHERE id = '.$id;
+        $sql = 'SELECT section_id FROM '.Model::getTable('SectionItem').' WHERE id = ?';
+        $params[] = $id;
         $error = 'Could not get parent id.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
             $section_id = (int) $row['section_id'];
@@ -78,10 +82,11 @@ class SectionItem extends Entity
     {
         array_push($ids, $id);
         $tree->deleteData($id, 1);
-
-        $sql = 'SELECT id FROM '.Model::getTable('SectionItem').' WHERE section_id = '.$id;
+        $params = [];
+        $sql = 'SELECT id FROM '.Model::getTable('SectionItem').' WHERE section_id = ?';
+        $params[] = $id;
         $error = 'Could not find section items for deletion.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
                 $this->buildDelete($row['id'], $ids, $tree);
@@ -89,11 +94,11 @@ class SectionItem extends Entity
         }
     }
 
-    public function doDelete($ids)
+    public function doDelete($idsString, $params)
     {
-        $sql = 'DELETE FROM '.Model::getTable('SectionItem').' WHERE id IN'.$ids;
+        $sql = 'DELETE FROM '.Model::getTable('SectionItem').' WHERE id IN '.$idsString;
         $error = 'Could not remove section item(s).';
-        $this->query($sql, $error);
+        $this->query($sql, $error, $params);
     }
 
     public function buildTree($current, $tree, $order = [], $asc = true)
@@ -170,11 +175,13 @@ class SectionItem extends Entity
     {
         $i = 0;
         $build = 1;
+        $params = [];
         while ($build) {
             $sql = "SELECT section_id, label  FROM ".Model::getTable('SectionItem')
-                ." WHERE id = $id";
+                .' WHERE id = ?';
+            $params[] = $id;
             $error = "Could not build URL.";
-            $result = $this->query($sql, $error);
+            $result = $this->query($sql, $error, $params);
             $row = $result->fetch();
 
             $url[$i] = $row['label'];
@@ -192,11 +199,12 @@ class SectionItem extends Entity
 
     public function getAllForSitemap($ignore)
     {
-        $sections = array();
+        $sections = [];
+        list($unionSql, $params) = $this->buildUnionString($ignore);
         $sql = 'SELECT *, UNIX_TIMESTAMP(stamp) AS stamp FROM '.Model::getTable('SectionItem')
-            .' WHERE id NOT IN'.$this->buildUnionString($ignore);
+            .' WHERE id NOT IN '. $unionSql;
         $error = 'Could not get sections for sitemap.';
-        $result = $this->query($sql, $error);
+        $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
 

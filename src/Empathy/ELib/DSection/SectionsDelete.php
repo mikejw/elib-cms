@@ -27,10 +27,14 @@ class SectionsDelete
         $ids = array();
         $this->data_item->buildDelete($id, $ids, $section_start);
         if (sizeof($ids) > 0) {
-            $ids_string = '('.implode(',', $ids).')';
-            $images = $this->data_item->getImageFilenames($ids_string);
-            $videos = $this->data_item->getVideoFilenames($ids_string);
-            $audioFiles = $this->data_item->getAudioFilenames($ids_string);
+            $queryParams = [];
+            foreach ($ids as $id) {
+                $queryParams[] = '?';
+            }
+            $ids_string = '('.implode(',', $queryParams).')';
+            $images = $this->data_item->getImageFilenames($ids_string, $ids);
+            $videos = $this->data_item->getVideoFilenames($ids_string, $ids);
+            $audioFiles = $this->data_item->getAudioFilenames($ids_string, $ids);
 
             $all_files = array();
             if (sizeof($videos) > 0) {
@@ -61,7 +65,7 @@ class SectionsDelete
                 (sizeof($images) < 1 || $images_removed) ||
                 (sizeof($audioFiles) < 1 || $audioFiles_removed)
             ){
-                $this->data_item->doDelete($ids_string);
+                $this->data_item->doDelete($ids_string, $ids);
             }
         }
     }
@@ -71,10 +75,12 @@ class SectionsDelete
         $ids = array();
         $this->section->buildDelete($id, $ids, $this);
         if (sizeof($ids) > 0) {
-            $ids_string = '('.implode(',', $ids).')';
-            $this->section->doDelete($ids_string);
+            $params = [];
+            foreach ($ids as $id) {
+                $params[] = '?';
+            }
+            $ids_string = '('.implode(',', $params).')';
+            $this->section->doDelete($ids_string, $ids);
         }
-
     }
-
 }

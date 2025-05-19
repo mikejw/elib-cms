@@ -13,9 +13,9 @@ class Container extends Entity
     public $name;
     public $description;
 
-    public function getAll($table=null)
+    public function getAll()
     {
-        $container = array();
+        $container = [];
         $sql = 'SELECT'
             .' c.id AS container_id, i.id AS image_size_id, '
             .' i.name AS image_size_name, c.name AS container_name'
@@ -68,15 +68,20 @@ class Container extends Entity
 
     public function update($id, $new_sizes)
     {
+        $params = [];
         $sql = 'DELETE FROM '.Model::getTable('ContainerImageSize')
-            .' WHERE container_id = '.$id;
+            .' WHERE container_id = ?';
+        $params[] = $id;
         $error = 'Could not clear old image sizes from container.';
-        $this->query($sql, $error);
+        $this->query($sql, $error, $params);
         foreach ($new_sizes as $index => $size_id) {
+            $params = [];
             $sql = 'INSERT INTO '.Model::getTable('ContainerImageSize')
-                .' VALUES('.$id.', '.$size_id.')';
+                .' VALUES(?, ?)';
+            $params[] = $id;
+            $params[] = $size_id;
             $error = 'Could not inert new image size';
-            $this->query($sql, $error);
+            $this->query($sql, $error, $params);
         }
     }
 }
