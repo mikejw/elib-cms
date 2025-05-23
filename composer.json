@@ -14,7 +14,7 @@
         }
     ],
     "require": {
-        "mikejw/elib-base": "^2",
+        "mikejw/elib-base": "^3",
         "michelf/php-markdown": "1.9.1"
     },
     "require-dev": {
