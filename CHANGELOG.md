@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [2.0.3] - 2025-05-23
+
+### Fixed
+
+- Add missing square brackets
+
+
 ## [2.0.2] - 2025-05-19
 
 ### Fixed
