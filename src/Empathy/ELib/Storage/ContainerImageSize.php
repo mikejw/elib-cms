@@ -20,7 +20,7 @@ class ContainerImageSize extends Entity
         $sql = 'SELECT prefix, width, height FROM '.Model::getTable('ImageSize').' i, '
             .Model::getTable('ContainerImageSize').' c WHERE c.image_size_id = i.id'
             .' AND c.container_id = ?';
-        $params = $container_id;
+        $params[] = $container_id;
         $error = 'Could not get image sizes for container.';
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
@@ -39,7 +39,7 @@ class ContainerImageSize extends Entity
         $sql = 'SELECT prefix FROM '.Model::getTable('ImageSize').' i, '
             .Model::getTable('ContainerImageSize').' c WHERE c.image_size_id = i.id'
             .' AND c.container_id = ?';
-        $params = $container_id;
+        $params[] = $container_id;
         $error = 'Could not get image sizes for container.';
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
