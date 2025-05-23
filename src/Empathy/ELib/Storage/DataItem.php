@@ -2,11 +2,12 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
 use Empathy\MVC\DI;
 use Empathy\MVC\Config;
 use Michelf\Markdown;
+use Empathy\ELib\Storage\DataItem as EDataItem;
 
 
 class DataItem extends Entity implements \JsonSerializable, \Iterator
@@ -134,7 +135,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             $i = 0;
             foreach ($data_set as $index => $item) {
 
-                $data = Model::load('DataItem');
+                $data = Model::load(EDataItem::class);
                 if ($this->export) {
                     $data->setExporting();
                 }
@@ -169,7 +170,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getSectionData($section_id)
     {
         $ids = array();
-        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ' . $section_id
+        $sql = 'SELECT id FROM ' . Model::getTable(EDataItem::class) . ' WHERE section_id = ' . $section_id
             . ' and hidden != 1'
             . ' ORDER BY position';
         $error = 'Could not get data item id based on section id.';
@@ -329,7 +330,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     {
         $section_id = 0;
         $params = [];
-        $sql = 'SELECT id,section_id,data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ?';
+        $sql = 'SELECT id,section_id,data_item_id FROM ' . Model::getTable(EDataItem::class) . ' WHERE id = ?';
         $params[] = $id;
         $error = 'Could not find last section.';
 
@@ -348,7 +349,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     {
         $data_item_id = 0;
         $params = [];
-        $sql = 'SELECT data_item_id FROM ' . Model::getTable('DataItem') . ' WHERE id = ?';
+        $sql = 'SELECT data_item_id FROM ' . Model::getTable(EDataItem::class) . ' WHERE id = ?';
         $params[] = $id;
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error, $params);
@@ -368,10 +369,10 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     {
         $params = [];
         if ($section_start) {
-            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE section_id = ?';
+            $sql = 'SELECT id FROM ' . Model::getTable(EDataItem::class) . ' WHERE section_id = ?';
             $params[] = $id;
         } else {
-            $sql = 'SELECT id FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ?';
+            $sql = 'SELECT id FROM ' . Model::getTable(EDataItem::class) . ' WHERE data_item_id = ?';
             $params[] = $id;
             array_push($ids, $id);
         }
@@ -386,7 +387,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
 
     public function doDelete($idsString, $params)
     {
-        $sql = 'DELETE FROM ' . Model::getTable('DataItem') . ' WHERE id IN ' . $idsString;
+        $sql = 'DELETE FROM ' . Model::getTable(EDataItem::class) . ' WHERE id IN ' . $idsString;
         $error = 'Could not remove data item(s).';
         $this->query($sql, $error, $params);
     }
@@ -396,7 +397,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         $i = 0;
         $nodes = array();
         $params = [];
-        $sql = 'SELECT id,label FROM ' . Model::getTable('DataItem') . ' WHERE data_item_id = ?';
+        $sql = 'SELECT id,label FROM ' . Model::getTable(EDataItem::class) . ' WHERE data_item_id = ?';
         $params[] = $current;
 
         $orderParams = [];
@@ -432,7 +433,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getImageFilenames($sql, $params)
     {
         $images = array();
-        $sql = 'SELECT image FROM ' . Model::getTable('DataItem') . ' WHERE image IS NOT NULL'
+        $sql = 'SELECT image FROM ' . Model::getTable(EDataItem::class) . ' WHERE image IS NOT NULL'
             . ' AND id IN' . $sql;
         $error = 'Could not get matching data item image filenames.';
         $result = $this->query($sql, $error, $params);
@@ -448,7 +449,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getVideoFilenames($sql, $params)
     {
         $videos = array();
-        $sql = 'SELECT video FROM ' . Model::getTable('DataItem') . ' WHERE video IS NOT NULL'
+        $sql = 'SELECT video FROM ' . Model::getTable(EDataItem::class) . ' WHERE video IS NOT NULL'
             . ' AND id IN' . $sql;
         $error = 'Could not get matching data item video filenames.';
         $result = $this->query($sql, $error, $params);
@@ -464,7 +465,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     public function getAudioFilenames($sql, $params)
     {
         $audioFiles = array();
-        $sql = 'SELECT audio FROM ' . Model::getTable('DataItem') . ' WHERE audio IS NOT NULL'
+        $sql = 'SELECT audio FROM ' . Model::getTable(EDataItem::class) . ' WHERE audio IS NOT NULL'
             . ' AND id IN' . $sql;
         $error = 'Could not get matching data item audio filenames.';
         $result = $this->query($sql, $error, $params);
@@ -481,7 +482,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
         // ammended to perform search by position value
     {
         $id = 0;
-        $sql = 'SELECT id FROM ' . Model::getTable('DataItem') .
+        $sql = 'SELECT id FROM ' . Model::getTable(EDataItem::class) .
             ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
         $error = 'Could not get most recent video.';
         $result = $this->query($sql, $error);

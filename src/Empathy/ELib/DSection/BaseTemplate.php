@@ -2,8 +2,11 @@
 
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\Model,
-    Empathy\ELib\EController;
+use Empathy\MVC\Model;
+use Empathy\ELib\EController;
+use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\Storage\DataItem;
+
 
 class BaseTemplate extends EController
 {
@@ -13,11 +16,10 @@ class BaseTemplate extends EController
     public function __construct($boot)
     {
         parent::__construct($boot);
-        $this->section = Model::load('SectionItem');
-        $this->data_item = Model::load('DataItem');
+        $this->section = Model::load(SectionItem::class);
+        $this->data_item = Model::load(DataItem::class);
 
         $this->section->load($_GET['section']);
         $this->assign('template', $this->section->template);
     }
-
 }

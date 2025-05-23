@@ -3,8 +3,9 @@
 namespace ESuite\Storage;
 
 use ESuite\ESuiteTest;
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\DSection\SectionsTree;
 
 
@@ -18,16 +19,15 @@ class SectionItemTest extends ESuiteTest
 
     public function testGetSectionItemEntity()
     {
-        $s = Model::load('SectionItem');
+        $s = Model::load(SectionItem::class);
         $this->assertInstanceOf(SectionItem::class, $s);
     }
 
     public function testHasSection()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
-        $s = Model::load('SectionItem');
-        $s->load(1);
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class, 1);
+        $d = Model::load(DataItem::class);
 
         $tree = new SectionsTree(
             $s, $d, true, null, true
@@ -39,9 +39,8 @@ class SectionItemTest extends ESuiteTest
     public function testRootIsSection()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
-        $s = Model::load('SectionItem');
-        $s->id = 0;
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class);
+        $d = Model::load(DataItem::class);
 
         $tree = new SectionsTree(
             $s, $d, true, null, true
@@ -53,9 +52,8 @@ class SectionItemTest extends ESuiteTest
     public function testHasSectionAndData()
     {
         $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
-        $s = Model::load('SectionItem');
-        $s->load(0);
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class, 0);
+        $d = Model::load(DataItem::class);
 
         $tree = new SectionsTree(
             $s, $d, true, null, true

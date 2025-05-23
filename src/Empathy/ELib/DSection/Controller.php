@@ -8,7 +8,14 @@ use Empathy\ELib\File\Image as ImageUpload;
 use Empathy\ELib\File\Upload as AudioUpload;
 use Empathy\ELib\DSection\SectionsDelete;
 use Empathy\ELib\DSection\SectionsTree;
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\Container;
+use Empathy\ELib\Storage\VideoUpload;
+use Empathy\ELib\Storage\ContainerImageSize;
+use Empathy\ELib\Storage\ImageSize;
+
 
 class Controller extends AdminController
 {
@@ -59,13 +66,13 @@ class Controller extends AdminController
         } elseif (isset($_GET['cancel'])) {
             $this->redirect('admin/dsection/' . $_GET['id']);
         } else {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
             $this->presenter->assign('section_item', $s);
             $this->presenter->assign('section_item_id', $s->id);
             $this->presenter->assign('data_types', $this->getDataTypes());
 
-            $c = Model::load('Container');
+            $c = Model::load(Container::class);
             $containers = $c->getAllCustom('');
             $containers_arr = array();
             $containers_arr[0] = 'Default';
@@ -80,7 +87,7 @@ class Controller extends AdminController
     public function addDataContainer()
     {
         if (isset($_GET['container_type']) && is_numeric($_GET['container_type'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->section_id = $_GET['id'];
             if ($_GET['container_type'] > 0) {
                 $d->container_id = $_GET['container_type'];
@@ -88,7 +95,7 @@ class Controller extends AdminController
             $d->label = 'Container';
             $d->position = 'DEFAULT';
             $d->hidden = 'DEFAULT';
-            $su = Model::load('SectionItem');
+            $su = Model::load(SectionItem::class);
             $u = new SectionsUpdate($su, $d->section_id);
             $id = $d->insert();
 
@@ -100,7 +107,7 @@ class Controller extends AdminController
     public function add_data_heading()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->label = 'Heading';
             $d->section_id = $_GET['id'];
             $d->heading = $_POST['heading'];
@@ -111,7 +118,7 @@ class Controller extends AdminController
                 $this->presenter->assign('data_item', $d);
                 $this->presenter->assign('errors', $d->getValErrors());
             } else {
-                $su = Model::load('SectionItem');
+                $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
@@ -128,7 +135,7 @@ class Controller extends AdminController
     public function add_data_body()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->label = 'Body';
             $d->section_id = $_GET['id'];
             $d->body = $_POST['body'];
@@ -139,7 +146,7 @@ class Controller extends AdminController
                 $this->presenter->assign('data_item', $d);
                 $this->presenter->assign('errors', $d->getValErrors());
             } else {
-                $su = Model::load('SectionItem');
+                $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
@@ -175,7 +182,7 @@ class Controller extends AdminController
                 if ($u->error != '') {
                     $this->presenter->assign('error', $u->error);
                 } else {
-                    $d = Model::load('DataItem');
+                    $d = Model::load(DataItem::class);
                     $d->label = $u->getFileEncoded();
                     $d->section_id = $_GET['id'];
                     $d->image = $u->getFile();
@@ -183,7 +190,7 @@ class Controller extends AdminController
                     $d->image_height = $u->getDimensions()[1];
                     $d->position = 'DEFAULT';
                     $d->hidden = 'DEFAULT';
-                    $su = Model::load('SectionItem');
+                    $su = Model::load(SectionItem::class);
                     $u = new SectionsUpdate($su, $d->section_id);
                     $id = $d->insert();
                     $this->clearCache();
@@ -212,7 +219,7 @@ class Controller extends AdminController
 
         if (isset($_POST['id'])) {
             echo 1;
-            $v = Model::load('VideoUpload');
+            $v = Model::load(VideoUpload::class);
             $v->upload();
 
             if ($v->error == '') {
@@ -222,7 +229,7 @@ class Controller extends AdminController
             if ($v->error != '') {
                 $this->presenter->assign('error', $v->error);
             } else {
-                $d = Model::load('DataItem');
+                $d = Model::load(DataItem::class);
                 $d->label = $v->file;
                 $d->data_item_id = $_GET['id'];
                 $d->image = 'DEFAULT';
@@ -250,13 +257,13 @@ class Controller extends AdminController
             if ($u->error != '') {
                 $this->presenter->assign('error', $u->error);
             } else {
-                $d = Model::load('DataItem');
+                $d = Model::load(DataItem::class);
                 $d->label = $u->getFileNameEncoded();
                 $d->section_id = $_GET['id'];
                 $d->audio = $u->getFile();
                 $d->position = 'DEFAULT';
                 $d->hidden = 'DEFAULT';
-                $su = Model::load('SectionItem');
+                $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $d->section_id);
                 $id = $d->insert();
                 $this->clearCache();
@@ -295,8 +302,8 @@ class Controller extends AdminController
     {
         $this->setTemplate('elib:admin/section.tpl');
         $this->assertID();
-        $s = Model::load('SectionItem');
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class);
+        $d = Model::load(DataItem::class);
 
         if (isset($_GET['collapsed']) && $_GET['collapsed'] == 1) {
             $collapsed = 1;
@@ -313,7 +320,7 @@ class Controller extends AdminController
     public function add_section()
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->section_id = $_GET['id'];
             $s->label = 'New Section';
             $s->template = 'DEFAULT';
@@ -329,8 +336,8 @@ class Controller extends AdminController
     public function delete()
     {
         $this->assertID();
-        $s = Model::load('SectionItem');
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class);
+        $d = Model::load(DataItem::class);
         $s->load($_GET['id']);
         $sd = new SectionsDelete($s, $d, 1);
         $this->clearCache();
@@ -341,7 +348,7 @@ class Controller extends AdminController
     {
         $this->buildNav();
         if (isset($_POST['save'])) {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_POST['id']);
             $s->label = $_POST['label'];
             $s->validates();
@@ -350,7 +357,7 @@ class Controller extends AdminController
                 $this->presenter->assign('errors', $s->getValErrors());
             } else {
                 $s->save();
-                $su = Model::load('SectionItem');
+                $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $s->id);
                 $this->clearCache();
                 $this->redirect('admin/dsection/' . $s->id);
@@ -358,7 +365,7 @@ class Controller extends AdminController
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/' . $_POST['id']);
         } else {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
             $this->presenter->assign('section', $s);
         }
@@ -368,7 +375,7 @@ class Controller extends AdminController
     {
         $this->buildNav();
         if (isset($_POST['save'])) {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_POST['id']);
             $s->template = $_POST['template'];
             $s->validates();
@@ -377,7 +384,7 @@ class Controller extends AdminController
                 $this->presenter->assign('errors', $s->getValErrors());
             } else {
                 $s->save();
-                $su = Model::load('SectionItem');
+                $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $s->id);
                 $this->clearCache();
                 $this->redirect('admin/dsection/' . $s->id);
@@ -385,7 +392,7 @@ class Controller extends AdminController
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/' . $_POST['id']);
         } else {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
 
             $t = array(
@@ -425,7 +432,7 @@ class Controller extends AdminController
 
     public function toggle_hidden()
     {
-        $s = Model::load('SectionItem');
+        $s = Model::load(SectionItem::class);
         $s->load($_GET['id']);
         $s->hidden = ($s->hidden) ? 0 : 1;
         $s->save();
@@ -438,8 +445,8 @@ class Controller extends AdminController
     {
         //    $this->setTemplate('admin/data_item.tpl');
         $this->assertID();
-        $s = Model::load('SectionItem');
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class);
+        $d = Model::load(DataItem::class);
 
         $d->load($_GET['id']);
         $is_section = 0;
@@ -470,10 +477,10 @@ class Controller extends AdminController
         if ($d->image != '') {
             $parentId = $d->data_item_id;
             if (isset($parentId)) {
-                $parent = Model::load('DataItem');
+                $parent = Model::load(DataItem::class);
                 $parent->load($parentId);
                 if ($parent->isContainer() && isset($parent->container_id)) {
-                    $c = Model::load('ContainerImageSize');
+                    $c = Model::load(ContainerImageSize::class);
                     $imageSizes = $c->getImageSizes($parent->container_id);
                     if (count($imageSizes) > 0) {
                         $imagePrefix = $imageSizes[0][0];
@@ -491,8 +498,8 @@ class Controller extends AdminController
     {
         $this->assertID();
         $this->setTemplate('elib:/admin/section.tpl');
-        $s = Model::load('SectionItem');
-        $d = Model::load('DataItem');
+        $s = Model::load(SectionItem::class);
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->update_timestamps($d->id);
         $sd = new SectionsDelete($s, $d, 0);
@@ -507,7 +514,7 @@ class Controller extends AdminController
 
     public function update_timestamps($id)
     {
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $ancestors = array();
         $ancestors = $d->getAncestorIDs($id, $ancestors);
 
@@ -517,13 +524,13 @@ class Controller extends AdminController
             $d->id = $id;
         }
         $d->load($d->id);
-        $u = new SectionsUpdate(Model::load('SectionItem'), $d->section_id);
+        $u = new SectionsUpdate(Model::load(SectionItem::class), $d->section_id);
     }
 
     public function rename_data_item()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->load($_POST['id']);
             $d->label = $_POST['label'];
             $d->validates();
@@ -543,7 +550,7 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
@@ -553,7 +560,7 @@ class Controller extends AdminController
     {
         $this->assign('event', 'edit_meta');
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->load($_POST['id']);
             $d->meta = $_POST['meta'];
 
@@ -575,7 +582,7 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
@@ -584,7 +591,7 @@ class Controller extends AdminController
     public function edit_section_item_meta()
     {
         if (isset($_POST['save'])) {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->load($_POST['id']);
             $s->meta = $_POST['meta'];
 
@@ -603,7 +610,7 @@ class Controller extends AdminController
         }
 
         $this->buildNav();
-        $s = Model::load('SectionItem');
+        $s = Model::load(SectionItem::class);
         $s->load($_GET['id']);
         $this->assign('section_item', $s);
         $this->assign('section_id', $s->id);
@@ -611,7 +618,7 @@ class Controller extends AdminController
 
     public function data_item_toggle_hidden()
     {
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $d->hidden = ($d->hidden) ? 0 : 1;
         $d->save();
@@ -651,7 +658,7 @@ class Controller extends AdminController
                     break;
             }
         } else {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->load($_GET['id']);
             $this->presenter->assign('class', 'data_item');
             $this->presenter->assign('data_item', $d);
@@ -659,7 +666,7 @@ class Controller extends AdminController
             //$this->presenter->assign('add_data_menu', 1);
             $this->presenter->assign('data_types', $this->getDataTypes());
 
-            $c = Model::load('Container');
+            $c = Model::load(Container::class);
             $containers = $c->getAllCustom('');
             $containers_arr = array();
             $containers_arr[0] = 'Default';
@@ -674,7 +681,7 @@ class Controller extends AdminController
     public function data_add_data_body()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->label = 'Body';
             $d->data_item_id = $_GET['id'];
             $d->body = $_POST['body'];
@@ -703,7 +710,7 @@ class Controller extends AdminController
     public function data_add_data_heading()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->label = 'Heading';
             $d->data_item_id = $_GET['id'];
             $d->heading = $_POST['heading'];
@@ -734,11 +741,11 @@ class Controller extends AdminController
 
             $_GET['id'] = $_POST['id'];
 
-            $p = Model::load('DataItem');
+            $p = Model::load(DataItem::class);
             $p->load($_GET['id']);
 
             if (is_numeric($p->container_id)) {
-                $c = Model::load('ContainerImageSize');
+                $c = Model::load(ContainerImageSize::class);
                 $sizes = $c->getImageSizes($p->container_id);
             } else {
                 $sizes = array();
@@ -762,7 +769,7 @@ class Controller extends AdminController
                 if ($u->error != '') {
                     $this->presenter->assign('error', $u->error);
                 } else {
-                    $d = Model::load('DataItem');
+                    $d = Model::load(DataItem::class);
                     $d->label = $u->getFileEncoded();
                     $d->data_item_id = $_GET['id'];
                     $d->image = $u->getFile();
@@ -802,7 +809,7 @@ class Controller extends AdminController
             if ($u->error != '') {
                 $this->presenter->assign('error', $u->error);
             } else {
-                $d = Model::load('DataItem');
+                $d = Model::load(DataItem::class);
                 $d->label = $u->getFileNameEncoded();
                 $d->data_item_id = $_GET['id'];
                 $d->audio = $u->getFile();
@@ -832,7 +839,7 @@ class Controller extends AdminController
 
         if (isset($_POST['id'])) {
             echo 1;
-            $v = Model::load('VideoUpload');
+            $v = Model::load(VideoUpload::class);
             $v->upload();
 
             if ($v->error == '') {
@@ -842,7 +849,7 @@ class Controller extends AdminController
             if ($v->error != '') {
                 $this->presenter->assign('error', $v->error);
             } else {
-                $d = Model::load('DataItem');
+                $d = Model::load(DataItem::class);
                 $d->label = $v->file;
                 $d->data_item_id = $_GET['id'];
                 $d->image = 'DEFAULT';
@@ -865,7 +872,7 @@ class Controller extends AdminController
     public function dataAddDataContainer()
     {
         if (isset($_GET['container_type']) && is_numeric($_GET['container_type'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->data_item_id = $_GET['id'];
             if ($_GET['container_type'] > 0) {
                 $d->container_id = $_GET['container_type'];
@@ -883,7 +890,7 @@ class Controller extends AdminController
     public function edit_heading()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->load($_POST['id']);
             $d->heading = $_POST['heading'];
             $d->validates();
@@ -902,7 +909,7 @@ class Controller extends AdminController
 
         $this->buildNavData();
         $this->setTemplate('elib:/admin/section.tpl');
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->presenter->assign('data_item', $d);
     }
@@ -910,7 +917,7 @@ class Controller extends AdminController
     public function edit_body()
     {
         if (isset($_POST['save'])) {
-            $d = Model::load('DataItem');
+            $d = Model::load(DataItem::class);
             $d->load($_POST['id']);
             $d->body = $_POST['body'];
             $d->validates();
@@ -930,7 +937,7 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->setTemplate('elib:/admin/section.tpl');
         $this->assign('class', 'data_item');
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->presenter->assign('data_item', $d);
         $this->assign('data_item_id', $d->id);
@@ -946,7 +953,7 @@ class Controller extends AdminController
     // containers
     public function add_container()
     {
-        $c = Model::load('Container');
+        $c = Model::load(Container::class);
         $c->name = '#New Container';
         $c->insert();
         $this->clearCache();
@@ -959,7 +966,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection');
         } elseif (isset($_POST['save'])) {
             foreach ($_POST['image_size'] as $index => $value) {
-                $c = Model::load('Container');
+                $c = Model::load(Container::class);
                 $c->update($index, $value);
             }
             $this->clearCache();
@@ -967,17 +974,17 @@ class Controller extends AdminController
         }
 
         $this->setTemplate('elib:/admin/containers.tpl');
-        $c = Model::load('Container');
+        $c = Model::load(Container::class);
         $containers = $c->getAll();
         $this->assign('containers', $containers);
-        $i = Model::load('ImageSize');
+        $i = Model::load(ImageSize::class);
         $image_sizes = $i->loadAsOptions('name');
         $this->presenter->assign('image_sizes', $image_sizes);
     }
 
     public function remove_container()
     {
-        $c = Model::load('Container');
+        $c = Model::load(Container::class);
         $c->id = $_GET['id'];
         $c->remove();
         $this->clearCache();
@@ -990,7 +997,7 @@ class Controller extends AdminController
         if (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/containers');
         } elseif (isset($_POST['save'])) {
-            $c = Model::load('Container');
+            $c = Model::load(Container::class);
             $c->load($_GET['id']);
             $c->name = $_POST['name'];
             $c->validates();
@@ -1003,7 +1010,7 @@ class Controller extends AdminController
                 $this->presenter->assign('errors', $c->getValErrors());
             }
         } else {
-            $c = Model::load('Container');
+            $c = Model::load(Container::class);
             $c->load($_GET['id']);
             $this->assign('container', $c);
         }
@@ -1012,7 +1019,7 @@ class Controller extends AdminController
     // image sizes
     public function add_image_size()
     {
-        $i = Model::load('ImageSize');
+        $i = Model::load(ImageSize::class);
         $i->name = 'New Image Size';
         $i->width = 0;
         $i->height = 0;
@@ -1027,7 +1034,7 @@ class Controller extends AdminController
         if ($this->isXMLHttpRequest()) {
             $return_code = 1;
             if (isset($_POST['id']) && is_numeric($_POST['id'])) {
-                $i = Model::load('ImageSize');
+                $i = Model::load(ImageSize::class);
                 $i->load($_POST['id']);
                 $field = $_POST['field'];
                 $i->$field = $_POST['value'];
@@ -1049,7 +1056,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection');
         } elseif (isset($_POST['save'])) {
             foreach ($_POST['image_size'] as $index => $value) {
-                $c = Model::load('Container');
+                $c = Model::load(Container::class);
                 $c->update($index, $value);
             }
             $this->clearCache();
@@ -1058,7 +1065,7 @@ class Controller extends AdminController
 
         $this->setTemplate('elib:/admin/image_sizes.tpl');
 
-        $i = Model::load('ImageSize');
+        $i = Model::load(ImageSize::class);
         $sql = ' ORDER BY name';
         $image_sizes = $i->getAllCustom($sql);
 
@@ -1067,7 +1074,7 @@ class Controller extends AdminController
 
     public function remove_image_size()
     {
-        $i = Model::load('ImageSize');
+        $i = Model::load(ImageSize::class);
         $i->id = $_GET['id'];
         $i->delete();
         $this->clearCache();
@@ -1080,7 +1087,7 @@ class Controller extends AdminController
       if (isset($_POST['cancel'])) {
       $this->redirect('admin/dsection/containers');
       } elseif (isset($_POST['save'])) {
-      $c = Model::load('Container');
+      $c = Model::load(Container::class);
       $c->id = $_GET['id'];
       $c->load();
       $c->name = $_POST['name'];
@@ -1093,7 +1100,7 @@ class Controller extends AdminController
       $this->presenter->assign('errors', $c->getValErrors());
       }
       } else {
-      $c = Model::load('Container');
+      $c = Model::load(Container::class);
       $c->id = $_GET['id'];
       $c->load();
       $this->assign('container', $c);
@@ -1103,7 +1110,7 @@ class Controller extends AdminController
 
     public function update_image_sizes()
     {
-        $i = Model::load('ImageSize');
+        $i = Model::load(ImageSize::class);
         $i->load($_GET['id']);
         $images = $i->getDataFiles();
 

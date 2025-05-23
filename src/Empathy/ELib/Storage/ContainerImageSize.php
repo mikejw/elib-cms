@@ -2,8 +2,10 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\ELib\Storage\ImageSize;
+use Empathy\ELib\Storage\ContainerImageSize as EContainerImageSize;
 
 
 class ContainerImageSize extends Entity
@@ -16,12 +18,13 @@ class ContainerImageSize extends Entity
     public function getImageSizes($container_id)
     {
         $params = [];
-        $sizes = array();
-        $sql = 'SELECT prefix, width, height FROM '.Model::getTable('ImageSize').' i, '
-            .Model::getTable('ContainerImageSize').' c WHERE c.image_size_id = i.id'
+        $sizes = [];
+        $sql = 'SELECT prefix, width, height FROM '.Model::getTable(ImageSize::class).' i, '
+            .Model::getTable(EContainerImageSize::class).' c WHERE c.image_size_id = i.id'
             .' AND c.container_id = ?';
         $params[] = $container_id;
         $error = 'Could not get image sizes for container.';
+
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
@@ -36,8 +39,8 @@ class ContainerImageSize extends Entity
     {
         $prefix = array();
         $params = [];
-        $sql = 'SELECT prefix FROM '.Model::getTable('ImageSize').' i, '
-            .Model::getTable('ContainerImageSize').' c WHERE c.image_size_id = i.id'
+        $sql = 'SELECT prefix FROM '.Model::getTable(ImageSize::class).' i, '
+            .Model::getTable(EContainerImageSize::class).' c WHERE c.image_size_id = i.id'
             .' AND c.container_id = ?';
         $params[] = $container_id;
         $error = 'Could not get image sizes for container.';

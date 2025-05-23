@@ -2,9 +2,9 @@
 
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\DSection,
-    Empathy\ELib\Model,
-    Empathy\MVC\Model\SectionItem as SectionItem;
+use Empathy\ELib\DSection;
+use Empathy\MVC\Model;
+use Empathy\MVC\Model\SectionItem as SectionItem;
 
 class SectionsUpdate
 {

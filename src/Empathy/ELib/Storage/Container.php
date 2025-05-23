@@ -2,8 +2,10 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\ELib\Storage\Container as EContainer;
+use Empathy\ELib\Storage\ContainerImageSize;
 
 class Container extends Entity
 {
@@ -19,10 +21,10 @@ class Container extends Entity
         $sql = 'SELECT'
             .' c.id AS container_id, i.id AS image_size_id, '
             .' i.name AS image_size_name, c.name AS container_name'
-            .' FROM '.Model::getTable('Container').' c'
-            .' LEFT JOIN '.Model::getTable('ContainerImageSize').' ci'
+            .' FROM '.Model::getTable(EContainer::class).' c'
+            .' LEFT JOIN '.Model::getTable(ContainerImageSize::class).' ci'
             .' ON ci.container_id = c.id'
-            .' LEFT JOIN '.Model::getTable('ImageSize').' i'
+            .' LEFT JOIN '.Model::getTable(ImageSize::class).' i'
             .' ON i.id = ci.image_size_id';
         $error = 'Could not get containers.';
         $result = $this->query($sql, $error);
@@ -54,7 +56,7 @@ class Container extends Entity
 
     public function remove()
     {
-        $sql = 'DELETE FROM '.Model::getTable('ContainerImageSize')
+        $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
             .' WHERE container_id = '.$this->id;
         $this->delete();
     }
@@ -69,14 +71,14 @@ class Container extends Entity
     public function update($id, $new_sizes)
     {
         $params = [];
-        $sql = 'DELETE FROM '.Model::getTable('ContainerImageSize')
+        $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
             .' WHERE container_id = ?';
         $params[] = $id;
         $error = 'Could not clear old image sizes from container.';
         $this->query($sql, $error, $params);
         foreach ($new_sizes as $index => $size_id) {
             $params = [];
-            $sql = 'INSERT INTO '.Model::getTable('ContainerImageSize')
+            $sql = 'INSERT INTO '.Model::getTable(ContainerImageSize::class)
                 .' VALUES(?, ?)';
             $params[] = $id;
             $params[] = $size_id;

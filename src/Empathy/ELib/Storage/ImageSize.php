@@ -2,9 +2,10 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model,
-    Empathy\MVC\Entity;
-
+use Empathy\MVC\Model;
+use Empathy\MVC\Entity;
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\ContainerImageSize;
 
 
 class ImageSize extends Entity
@@ -38,8 +39,8 @@ class ImageSize extends Entity
         $images = [];
         $ids = [];
         $params = [];
-        $sql = 'SELECT id from '.Model::getTable('DataItem').' d,'
-            .Model::getTable('ContainerImageSize')
+        $sql = 'SELECT id from '.Model::getTable(DataItem::class).' d,'
+            .Model::getTable(ContainerImageSize::class)
             .' c WHERE c.image_size_id = ?'
             .' AND c.container_id = d.container_id';
         $params[] = $this->id;
@@ -51,7 +52,7 @@ class ImageSize extends Entity
 
         if (sizeof($ids) > 0) {
             list($unionString, $params) = $this->buildUnionString($ids);
-            $sql = 'SELECT image FROM '.Model::getTable('DataItem').' WHERE data_item_id IN '. $unionString;
+            $sql = 'SELECT image FROM '.Model::getTable(DataItem::class).' WHERE data_item_id IN '. $unionString;
             $error = 'Could not got images matching image size.';
             $result = $this->query($sql, $error, $params);
             foreach ($result as $row) {

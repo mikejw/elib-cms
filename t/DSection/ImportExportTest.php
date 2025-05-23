@@ -3,7 +3,7 @@
 namespace ESuite\DSection;
 
 use ESuite\ESuiteTest;
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\ELib\DSection\ImportExport;
 use Empathy\ELib\User\CurrentUser;
 

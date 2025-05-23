@@ -2,9 +2,11 @@
 
 namespace Empathy\ELib\Storage;
 
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
 use Empathy\MVC\DI;
+use Empathy\ELib\Storage\SectionItem as ESectionItem;
+use Empathy\ELib\Storage\DataItem;
 
 class SectionItem extends Entity
 {
@@ -23,7 +25,7 @@ class SectionItem extends Entity
 
     public function updateTimeStamps($update)
     {
-        $sql = 'UPDATE '.Model::getTable('SectionItem')
+        $sql = 'UPDATE '.Model::getTable(ESectionItem::class)
             .' SET stamp = NOW() WHERE id IN ' . $update[0];
         $error = 'Could not update timestamps.';
         $this->query($sql, $error, $update[1]);
@@ -33,9 +35,9 @@ class SectionItem extends Entity
     {
         $country = [];
         $params = [];
-        $sql = 'SELECT  d1.label, d3.body FROM '.Model::getTable('DataItem').' d1, '
-            .Model::getTable('DataItem').' d2, '.Model::getTable('DataItem').' d3,'
-            .' '.Model::getTable('SectionItem').' s WHERE s.id =  ?'
+        $sql = 'SELECT  d1.label, d3.body FROM '.Model::getTable(DataItem::class).' d1, '
+            .Model::getTable(DataItem::class).' d2, '.Model::getTable(DataItem::class).' d3,'
+            .' '.Model::getTable(SectionItem::class).' s WHERE s.id =  ?'
             .' AND d2.section_id = s.id AND d1.data_item_id = d2.id'
             .' AND d3.data_item_id = d1.id'
             .' ORDER BY d1.label';
@@ -61,7 +63,7 @@ class SectionItem extends Entity
     {
         $params = [];
         $section_id = 0;
-        $sql = 'SELECT section_id FROM '.Model::getTable('SectionItem').' WHERE id = ?';
+        $sql = 'SELECT section_id FROM '.Model::getTable(SectionItem::class).' WHERE id = ?';
         $params[] = $id;
         $error = 'Could not get parent id.';
         $result = $this->query($sql, $error, $params);
@@ -83,7 +85,7 @@ class SectionItem extends Entity
         array_push($ids, $id);
         $tree->deleteData($id, 1);
         $params = [];
-        $sql = 'SELECT id FROM '.Model::getTable('SectionItem').' WHERE section_id = ?';
+        $sql = 'SELECT id FROM '.Model::getTable(SectionItem::class).' WHERE section_id = ?';
         $params[] = $id;
         $error = 'Could not find section items for deletion.';
         $result = $this->query($sql, $error, $params);
@@ -96,7 +98,7 @@ class SectionItem extends Entity
 
     public function doDelete($idsString, $params)
     {
-        $sql = 'DELETE FROM '.Model::getTable('SectionItem').' WHERE id IN '.$idsString;
+        $sql = 'DELETE FROM '.Model::getTable(SectionItem::class).' WHERE id IN '.$idsString;
         $error = 'Could not remove section item(s).';
         $this->query($sql, $error, $params);
     }
@@ -107,7 +109,7 @@ class SectionItem extends Entity
         $nodes = [];
         $params = [];
         $sql = 'SELECT id,label, position, template, hidden, meta, UNIX_TIMESTAMP(stamp) as stamp FROM '
-            .Model::getTable('SectionItem').' WHERE section_id = ?';
+            .Model::getTable(SectionItem::class).' WHERE section_id = ?';
         $params[] = $current;
 
         if ($tree->getDetectHidden()) {
@@ -151,7 +153,7 @@ class SectionItem extends Entity
         if ($tree->getDataItem() !== NULL) {
 
             $params = [];
-            $sql = 'SELECT id,label FROM '.Model::getTable('DataItem').' WHERE section_id = ?'
+            $sql = 'SELECT id,label FROM '.Model::getTable(DataItem::class).' WHERE section_id = ?'
                 .' order by position';
             $params[] = $current;
             $error = 'Could not get child data items.';
@@ -177,7 +179,7 @@ class SectionItem extends Entity
         $build = 1;
         $params = [];
         while ($build) {
-            $sql = "SELECT section_id, label  FROM ".Model::getTable('SectionItem')
+            $sql = "SELECT section_id, label  FROM ".Model::getTable(SectionItem::class)
                 .' WHERE id = ?';
             $params[] = $id;
             $error = "Could not build URL.";
@@ -201,7 +203,7 @@ class SectionItem extends Entity
     {
         $sections = [];
         list($unionSql, $params) = $this->buildUnionString($ignore);
-        $sql = 'SELECT *, UNIX_TIMESTAMP(stamp) AS stamp FROM '.Model::getTable('SectionItem')
+        $sql = 'SELECT *, UNIX_TIMESTAMP(stamp) AS stamp FROM '.Model::getTable(SectionItem::class)
             .' WHERE id NOT IN '. $unionSql;
         $error = 'Could not get sections for sitemap.';
         $result = $this->query($sql, $error, $params);

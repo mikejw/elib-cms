@@ -3,18 +3,20 @@
 namespace Empathy\ELib\DSection;
 
 use Empathy\ELib\DSection\SectionsTree;
-use Empathy\ELib\Model;
+use Empathy\MVC\Model;
+use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\ContainerImageSize;
 use Empathy\MVC\Entity;
 use Empathy\MVC\Config;
 use Empathy\MVC\DI;
 
 class ImportExport
 {
-    private function load($section_id)
+    private function load($sectionId)
     {
         $sectionsData = [];
-        $section = Model::load('SectionItem');
-        $section->load($section_id);
+        $section = Model::load(SectionItem::class, $sectionId);
 
         $sections = $section->buildTree($section->id, new SectionsTree(
             $section,
@@ -26,7 +28,7 @@ class ImportExport
 
         foreach ($sections as &$item) {
             $item['type'] = 'section';
-            $data = Model::load('DataItem');
+            $data = Model::load(DataItem::class);
             $data->setExporting();
             $item['data'] = $data->getSectionDataRecursive($item['id']);
 
@@ -41,7 +43,7 @@ class ImportExport
     private function insertSection($parent_id, $data, $topLevelSection)
     {
         if (isset($data['template'])) {
-            $s = Model::load('SectionItem');
+            $s = Model::load(SectionItem::class);
             $s->section_id = $parent_id;
             $s->label = $data['label'];
             $s->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
@@ -63,7 +65,7 @@ class ImportExport
 
     private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
     {
-        $d = Model::load('DataItem');
+        $d = Model::load(DataItem::class);
         if (($sectionParent || $topLevelSection) && !isset($data['data_item_id'])) {
             $d->section_id = $parent_id;
         } else {
@@ -101,10 +103,9 @@ class ImportExport
             $imagePrefixes = ['mid', 'l', 'tn'];
             $parentId = $data['data_item_id'];
             if (isset($parentId)) {
-                $parent = Model::load('DataItem');
-                $parent->load($parentId);
+                $parent = Model::load(DataItem::class, $parentId);
                 if ($parent->isContainer() && isset($parent->container_id)) {
-                    $c = Model::load('ContainerImageSize');
+                    $c = Model::load(ContainerImageSize::class);
                     $imageSizes = $c->getImageSizes($parent->container_id);
                     if (count($imageSizes) > 0) {
                         $imagePrefixes = array_map(function($item) {
@@ -161,8 +162,8 @@ class ImportExport
     public function export($target_id)
     {
         $target_id = (int) $target_id;
-        $target = Model::load('SectionItem');
-        $data = Model::load('DataItem');
+        $target = Model::load(SectionItem::class);
+        $data = Model::load(DataItem::class);
         $data->setExporting();
         $target->load($target_id);
 
@@ -211,7 +212,7 @@ class ImportExport
     public function exportContainer($target_id)
     {
         $target_id = (int) $target_id;
-        $data = Model::load('DataItem');
+        $data = Model::load(DataItem::class);
 
         $data->load($target_id);
         $data->setExporting(); 
