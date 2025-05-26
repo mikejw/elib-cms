@@ -25,7 +25,7 @@ class SectionsUpdate
         $this->section->save();
 
         // ancestors => make optional?
-        $ancestors = array();
+        $ancestors = [];
         $ancestors = $this->section->getAncestorIDs($this->section->id, $ancestors);
         if (sizeof($ancestors) > 0) {
             $update = $this->section->buildUnionString($ancestors);

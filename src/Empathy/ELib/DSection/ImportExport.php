@@ -115,8 +115,8 @@ class ImportExport
                 }
             }
             foreach ($imagePrefixes as $prefix) {
-                if (file_exists("$path/${prefix}_" . $data['image'])) {
-                    copy("$path/${prefix}_" . $data['image'], "$path/${prefix}_" . $name);
+                if (file_exists("$path/{$prefix}_" . $data['image'])) {
+                    copy("$path/{$prefix}_" . $data['image'], "$path/{$prefix}_" . $name);
                 }
             }
 

@@ -15,6 +15,7 @@ use Empathy\ELib\Storage\Container;
 use Empathy\ELib\Storage\VideoUpload;
 use Empathy\ELib\Storage\ContainerImageSize;
 use Empathy\ELib\Storage\ImageSize;
+use Empathy\MVC\RequestException;
 
 
 class Controller extends AdminController
@@ -212,9 +213,9 @@ class Controller extends AdminController
     public function add_data_video()
     {
         if (isset($_GET['iframe']) && $_GET['iframe'] == true) {
-            $this->setTemplate('elib:/admin/video_upload.tpl');
+            $this->setTemplate('elib:admin/video_upload.tpl');
         } else {
-            $this->setTemplate('elib:/admin/section.tpl');
+            $this->setTemplate('elib:admin/section.tpl');
         }
 
         if (isset($_POST['id'])) {
@@ -279,7 +280,6 @@ class Controller extends AdminController
 
     public function default_event()
     {
-
         $ui_array = array('id');
         $this->loadUIVars('ui_section', $ui_array);
         if (!isset($_GET['id']) || $_GET['id'] == '') {
@@ -311,7 +311,9 @@ class Controller extends AdminController
             $collapsed = 0;
         }
 
-        $s->load($_GET['id']);
+        if (!$s->load($_GET['id']) && $_GET['id'] != 0) {
+            throw new RequestException('Section item not found.');
+        }
         $st = new SectionsTree($s, $d, 1, $collapsed);
         $this->presenter->assign('sections', $st->getMarkup());
         $this->presenter->assign('section', $s);
@@ -448,7 +450,9 @@ class Controller extends AdminController
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
 
-        $d->load($_GET['id']);
+        if (!$d->load($_GET['id'])) {
+            throw new RequestException('Data item not found.');
+        }
         $is_section = 0;
         if (isset($_GET['collapsed']) && $_GET['collapsed'] == 1) {
             $collapsed = 1;
@@ -465,7 +469,7 @@ class Controller extends AdminController
 
     public function data_item()
     {
-        $ui_array = array('id');
+        $ui_array = ['id'];
         $this->loadUIVars('ui_data_item', $ui_array);
         if (!isset($_GET['id']) || $_GET['id'] == '') {
             $_GET['id'] = 0;
@@ -491,13 +495,13 @@ class Controller extends AdminController
 
         $this->assign('image_prefix', $imagePrefix);
         $this->presenter->assign('data_item_id', $_GET['id']);
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
     }
 
     public function delete_data_item()
     {
         $this->assertID();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
@@ -548,7 +552,7 @@ class Controller extends AdminController
         }
 
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
@@ -580,7 +584,7 @@ class Controller extends AdminController
         }
 
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
@@ -629,7 +633,7 @@ class Controller extends AdminController
     public function data_add_data()
     {
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
 
         if (isset($_GET['cancel'])) {
             $this->redirect('admin/dsection/data_item/' . $_GET['id']);
@@ -702,7 +706,7 @@ class Controller extends AdminController
         }
 
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->presenter->assign('data_item_id', $_GET['id']);
         $this->presenter->assign('class', 'data_item');
     }
@@ -730,7 +734,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection/data_item/' . $_GET['id']);
         }
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->presenter->assign('data_item_id', $_GET['id']);
         $this->presenter->assign('class', 'data_item');
     }
@@ -794,7 +798,7 @@ class Controller extends AdminController
         }
         $this->buildNavData();
         $this->assign('class', 'data_item');
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->assign('data_item_id', $_GET['id']);
     }
 
@@ -825,16 +829,16 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->assign('data_item_id', $_GET['id']);
         $this->assign('class', 'data_item');
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
     }
 
 
     public function data_add_data_video()
     {
         if (isset($_GET['iframe']) && $_GET['iframe'] == true) {
-            $this->setTemplate('elib:/admin/video_upload.tpl');
+            $this->setTemplate('elib:admin/video_upload.tpl');
         } else {
-            $this->setTemplate('elib:/admin/section.tpl');
+            $this->setTemplate('elib:admin/section.tpl');
         }
 
         if (isset($_POST['id'])) {
@@ -866,7 +870,7 @@ class Controller extends AdminController
         $this->buildNavData();
         $this->assign('data_item_id', $_GET['id']);
         $this->assign('class', 'data_item');
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
     }
 
     public function dataAddDataContainer()
@@ -908,7 +912,7 @@ class Controller extends AdminController
         }
 
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->presenter->assign('data_item', $d);
@@ -935,7 +939,7 @@ class Controller extends AdminController
         }
 
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->assign('class', 'data_item');
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
@@ -973,7 +977,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection');
         }
 
-        $this->setTemplate('elib:/admin/containers.tpl');
+        $this->setTemplate('elib:admin/containers.tpl');
         $c = Model::load(Container::class);
         $containers = $c->getAll();
         $this->assign('containers', $containers);
@@ -993,7 +997,7 @@ class Controller extends AdminController
 
     public function rename_container()
     {
-        $this->setTemplate('elib:/admin/containers.tpl');
+        $this->setTemplate('elib:admin/containers.tpl');
         if (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/containers');
         } elseif (isset($_POST['save'])) {
@@ -1063,7 +1067,7 @@ class Controller extends AdminController
             $this->redirect('admin/dsection');
         }
 
-        $this->setTemplate('elib:/admin/image_sizes.tpl');
+        $this->setTemplate('elib:admin/image_sizes.tpl');
 
         $i = Model::load(ImageSize::class);
         $sql = ' ORDER BY name';
@@ -1186,7 +1190,7 @@ class Controller extends AdminController
     public function export_container()
     {
         $this->buildNavData();
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $output = '';
         $target_id = $_GET['id'];
 
@@ -1212,7 +1216,7 @@ class Controller extends AdminController
         }
 
 
-        $this->setTemplate('elib:/admin/section.tpl');
+        $this->setTemplate('elib:admin/section.tpl');
         $this->assertID();
         $content = '';
         $parent_id = $_GET['id'];

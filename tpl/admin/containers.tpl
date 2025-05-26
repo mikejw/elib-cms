@@ -1,4 +1,4 @@
-{include file="elib:/admin/admin_header.tpl"}
+{include file="elib:admin/admin_header.tpl"}
 
 
 {if $event neq 'rename_container'}
@@ -116,6 +116,6 @@
 
 
 
-{include file="elib:/admin/admin_footer.tpl"}
+{include file="elib:admin/admin_footer.tpl"}
 
 

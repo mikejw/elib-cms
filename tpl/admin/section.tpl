@@ -1,4 +1,4 @@
-{include file="elib:/admin/admin_header.tpl"}
+{include file="elib:admin/admin_header.tpl"}
 
 
 <div class="form-group cms-actions">
@@ -100,47 +100,47 @@
 
 
 {if $event eq 'rename'}
-{include file="elib:/admin/sections/rename_section.tpl"}
+{include file="elib:admin/sections/rename_section.tpl"}
 {elseif $event eq 'rename_data_item'}
-{include file="elib:/admin/sections/rename_data_item.tpl"}
+{include file="elib:admin/sections/rename_data_item.tpl"}
 
 {elseif $event eq 'add_data' || $event eq 'data_add_data'}
 
-{include file="elib:/admin/sections/add_data.tpl"}
+{include file="elib:admin/sections/add_data.tpl"}
 
 {elseif $event eq 'add_data_heading' || $event eq 'data_add_data_heading'}
-{include file="elib:/admin/sections/add_data_heading.tpl"}
+{include file="elib:admin/sections/add_data_heading.tpl"}
 {elseif $event eq 'add_data_body' || $event eq 'data_add_data_body'}
-{include file="elib:/admin/sections/add_data_body.tpl"}
+{include file="elib:admin/sections/add_data_body.tpl"}
 {elseif $event eq 'add_data_image' || $event eq 'data_add_data_image'}
-{include file="elib:/admin/sections/add_data_image.tpl"}
+{include file="elib:admin/sections/add_data_image.tpl"}
 {elseif $event eq 'add_data_audio'|| $event eq 'data_add_data_audio'}
-{include file="elib:/admin/sections/add_data_audio.tpl"}
+{include file="elib:admin/sections/add_data_audio.tpl"}
 {elseif $event eq 'add_data_video' || $event eq 'data_add_data_video'}
-{include file="elib:/admin/sections/add_data_video.tpl"}
+{include file="elib:admin/sections/add_data_video.tpl"}
 {elseif $event eq 'data_item'}
-{include file="elib:/admin/sections/data_item.tpl"}
+{include file="elib:admin/sections/data_item.tpl"}
 {elseif $event eq 'edit_heading'}
-{include file="elib:/admin/sections/edit_heading.tpl"}
+{include file="elib:admin/sections/edit_heading.tpl"}
 {elseif $event eq 'edit_body'}
-{include file="elib:/admin/sections/edit_body.tpl"}
+{include file="elib:admin/sections/edit_body.tpl"}
 {elseif $event eq 'change_template'}
-{include file="elib:/admin/sections/change_template.tpl"}
+{include file="elib:admin/sections/change_template.tpl"}
 {elseif $event eq 'edit_meta'}
-{include file="elib:/admin/sections/edit_meta.tpl"}
+{include file="elib:admin/sections/edit_meta.tpl"}
 {elseif $event eq 'edit_section_item_meta'}
-{include file="elib:/admin/sections/edit_section_item_meta.tpl"}
+{include file="elib:admin/sections/edit_section_item_meta.tpl"}
 {elseif $event eq 'edit_containers'}
-{include file="elib:/admin/sections/edit_containers.tpl"}
+{include file="elib:admin/sections/edit_containers.tpl"}
 {elseif $event eq 'export_section'}
-{include file="elib:/admin/sections/import_export.tpl"}
+{include file="elib:admin/sections/import_export.tpl"}
 {elseif $event eq 'import_section'}
-{include file="elib:/admin/sections/import_export.tpl"}
+{include file="elib:admin/sections/import_export.tpl"}
 
 {elseif $event eq 'export_container'}
-{include file="elib:/admin/sections/import_export_container.tpl"}
+{include file="elib:admin/sections/import_export_container.tpl"}
 {elseif $event eq 'import_container'}
-{include file="elib:/admin/sections/import_export_container.tpl"}
+{include file="elib:admin/sections/import_export_container.tpl"}
 
 {/if}
 
@@ -158,4 +158,4 @@
 </div>
 
 
-{include file="elib:/admin/admin_footer.tpl"}
+{include file="elib:admin/admin_footer.tpl"}

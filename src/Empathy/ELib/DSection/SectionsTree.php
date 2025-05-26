@@ -17,12 +17,13 @@ class SectionsTree extends Tree
 
     public function __construct(
         $section,
-        $data_item=NULL,
-        $current_is_section=NULL,
-        $collapsed=NULL,
-        $detect_hidden=NULL,
-        $order=array(),
-        $asc=true) {
+        $data_item = null,
+        $current_is_section = null,
+        $collapsed = null,
+        $detect_hidden = null,
+        $order = [],
+        $asc =true
+    ) {
         
         $this->detect_hidden = $detect_hidden;
 
@@ -43,8 +44,8 @@ class SectionsTree extends Tree
                 $parent_id = $data_item->data_item_id;
             }
 
-            $this->section_ancestors = array(0);
-            $this->data_item_ancestors = array();
+            $this->section_ancestors = [0];
+            $this->data_item_ancestors = [];
             if (!$current_is_section) {
                 if (!$collapsed) {
                     array_push($this->data_item_ancestors, $current_id);
@@ -72,7 +73,7 @@ class SectionsTree extends Tree
 
     public function buildTree($id, $is_section, $tree, $order, $asc)
     {
-        $nodes = array();
+        $nodes = [];
         if ($is_section) {
             $nodes = $tree->section->buildTree($id, $tree, $order, $asc);
         } else {
