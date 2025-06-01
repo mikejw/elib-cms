@@ -280,7 +280,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
                     throw new \Exception('No valid find type.');
             }
 
-            if (in_array(self::FIND_OPT_CONVERT_MD, $options)) {
+            if ($item !== null && in_array(self::FIND_OPT_CONVERT_MD, $options)) {
                 $item->convertToMarkdown();
             }
 
