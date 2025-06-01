@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.1] - 2025-06-01
+
+### Fixed
+
+- Convert markdown successfully when not using find label
+
+
 ## [4.0.0] - 2025-05-28
 
 ### Changed
