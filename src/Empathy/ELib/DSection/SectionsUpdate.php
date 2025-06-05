@@ -20,7 +20,7 @@ class SectionsUpdate
     public function update_timestamps()
     {
         // current section
-        $this->section->load();
+        $this->section->load($this->section->id);
         $this->section->stamp = date('Y-m-d H:i:s', time());
         $this->section->save();
 
