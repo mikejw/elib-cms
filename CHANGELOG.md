@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.2] - 2025-06-05
+
+### Fixed
+
+- Load section fix
+
+
 ## [4.0.1] - 2025-06-01
 
 ### Fixed
