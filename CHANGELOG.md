@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.0.3] - 2025-06-08
+
+### Fixed
+
+- Use correct models for data item/section sort
+
+
 ## [4.0.2] - 2025-06-05
 
 ### Fixed
