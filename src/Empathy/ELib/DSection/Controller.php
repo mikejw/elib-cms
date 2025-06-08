@@ -1132,9 +1132,9 @@ class Controller extends AdminController
         foreach ($_POST as $type => $value) {
 
             if ($type == 'section') {
-                $model = 'SectionItem';
+                $model = SectionItem::class;
             } else {
-                $model = 'DataItem';
+                $model = DataItem::class;
             }
 
             foreach ($value as $id) {
