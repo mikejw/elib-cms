@@ -53,7 +53,7 @@
                     {else}
 
                         <div class="mb-4">
-                            <div class="form-check">
+                            <div class="form-check ms-3">
                                 <label class="form-check-label">
                                 {html_checkboxes
                                     labels=false
@@ -61,7 +61,7 @@
                                     options=$image_sizes separator="<br />"
                                     selected=$container.image_size_ids
                                     class="form-check-input"
-                                    separator='</label></div><div class="form-check"><label class="form-check-label">'
+                                    separator='</label></div><div class="form-check ms-3"><label class="form-check-label">'
                                   }
                                 </label>
                             </div>
