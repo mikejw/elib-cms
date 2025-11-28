@@ -1,20 +1,17 @@
 
 <form action="" method="post">
-<fieldset>
-<legend>Change Template</legend>
-<p>
-<label>Template</label>
-<select name="template">
-{html_options options=$templates selected=$section->template}
-</select>
-</p>
-<p>
-<label>&nbsp;</label>
-<input type="hidden" name="id" value="{$section->id}" />
-
-<button class="btn btn-sm btn-primary" type="submit" name="save">Save</button>
-<button class="btn btn-sm btn-primary" type="submit" name="cancel">Cancel</button>
-
-</p>
-</fieldset>
+    <fieldset>
+        <legend><h2>Change Template</h2></legend>
+        <div class="mb-3">
+            <label class="form-label">Template</label>
+            <select class="form-control" name="template">
+                {html_options options=$templates selected=$section->template}
+            </select>
+        </div>
+        <div class="mb-3">
+            <input type="hidden" name="id" value="{$section->id}"/>
+            <button class="btn btn-sm btn-primary" type="submit" name="save">Save</button>
+            <button class="btn btn-sm btn-primary" type="submit" name="cancel">Cancel</button>
+        </div>
+    </fieldset>
 </form>
