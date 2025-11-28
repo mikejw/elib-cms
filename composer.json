@@ -1,7 +1,7 @@
 {
     "name": "mikejw/elib-cms",
     "type": "library",
-    "description": "CMS components of the Empathy PHP Framework",
+    "description": "ELib CMS",
     "keywords": [
         "lib"
     ],
