@@ -3,16 +3,18 @@
 
 <form action="" method="post">
     <fieldset>
-        <legend>Export Data Item Container</legend>
-        <p>
-            <label>Target ID:</label>
+        <legend><h2>Export Data Item Container</h2></legend>
+        <div class="mb-3">
+            <label class="form-label">Target ID:</label>
             <input class="form-control" type="text" name="target_id" value="{$target_id}" />
-        </p>
-        <p>
+        </div>
+        <div class="mb-3">
             <button class="btn btn-sm btn-primary" type="submit" name="submit">Export</button>
-        </p>
+        </div>
         {if $output neq ''}
-        <textarea rows="20" class="raw form-control">{$output}</textarea>
+        <div class="mb-3">
+            <textarea rows="20" class="raw form-control">{$output}</textarea>
+        </div>
         {/if}
     </fieldset>
 </form>
@@ -21,19 +23,18 @@
 
     <form action="" method="post">
         <fieldset>
-            <legend>Import Data Item Container</legend>
-            <p>
-                <label>Parent ID:</label>
+            <legend><h2>Import Data Item Container</h2></legend>
+            <div class="mb-3">
+                <label class="form-label">Parent ID:</label>
                 <input class="form-control" type="text" name="parent_id" value="{$parent_id}" />
-            </p>
-            <p>
-                <label>Sections Data</label>
+            </div>
+            <div class="mb-3">
+                <label class="form-label">Sections Data</label>
                 <textarea name="content" rows="20" class="raw form-control">{$content}</textarea>
-            </p>
-            <p>
+            </div>
+            <div class="mb-3">
                 <button class="btn btn-sm btn-primary" type="submit" name="submit">Import</button>
-            </p>
+            </div>
         </fieldset>
     </form>
-
 {/if}
