@@ -2,6 +2,14 @@
 # Changelog
 
 
+## [4.1.1] - 2026-03-11
+
+### Fixed
+
+- Allow the return of populated data item data property with `getDataValue()`
+- Data item `findContainers()` can optionally not run recursively
+
+
 ## [4.1.0] - 2025-11-29
 
 ### Changed
