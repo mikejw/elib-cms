@@ -12,7 +12,7 @@ class SectionItem extends Entity
 {
     const TABLE = 'section_item';
 
-    public $id;
+    public int $id;
     public $section_id;
     public $label;
     public $friendly_url;
@@ -231,11 +231,11 @@ class SectionItem extends Entity
         return $sections;
     }
 
-    public function insert($filter = [], $id = true)
+    public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {
             $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
         }
-        return parent::insert($filter, $id);
+        return parent::insert($filter, $includeAutoIdColumn);
     }
 }

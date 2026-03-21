@@ -11,7 +11,7 @@ class Container extends Entity
 {
     const TABLE = 'container';
 
-    public $id;
+    public int $id;
     public $name;
     public $description;
 

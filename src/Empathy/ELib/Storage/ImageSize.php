@@ -12,7 +12,7 @@ class ImageSize extends Entity
 {
     const TABLE = 'image_size';
 
-    public $id;
+    public int $id;
     public $name;
     public $prefix;
     public $width;

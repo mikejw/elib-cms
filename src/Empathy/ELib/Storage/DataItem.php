@@ -24,7 +24,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     const FIND_ALL = 8;
     const FIND_DEEP_ALL = 9;
 
-    public $id;
+    public int $id;
     public $data_item_id;
     public $section_id;
     public $container_id;
@@ -498,7 +498,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
     }
 
 
-    public function insert($filter = [], $id = true)
+    public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {
             $this->user_id = DI::getContainer()->get('CurrentUser')->getUserID();
@@ -508,7 +508,7 @@ class DataItem extends Entity implements \JsonSerializable, \Iterator
             $this->stamp = 'MYSQLTIME';
         }
 
-        return parent::insert($filter, $id);
+        return parent::insert($filter, $includeAutoIdColumn);
     }
 
 }
