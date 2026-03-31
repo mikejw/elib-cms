@@ -1,0 +1,25 @@
+
+Empathy\ELib\Storage\UserItem:
+  user{1..5}:
+    email: '<username()>@gmail.com'
+    auth: 2
+    username: <username()>
+    password: '$2y$12$t2xQiU0RR3lPv/230WpU1O918mbhFsNGPIedGWQH710l9nXvXhHem'
+    reg_code: 1
+    active: true
+    registered: 'MYSQLTIME'
+    activated: 'MYSQLTIME'
+    fullname: <firstName()> <lastName()>
+
+Empathy\ELib\Storage\SectionItem:
+  section1:
+    section_id: 0
+    label: 'New Test Section'
+    friendly_url: null
+    template: 'A'
+    position: 0
+    hidden: 0
+    stamp: 'MYSQLTIME'
+    meta: null
+    user_id: "@user1"
+

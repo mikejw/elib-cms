@@ -1,19 +1,22 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\DSection\SectionsTree;
-use Empathy\MVC\Model;
-use Empathy\ELib\Storage\SectionItem;
-use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\ContainerImageSize;
-use Empathy\MVC\Entity;
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\SectionItem;
 use Empathy\MVC\Config;
 use Empathy\MVC\DI;
+use Empathy\MVC\Model;
 
 class ImportExport
 {
-    private function load($sectionId)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function load(int $sectionId): array
     {
         $sectionsData = [];
         $section = Model::load(SectionItem::class, $sectionId);
@@ -32,15 +35,20 @@ class ImportExport
             $data->setExporting();
             $item['data'] = $data->getSectionDataRecursive($item['id']);
 
-            if (isset($item['children']) && sizeof($item['children'])) {
+            if (isset($item['children']) && count($item['children'])) {
                 $item['children'] = $this->load($item['id']);
             }
             $sectionsData[] = $item;
         }
+
         return $sectionsData;
     }
 
-    private function insertSection($parent_id, $data, $topLevelSection)
+    /**
+     * @param array<string, mixed> $data
+     * @return array{0: bool, 1: int}
+     */
+    private function insertSection(int $parent_id, array $data, bool $topLevelSection): array
     {
         if (isset($data['template'])) {
             $s = Model::load(SectionItem::class);
@@ -53,7 +61,7 @@ class ImportExport
             $s->meta = $data['meta'];
             $s->stamp = $data['stamp'] ?
                 is_numeric($data['stamp']) ?
-                    date('Y-m-d H:i:s', $data['stamp'])
+                    date('Y-m-d H:i:s', (int) $data['stamp'])
                     : $data['stamp']
                 : 'MYSQLTIME';
 
@@ -63,10 +71,13 @@ class ImportExport
         }
     }
 
-    private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function insertData(int $parent_id, array $data, bool $sectionParent, bool $topLevelSection = false): int
     {
         $d = Model::load(DataItem::class);
-        if (($sectionParent || $topLevelSection) && !isset($data['data_item_id'])) {
+        if (($sectionParent || $topLevelSection) && ! isset($data['data_item_id'])) {
             $d->section_id = $parent_id;
         } else {
             $d->data_item_id = $parent_id;
@@ -85,18 +96,18 @@ class ImportExport
         $d->image = $data['image'];
 
         if ($data['image']) {
-            $data['image'] = trim(escapeshellarg($data['image']), '\'');
+            $data['image'] = trim(escapeshellarg((string) $data['image']), '\'');
         }
 
-        $path = Config::get('DOC_ROOT') . '/public_html/uploads';
-        if ($data['image'] && file_exists($path . '/' . $data['image'])) {
+        $path = Config::get('DOC_ROOT').'/public_html/uploads';
+        if ($data['image'] && file_exists($path.'/'.$data['image'])) {
             $attempt = 0;
             $success = false;
             while ($success === false) {
                 $attempt++;
-                $name = $attempt . '__' . $data['image'];
-                if (!file_exists($path . '/' . $name)) {
-                    $success = copy($path . '/' . $data['image'], $path . '/' . $name);
+                $name = $attempt.'__'.$data['image'];
+                if (! file_exists($path.'/'.$name)) {
+                    $success = copy($path.'/'.$data['image'], $path.'/'.$name);
                 }
             }
 
@@ -104,43 +115,43 @@ class ImportExport
             $parentId = $data['data_item_id'];
             if (isset($parentId)) {
                 $parent = Model::load(DataItem::class, $parentId);
-                if ($parent->isContainer() && isset($parent->container_id)) {
+                if ($parent->isContainer() && $parent->container_id !== null) {
                     $c = Model::load(ContainerImageSize::class);
-                    $imageSizes = $c->getImageSizes($parent->container_id);
+                    $imageSizes = $c->getImageSizes((int) $parent->container_id);
                     if (count($imageSizes) > 0) {
-                        $imagePrefixes = array_map(function($item) {
-                            return $item[0];
-                        }, $imageSizes);
+                        $imagePrefixes = array_map(fn ($item) => $item[0], $imageSizes);
                     }
                 }
             }
             foreach ($imagePrefixes as $prefix) {
-                if (file_exists("$path/{$prefix}_" . $data['image'])) {
-                    copy("$path/{$prefix}_" . $data['image'], "$path/{$prefix}_" . $name);
+                if (file_exists("$path/{$prefix}_".$data['image'])) {
+                    copy("$path/{$prefix}_".$data['image'], "$path/{$prefix}_".$name);
                 }
             }
 
             $d->image = $name;
             $d->label = $name;
         }
+
         return $d->insert();
     }
 
-    private function populate($sectionsData, $parent_id, $sectionParent = false, $topLevelSection = false)
+    /**
+     * @param array<int, array<string, mixed>> $sectionsData
+     */
+    private function populate(array $sectionsData, int $parent_id, bool $sectionParent = false, bool $topLevelSection = false): void
     {
         foreach ($sectionsData as $item) {
 
             if ($sectionParent) {
-                list($sectionParent, $id) = $this->insertSection($parent_id, $item, $topLevelSection);
+                [$sectionParent, $id] = $this->insertSection($parent_id, $item, $topLevelSection);
             } else {
                 $id = $this->insertData($parent_id, $item, $sectionParent, $topLevelSection);
             }
-            
 
-            if (isset($item['children']) && sizeof($item['children'])) {
+            if (isset($item['children']) && count($item['children'])) {
                 $this->populate($item['children'], $id, true);
             }
-
 
             if (isset($item['data']) && is_array($item['data'])) {
                 $this->populateData($item['data'], $id, $sectionParent);
@@ -148,30 +159,31 @@ class ImportExport
         }
     }
 
-    private function populateData($data, $parent_id, $sectionParent = true)
+    /**
+     * @param array<int, array<string, mixed>> $data
+     */
+    private function populateData(array $data, int $parent_id, bool $sectionParent = true): void
     {
         foreach ($data as $item) {
             $id = $this->insertData($parent_id, $item, $sectionParent);
 
-            if (sizeof($item['data'])) {
+            if (count($item['data']) > 0) {
                 $this->populateData($item['data'], $id, false);
             }
         }
     }
 
-    public function export($target_id)
+    public function export(int $target_id): string
     {
-        $target_id = (int) $target_id;
         $target = Model::load(SectionItem::class);
         $data = Model::load(DataItem::class);
         $data->setExporting();
         $target->load($target_id);
 
-
         $sectionsData = $this->load($target_id);
 
         if ($target_id === 0) {
-            $sectionsData = array(
+            $sectionsData = [
                 'section_id' => null,
                 'label' => 'New Section',
                 'friendly_url' => null,
@@ -182,10 +194,10 @@ class ImportExport
                 'meta' => null,
                 'user_id' => null,
                 'children' => $sectionsData,
-                'data' => $data->getSectionDataRecursive(0)
-            );
+                'data' => $data->getSectionDataRecursive(0),
+            ];
         } else {
-            $sectionsData = array(
+            $sectionsData = [
                 'section_id' => $target->section_id,
                 'label' => $target->label,
                 'friendly_url' => $target->friendly_url,
@@ -196,38 +208,43 @@ class ImportExport
                 'meta' => $target->meta,
                 'user_id' => $target->user_id,
                 'children' => $sectionsData,
-                'data' => $data->getSectionDataRecursive($target->id)
-            );
+                'data' => $data->getSectionDataRecursive($target->id),
+            ];
         }
-        
-        return json_encode($sectionsData, JSON_PRETTY_PRINT);
+
+        $json = json_encode($sectionsData, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Unable to encode section export payload.');
+        }
+
+        return $json;
     }
 
-    public function import($target_parent_id, $sectionsData)
+    public function import(int $target_parent_id, string $sectionsData): void
     {
-        $sectionsData = '[' . $sectionsData . ']';
-        $this->populate(json_decode($sectionsData, JSON_OBJECT_AS_ARRAY), $target_parent_id, true);
+        $sectionsData = '['.$sectionsData.']';
+        $this->populate(json_decode($sectionsData, true), $target_parent_id, true);
     }
 
-    public function exportContainer($target_id)
+    public function exportContainer(int $target_id): string
     {
-        $target_id = (int) $target_id;
         $data = Model::load(DataItem::class);
 
         $data->load($target_id);
-        $data->setExporting(); 
+        $data->setExporting();
         $data->getSectionDataRecursive();
-        
-        return json_encode($data, JSON_PRETTY_PRINT);
+
+        $json = json_encode($data, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Unable to encode container export payload.');
+        }
+
+        return $json;
     }
 
-    public function importContainer($target_parent_id, $data, $topLevelSection)
+    public function importContainer(int $target_parent_id, string $data, bool $topLevelSection): void
     {
-        $data = '[' . $data . ']';
-        $this->populate(json_decode($data, JSON_OBJECT_AS_ARRAY), $target_parent_id, false, $topLevelSection);
+        $data = '['.$data.']';
+        $this->populate(json_decode($data, true), $target_parent_id, false, $topLevelSection);
     }
 }
-
-
-
-

@@ -1,21 +1,28 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
-use Empathy\MVC\Entity;
 use Empathy\ELib\Storage\Container as EContainer;
-use Empathy\ELib\Storage\ContainerImageSize;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class Container extends Entity
 {
-    const TABLE = 'container';
+    public const TABLE = 'container';
 
     public int $id;
-    public $name;
-    public $description;
 
-    public function getAll()
+    public ?string $name = null;
+
+    public ?string $description = null;
+
+    /**
+     * @return array<int, mixed>
+     */
+    #[\Override]
+    public function getAll(): array
     {
         $container = [];
         $sql = 'SELECT'
@@ -31,20 +38,20 @@ class Container extends Entity
 
         $last_id = 0;
         foreach ($result as $row) {
-            $id = $row['container_id'];
-            if ($last_id != $id) {
+            $id = (int) $row['container_id'];
+            if ($last_id !== $id) {
                 $container[$id]['name'] = $row['container_name'];
             }
 
             if (is_numeric($row['image_size_id'])) {
-                $image_size_id = $row['image_size_id'];
+                $image_size_id = (int) $row['image_size_id'];
                 $container[$id]['image_sizes'][$image_size_id] = $row['image_size_name'];
             }
 
             $last_id = $id;
         }
 
-        foreach ($container as $index => $item) {
+        foreach (array_keys($container) as $index) {
             if (isset($container[$index]['image_sizes'])) {
                 $container[$index]['image_size_ids'] =
                     array_keys($container[$index]['image_sizes']);
@@ -54,21 +61,23 @@ class Container extends Entity
         return $container;
     }
 
-    public function remove()
+    public function remove(): void
     {
-        $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
-            .' WHERE container_id = '.$this->id;
+        Model::getTable(ContainerImageSize::class);
         $this->delete();
     }
 
-    public function validates()
+    public function validates(): void
     {
-        if ($this->name == '' || !ctype_alnum(str_replace(' ', '', $this->name))) {
+        if ($this->name === '' || ! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid container name');
         }
     }
 
-    public function update($id, $new_sizes)
+    /**
+     * @param array<int, mixed> $new_sizes
+     */
+    public function update(int $id, array $new_sizes): void
     {
         $params = [];
         $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
@@ -76,7 +85,7 @@ class Container extends Entity
         $params[] = $id;
         $error = 'Could not clear old image sizes from container.';
         $this->query($sql, $error, $params);
-        foreach ($new_sizes as $index => $size_id) {
+        foreach ($new_sizes as $size_id) {
             $params = [];
             $sql = 'INSERT INTO '.Model::getTable(ContainerImageSize::class)
                 .' VALUES(?, ?)';

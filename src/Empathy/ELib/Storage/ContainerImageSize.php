@@ -1,21 +1,25 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
-use Empathy\MVC\Entity;
-use Empathy\ELib\Storage\ImageSize;
 use Empathy\ELib\Storage\ContainerImageSize as EContainerImageSize;
-
+use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class ContainerImageSize extends Entity
 {
-    const TABLE = 'container_image_size';
+    public const TABLE = 'container_image_size';
 
-    public $container_id;
-    public $image_size_id;
+    public int $container_id;
 
-    public function getImageSizes($container_id)
+    public int $image_size_id;
+
+    /**
+     * @return array<int, mixed>
+     */
+    public function getImageSizes(int $container_id): array
     {
         $params = [];
         $sizes = [];
@@ -28,16 +32,19 @@ class ContainerImageSize extends Entity
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($sizes, array($row['prefix'], $row['width'], $row['height']));
+                $sizes[] = [$row['prefix'], $row['width'], $row['height']];
             }
         }
 
         return $sizes;
     }
 
-    public function getContainerPrefixes($container_id)
+    /**
+     * @return array<int, mixed>
+     */
+    public function getContainerPrefixes(int $container_id): array
     {
-        $prefix = array();
+        $prefix = [];
         $params = [];
         $sql = 'SELECT prefix FROM '.Model::getTable(ImageSize::class).' i, '
             .Model::getTable(EContainerImageSize::class).' c WHERE c.image_size_id = i.id'
@@ -47,11 +54,10 @@ class ContainerImageSize extends Entity
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($prefix, $row['prefix'].'_');
+                $prefix[] = $row['prefix'].'_';
             }
         }
 
         return $prefix;
     }
-
 }
