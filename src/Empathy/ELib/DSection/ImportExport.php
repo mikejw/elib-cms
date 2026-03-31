@@ -223,6 +223,6 @@ class ImportExport
     public function importContainer($target_parent_id, $data, $topLevelSection)
     {
         $data = '['.$data.']';
-        $this->populate(json_decode($data, JSON_OBJECT_AS_ARRAY), $target_parent_id, false, $topLevelSection);
+        $this->populate(json_decode($data, true), $target_parent_id, false, $topLevelSection);
     }
 }

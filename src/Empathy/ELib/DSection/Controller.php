@@ -568,8 +568,7 @@ class Controller extends AdminController
             $d->meta = $_POST['meta'];
 
             $d->validates();
-            // if($d->hasValErrors())
-            if (0) {
+            if ($d->hasValErrors()) {
                 $this->presenter->assign('data_item', $d);
                 $this->presenter->assign('errors', $d->getValErrors());
             } else {
@@ -599,8 +598,7 @@ class Controller extends AdminController
             $s->meta = $_POST['meta'];
 
             $s->validates();
-            // if($d->hasValErrors())
-            if (0) {
+            if ($s->hasValErrors()) {
                 $this->presenter->assign('section_item', $s);
                 $this->presenter->assign('errors', $s->getValErrors());
             } else {

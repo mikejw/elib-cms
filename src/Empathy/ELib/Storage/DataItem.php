@@ -110,7 +110,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function valid(): bool
     {
         $key = key($this->data);
-        $var = ($key !== null && $key !== false);
+        $var = ($key !== null);
 
         return $var;
     }
