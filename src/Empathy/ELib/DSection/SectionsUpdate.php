@@ -1,10 +1,8 @@
 <?php
 
-namespace Empathy\ELib\DSection;
+declare(strict_types=1);
 
-use Empathy\ELib\DSection;
-use Empathy\MVC\Model;
-use Empathy\MVC\Model\SectionItem as SectionItem;
+namespace Empathy\ELib\DSection;
 
 class SectionsUpdate
 {
@@ -27,10 +25,9 @@ class SectionsUpdate
         // ancestors => make optional?
         $ancestors = [];
         $ancestors = $this->section->getAncestorIDs($this->section->id, $ancestors);
-        if (sizeof($ancestors) > 0) {
+        if (count($ancestors) > 0) {
             $update = $this->section->buildUnionString($ancestors);
             $this->section->updateTimestamps($update);
         }
     }
-
 }

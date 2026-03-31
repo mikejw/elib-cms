@@ -25,7 +25,8 @@
   },
   "require-dev": {
     "nelmio/alice": "dev-2.x-dev",
-    "pestphp/pest": "^4.4"
+    "pestphp/pest": "4.x-dev",
+    "laravel/pint": "dev-main"
   },
   "autoload": {
     "psr-0": {
@@ -38,8 +39,18 @@
     }
   },
   "scripts": {
-    "pest": "pest",
-    "test": "phpunit -c ./phpunit.xml"
+    "format": "pint",
+    "format-check": "pint --test ./src ./tests",
+    "analyse": "phpstan --memory-limit=1G",
+    "test": "pest",
+    "test:coverage": "XDEBUG_MODE=coverage pest --coverage-html ./build/coverage",
+    "rector": "rector process",
+    "rector:dry": "rector process --dry-run",
+    "check": [
+      "@format-check",
+      "@analyse",
+      "@test"
+    ]
   },
   "minimum-stability": "dev",
   "config": {

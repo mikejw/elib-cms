@@ -1,7 +1,8 @@
 <?php
 
-namespace Empathy\ELib\DSection;
+declare(strict_types=1);
 
+namespace Empathy\ELib\DSection;
 
 use Empathy\ELib\Tree;
 use Empathy\MVC\Config;
@@ -9,10 +10,15 @@ use Empathy\MVC\Config;
 class SectionsTree extends Tree
 {
     private $section;
+
     private $data_item;
+
     private $data;
+
     private $section_ancestors;
+
     private $data_item_ancestors;
+
     private $detect_hidden;
 
     public function __construct(
@@ -22,16 +28,16 @@ class SectionsTree extends Tree
         $collapsed = null,
         $detect_hidden = null,
         $order = [],
-        $asc =true
+        $asc = true
     ) {
-        
+
         $this->detect_hidden = $detect_hidden;
 
         $this->section = $section;
 
         // allow tree use without building markup
-        if ($data_item !== NULL) {
-            
+        if ($data_item !== null) {
+
             $this->data_item = $data_item;
 
             if ($current_is_section) {
@@ -46,8 +52,8 @@ class SectionsTree extends Tree
 
             $this->section_ancestors = [0];
             $this->data_item_ancestors = [];
-            if (!$current_is_section) {
-                if (!$collapsed) {
+            if (! $current_is_section) {
+                if (! $collapsed) {
                     array_push($this->data_item_ancestors, $current_id);
                 }
                 if (is_numeric($data_item->section_id)) {
@@ -56,13 +62,13 @@ class SectionsTree extends Tree
                     $active_section = $this->data_item->findLastSection($parent_id);
                 }
             }
-            if ($current_id != 0) {
+            if ($current_id !== 0) {
                 $this->section_ancestors = $this->section->getAncestorIDs($active_section, $this->section_ancestors);
             }
-            if (!$current_is_section) {
+            if (! $current_is_section) {
                 $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
             }
-            if (!$collapsed || !$current_is_section) {
+            if (! $collapsed || ! $current_is_section) {
                 array_push($this->section_ancestors, $active_section);
             }
 
@@ -93,72 +99,72 @@ class SectionsTree extends Tree
             $ancestors = $this->section_ancestors;
         }
 
-        $class = "clearfix";
-        if (!in_array($last_id, $ancestors)) {
-            $class .= " hidden_sections";
+        $class = 'clearfix';
+        if (! in_array($last_id, $ancestors, true)) {
+            $class .= ' hidden_sections';
         }
         $markup .= " class=\"$class\"";
 
-        if ($level == 0) {
-            $markup .= " id=\"tree\"";
+        if ($level === 0) {
+            $markup .= ' id="tree"';
             $level++;
         }
-        $markup .=">\n";
+        $markup .= ">\n";
         foreach ($data as $index => $value) {
 
             $toggle = '+';
             $folder = '<i class="far fa-folder"></i>';
             $url = 'dsection';
 
-            if ($value['data'] == 1) {
+            if ($value['data'] === 1) {
                 $ancestors = $this->data_item_ancestors;
             } else {
                 $ancestors = $this->section_ancestors;
             }
 
-            if (in_array($value['id'], $ancestors)) {
+            if (in_array($value['id'], $ancestors, true)) {
                 $toggle = '-';
                 $folder = '<i class="far fa-folder-open"></i>';
             }
-            if ($value['data'] == 1) {
+            if ($value['data'] === 1) {
                 $folder = '<i class="far fa-file"></i>';
                 $url = 'dsection/data_item';
                 $value['label'] = $this->truncate($value['label'], 10); // trunc
             }
-            $children = sizeof($value['children']);
-            $class = "clearfix";
-            $markup .= "<li ";
+            $children = count($value['children']);
+            $class = 'clearfix';
+            $markup .= '<li ';
             // if current is section
-            if (!$value['data']) {
-                $markup .= "id=\"section_".$value['id']."\"";    
+            if (! $value['data']) {
+                $markup .= 'id="section_'.$value['id'].'"';
             } else {
-                $markup .= "id=\"data_".$value['id']."\"";    
-            }            
-            if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
-                $class .= " current";
+                $markup .= 'id="data_'.$value['id'].'"';
+            }
+            if ($current_id === $value['id'] && $value['data'] !== $current_is_section) {
+                $class .= ' current';
             }
 
             if (isset($value['hidden']) && $value['hidden']) {
-                $class .= " hidden";
+                $class .= ' hidden';
             }
 
             $markup .= " class=\"$class\"";
 
             $markup .= ">\n";
             if ($children > 0) {
-                $markup .= "<a class=\"toggle\" href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'];
-                if ($toggle == '-') {
+                $markup .= '<a class="toggle" href="http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'];
+                if ($toggle === '-') {
                     $markup .= '/?collapsed=1';
                 }
                 $markup .= "\">$toggle</a>";
             } else {
-                $markup .= "<span class=\"toggle\">&nbsp;</span>";
+                $markup .= '<span class="toggle">&nbsp;</span>';
             }
             $markup .= $folder;
-            if ($current_id == $value['id'] && $value['data'] != $current_is_section) {
-                $markup .= "<span class=\"label current\">".$value['label']."</span>";
+            if ($current_id === $value['id'] && $value['data'] !== $current_is_section) {
+                $markup .= '<span class="label current">'.$value['label'].'</span>';
             } else {
-                $markup .= "<span class=\"label\"><a href=\"http://".Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id']."\">".$value['label']."</a></span>";
+                $markup .= '<span class="label"><a href="http://'.Config::get('WEB_ROOT').Config::get('PUBLIC_DIR')."/admin/$url/".$value['id'].'">'.$value['label'].'</a></span>';
             }
             if ($children > 0) {
                 $markup .= $this->buildMarkup(
@@ -178,15 +184,13 @@ class SectionsTree extends Tree
         return $markup;
     }
 
-
     public function getDataItem()
     {
         return $this->data_item;
     }
 
-    public function getDetectHidden() {
+    public function getDetectHidden()
+    {
         return $this->detect_hidden;
     }
-
-
 }

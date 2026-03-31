@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\DSection;
 
-use Empathy\ELib\DSection;
 use Empathy\ELib\File\Image as ImageUpload;
 use Empathy\ELib\File\Upload as AudioUpload;
 
 class SectionsDelete
 {
     private $section;
+
     private $data_item;
 
     public function __construct($section, $data_item, $current_is_section)
@@ -24,9 +26,9 @@ class SectionsDelete
 
     public function deleteData($id, $section_start)
     {
-        $ids = array();
+        $ids = [];
         $this->data_item->buildDelete($id, $ids, $section_start);
-        if (sizeof($ids) > 0) {
+        if (count($ids) > 0) {
             $queryParams = [];
             foreach ($ids as $id) {
                 $queryParams[] = '?';
@@ -36,10 +38,10 @@ class SectionsDelete
             $videos = $this->data_item->getVideoFilenames($ids_string, $ids);
             $audioFiles = $this->data_item->getAudioFilenames($ids_string, $ids);
 
-            $all_files = array();
-            if (sizeof($videos) > 0) {
+            $all_files = [];
+            if (count($videos) > 0) {
                 // take care of video thumbnails
-                $all_videos = array();
+                $all_videos = [];
                 foreach ($videos as $video) {
                     array_push($all_videos, $video);
                     array_push($all_videos, $video.'.jpg');
@@ -50,21 +52,21 @@ class SectionsDelete
             }
 
             $images_removed = false;
-            if (sizeof($all_files) > 0) {
-                $u = new ImageUpload('data', false, array());
+            if (count($all_files) > 0) {
+                $u = new ImageUpload('data', false, []);
                 $images_removed = $u->remove($all_files);
             }
 
             $audioFiles_removed = false;
-            if (sizeof($audioFiles) > 0) {
+            if (count($audioFiles) > 0) {
                 $au = new AudioUpload(false);
                 $audioFiles_removed = $au->remove($audioFiles);
             }
 
             if (
-                (sizeof($images) < 1 || $images_removed) ||
-                (sizeof($audioFiles) < 1 || $audioFiles_removed)
-            ){
+                (count($images) < 1 || $images_removed) ||
+                (count($audioFiles) < 1 || $audioFiles_removed)
+            ) {
                 $this->data_item->doDelete($ids_string, $ids);
             }
         }
@@ -72,9 +74,9 @@ class SectionsDelete
 
     public function delete($id)
     {
-        $ids = array();
+        $ids = [];
         $this->section->buildDelete($id, $ids, $this);
-        if (sizeof($ids) > 0) {
+        if (count($ids) > 0) {
             $params = [];
             foreach ($ids as $id) {
                 $params[] = '?';

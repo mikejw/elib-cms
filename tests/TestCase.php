@@ -10,6 +10,7 @@ use Empathy\MVC\DBC;
 use Empathy\MVC\DI;
 use Empathy\MVC\EntityManager;
 use Empathy\MVC\EntityPopulator;
+use Empathy\MVC\Plugin\ELibs;
 use Empathy\MVC\Util\Testing\EmpathyApp;
 use Empathy\MVC\Util\Testing\Util\Config;
 use Empathy\MVC\Util\Testing\Util\DB;
@@ -39,7 +40,7 @@ abstract class TestCase extends BaseTestCase
     {
         parent::setUp();
         $this->empathy = new EmpathyApp();
-        $this->bootstrap = $this->empathy->makeFakeBootstrap(\Empathy\MVC\Plugin\ELibs::TESTING_LIB);
+        $this->bootstrap = $this->empathy->makeFakeBootstrap(ELibs::TESTING_LIB);
         $this->controller = new Controller($this->bootstrap);
         DI::getContainer()->set('Controller', $this->controller);
     }
@@ -50,7 +51,7 @@ abstract class TestCase extends BaseTestCase
         DB::reset($reset, true);
         $objectManager = new EntityManager();
 
-        $path = Config::get('base') . '/' . ltrim($file, '/');
+        $path = Config::get('base').'/'.ltrim($file, '/');
         $loader = new Loader();
         $loader->addPopulator($populator);
 

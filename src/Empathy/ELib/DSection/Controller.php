@@ -1,22 +1,20 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\DSection;
 
 use Empathy\ELib\AdminController;
-use Empathy\ELib\DSection\SectionsUpdate;
 use Empathy\ELib\File\Image as ImageUpload;
 use Empathy\ELib\File\Upload as AudioUpload;
-use Empathy\ELib\DSection\SectionsDelete;
-use Empathy\ELib\DSection\SectionsTree;
-use Empathy\MVC\Model;
-use Empathy\ELib\Storage\SectionItem;
-use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\Container;
-use Empathy\ELib\Storage\VideoUpload;
 use Empathy\ELib\Storage\ContainerImageSize;
+use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\ImageSize;
+use Empathy\ELib\Storage\SectionItem;
+use Empathy\ELib\Storage\VideoUpload;
+use Empathy\MVC\Model;
 use Empathy\MVC\RequestException;
-
 
 class Controller extends AdminController
 {
@@ -31,7 +29,7 @@ class Controller extends AdminController
     // functions that are similar to those in data_item
     public function getDataTypes()
     {
-        return array('Heading', 'Body', 'Image', 'Audio', 'Video', 'Container');
+        return ['Heading', 'Body', 'Image', 'Audio', 'Video', 'Container'];
     }
 
     public function add_data()
@@ -43,29 +41,29 @@ class Controller extends AdminController
             && isset($_GET['add'])) {
             switch ($_GET['data_type']) {
                 case 0:
-                    $this->redirect('admin/dsection/add_data_heading/' . $_GET['id']);
+                    $this->redirect('admin/dsection/add_data_heading/'.$_GET['id']);
                     break;
                 case 1:
-                    $this->redirect('admin/dsection/add_data_body/' . $_GET['id']);
+                    $this->redirect('admin/dsection/add_data_body/'.$_GET['id']);
                     break;
                 case 2:
-                    $this->redirect('admin/dsection/add_data_image/' . $_GET['id']);
+                    $this->redirect('admin/dsection/add_data_image/'.$_GET['id']);
                     break;
                 case 3:
-                    $this->redirect('admin/dsection/add_data_audio/' . $_GET['id']);
+                    $this->redirect('admin/dsection/add_data_audio/'.$_GET['id']);
                     break;
                 case 4:
-                    $this->redirect('admin/dsection/add_data_video/' . $_GET['id']);
+                    $this->redirect('admin/dsection/add_data_video/'.$_GET['id']);
                     break;
                 case 5:
                     $this->addDataContainer();
                     break;
                 default:
-                    $this->redirect('admin/dsection/' . $_GET['id']);
+                    $this->redirect('admin/dsection/'.$_GET['id']);
                     break;
             }
         } elseif (isset($_GET['cancel'])) {
-            $this->redirect('admin/dsection/' . $_GET['id']);
+            $this->redirect('admin/dsection/'.$_GET['id']);
         } else {
             $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
@@ -75,7 +73,7 @@ class Controller extends AdminController
 
             $c = Model::load(Container::class);
             $containers = $c->getAllCustom('');
-            $containers_arr = array();
+            $containers_arr = [];
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
                 $id = $item['id'];
@@ -102,7 +100,7 @@ class Controller extends AdminController
 
             $this->clearCache();
         }
-        $this->redirect('admin/dsection/data_item/' . $id);
+        $this->redirect('admin/dsection/data_item/'.$id);
     }
 
     public function add_data_heading()
@@ -123,10 +121,10 @@ class Controller extends AdminController
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/' . $d->section_id);
+                $this->redirect('admin/dsection/'.$d->section_id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         }
 
         $this->buildNav();
@@ -151,10 +149,10 @@ class Controller extends AdminController
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/' . $d->section_id);
+                $this->redirect('admin/dsection/'.$d->section_id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         }
 
         $this->buildNav();
@@ -167,8 +165,8 @@ class Controller extends AdminController
 
             $_GET['id'] = $_POST['id'];
 
-            $images = array();
-            if (!is_array($_FILES['file']['name'])) {
+            $images = [];
+            if (! is_array($_FILES['file']['name'])) {
 
                 $images[0] = $_FILES['file'];
             } else {
@@ -178,9 +176,9 @@ class Controller extends AdminController
             $success = 0;
             foreach ($images as $img) {
                 $_FILES['file'] = $img;
-                $u = new ImageUpload('data', true, array());
+                $u = new ImageUpload('data', true, []);
 
-                if ($u->error != '') {
+                if ($u->error !== '') {
                     $this->presenter->assign('error', $u->error);
                 } else {
                     $d = Model::load(DataItem::class);
@@ -198,21 +196,20 @@ class Controller extends AdminController
                     $success++;
                 }
             }
-            if ($success === sizeof($images)) {
-                $this->redirect('admin/dsection/data_item/' . $id);
+            if ($success === count($images)) {
+                $this->redirect('admin/dsection/data_item/'.$id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         }
 
         $this->buildNav();
         $this->presenter->assign('section_id', $_GET['id']);
     }
 
-
     public function add_data_video()
     {
-        if (isset($_GET['iframe']) && $_GET['iframe'] == true) {
+        if (isset($_GET['iframe']) && $_GET['iframe'] === true) {
             $this->setTemplate('elib:admin/video_upload.tpl');
         } else {
             $this->setTemplate('elib:admin/section.tpl');
@@ -223,11 +220,11 @@ class Controller extends AdminController
             $v = Model::load(VideoUpload::class);
             $v->upload();
 
-            if ($v->error == '') {
+            if ($v->error === '') {
                 $v->make_flv();
             }
 
-            if ($v->error != '') {
+            if ($v->error !== '') {
                 $this->presenter->assign('error', $v->error);
             } else {
                 $d = Model::load(DataItem::class);
@@ -241,13 +238,12 @@ class Controller extends AdminController
                 $this->update_timestamps($d->data_item_id);
                 $v->generateThumb();
                 $this->clearCache();
-                //$this->redirect('admin/data_item/'.mysql_insert_id());
+                // $this->redirect('admin/data_item/'.mysql_insert_id());
             }
         }
         $this->buildNav();
         $this->presenter->assign('section_id', $_GET['id']);
     }
-
 
     public function add_data_audio()
     {
@@ -255,7 +251,7 @@ class Controller extends AdminController
             $_GET['id'] = $_POST['id'];
 
             $u = new AudioUpload();
-            if ($u->error != '') {
+            if ($u->error !== '') {
                 $this->presenter->assign('error', $u->error);
             } else {
                 $d = Model::load(DataItem::class);
@@ -268,21 +264,20 @@ class Controller extends AdminController
                 $u = new SectionsUpdate($su, $d->section_id);
                 $id = $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $id);
+                $this->redirect('admin/dsection/data_item/'.$id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         }
         $this->buildNav();
         $this->presenter->assign('section_id', $_GET['id']);
     }
 
-
     public function default_event()
     {
-        $ui_array = array('id');
+        $ui_array = ['id'];
         $this->loadUIVars('ui_section', $ui_array);
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (! isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
 
@@ -293,7 +288,7 @@ class Controller extends AdminController
 
     public function assertID()
     {
-        if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
+        if (! isset($_GET['id']) || ! is_numeric($_GET['id'])) {
             $_GET['id'] = 0;
         }
     }
@@ -305,13 +300,13 @@ class Controller extends AdminController
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
 
-        if (isset($_GET['collapsed']) && $_GET['collapsed'] == 1) {
+        if (isset($_GET['collapsed']) && $_GET['collapsed'] === 1) {
             $collapsed = 1;
         } else {
             $collapsed = 0;
         }
 
-        if (!$s->load($_GET['id']) && $_GET['id'] != 0) {
+        if (! $s->load($_GET['id']) && $_GET['id'] !== 0) {
             throw new RequestException('Section item not found.');
         }
         $st = new SectionsTree($s, $d, 1, $collapsed);
@@ -332,7 +327,7 @@ class Controller extends AdminController
             $s->insert();
             $this->clearCache();
         }
-        $this->redirect('admin/dsection/' . $_GET['id']);
+        $this->redirect('admin/dsection/'.$_GET['id']);
     }
 
     public function delete()
@@ -343,7 +338,7 @@ class Controller extends AdminController
         $s->load($_GET['id']);
         $sd = new SectionsDelete($s, $d, 1);
         $this->clearCache();
-        $this->redirect('admin/dsection/' . $s->section_id);
+        $this->redirect('admin/dsection/'.$s->section_id);
     }
 
     public function rename()
@@ -362,10 +357,10 @@ class Controller extends AdminController
                 $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $s->id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/' . $s->id);
+                $this->redirect('admin/dsection/'.$s->id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         } else {
             $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
@@ -389,15 +384,15 @@ class Controller extends AdminController
                 $su = Model::load(SectionItem::class);
                 $u = new SectionsUpdate($su, $s->id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/' . $s->id);
+                $this->redirect('admin/dsection/'.$s->id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         } else {
             $s = Model::load(SectionItem::class);
             $s->load($_GET['id']);
 
-            $t = array(
+            $t = [
                 '0' => '0',
                 'A' => 'A',
                 'B' => 'B',
@@ -424,8 +419,8 @@ class Controller extends AdminController
                 'W' => 'W',
                 'X' => 'X',
                 'Y' => 'Y',
-                'Z' => 'Z'
-            );
+                'Z' => 'Z',
+            ];
 
             $this->presenter->assign('templates', $t);
             $this->presenter->assign('section', $s);
@@ -439,7 +434,7 @@ class Controller extends AdminController
         $s->hidden = ($s->hidden) ? 0 : 1;
         $s->save();
         $this->clearCache();
-        $this->redirect('admin/dsection/' . $s->id);
+        $this->redirect('admin/dsection/'.$s->id);
     }
 
     // data item stuff
@@ -450,11 +445,11 @@ class Controller extends AdminController
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
 
-        if (!$d->load($_GET['id'])) {
+        if (! $d->load($_GET['id'])) {
             throw new RequestException('Data item not found.');
         }
         $is_section = 0;
-        if (isset($_GET['collapsed']) && $_GET['collapsed'] == 1) {
+        if (isset($_GET['collapsed']) && $_GET['collapsed'] === 1) {
             $collapsed = 1;
         } else {
             $collapsed = 0;
@@ -464,6 +459,7 @@ class Controller extends AdminController
         $this->presenter->assign('sections', $st->getMarkup());
         $this->presenter->assign('data_item', $d);
         $this->presenter->assign('is_container', $d->isContainer());
+
         return $d;
     }
 
@@ -471,14 +467,14 @@ class Controller extends AdminController
     {
         $ui_array = ['id'];
         $this->loadUIVars('ui_data_item', $ui_array);
-        if (!isset($_GET['id']) || $_GET['id'] == '') {
+        if (! isset($_GET['id']) || $_GET['id'] === '') {
             $_GET['id'] = 0;
         }
 
         $d = $this->buildNavData();
 
         $imagePrefix = 'mid';
-        if ($d->image != '') {
+        if ($d->image !== '') {
             $parentId = $d->data_item_id;
             if (isset($parentId)) {
                 $parent = Model::load(DataItem::class);
@@ -509,20 +505,20 @@ class Controller extends AdminController
         $sd = new SectionsDelete($s, $d, 0);
         $this->clearCache();
 
-        if (!is_numeric($d->data_item_id)) {
-            $this->redirect('admin/dsection/' . $d->section_id);
+        if (! is_numeric($d->data_item_id)) {
+            $this->redirect('admin/dsection/'.$d->section_id);
         } else {
-            $this->redirect('admin/dsection/data_item/' . $d->data_item_id);
+            $this->redirect('admin/dsection/data_item/'.$d->data_item_id);
         }
     }
 
     public function update_timestamps($id)
     {
         $d = Model::load(DataItem::class);
-        $ancestors = array();
+        $ancestors = [];
         $ancestors = $d->getAncestorIDs($id, $ancestors);
 
-        if (sizeof($ancestors) > 0) {
+        if (count($ancestors) > 0) {
             $d->id = min($ancestors);
         } else {
             $d->id = $id;
@@ -545,10 +541,10 @@ class Controller extends AdminController
                 $d->save();
                 $this->update_timestamps($d->id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $d->id);
+                $this->redirect('admin/dsection/data_item/'.$d->id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_POST['id']);
+            $this->redirect('admin/dsection/data_item/'.$_POST['id']);
         }
 
         $this->buildNavData();
@@ -569,7 +565,7 @@ class Controller extends AdminController
             $d->meta = $_POST['meta'];
 
             $d->validates();
-            //if($d->hasValErrors())
+            // if($d->hasValErrors())
             if (0) {
                 $this->presenter->assign('data_item', $d);
                 $this->presenter->assign('errors', $d->getValErrors());
@@ -577,10 +573,10 @@ class Controller extends AdminController
                 $d->save();
                 $this->update_timestamps($d->id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $d->id);
+                $this->redirect('admin/dsection/data_item/'.$d->id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_POST['id']);
+            $this->redirect('admin/dsection/data_item/'.$_POST['id']);
         }
 
         $this->buildNavData();
@@ -600,17 +596,17 @@ class Controller extends AdminController
             $s->meta = $_POST['meta'];
 
             $s->validates();
-            //if($d->hasValErrors())
+            // if($d->hasValErrors())
             if (0) {
                 $this->presenter->assign('section_item', $s);
                 $this->presenter->assign('errors', $s->getValErrors());
             } else {
                 $s->save();
                 $this->clearCache();
-                $this->redirect('admin/dsection/' . $s->id);
+                $this->redirect('admin/dsection/'.$s->id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/' . $_POST['id']);
+            $this->redirect('admin/dsection/'.$_POST['id']);
         }
 
         $this->buildNav();
@@ -627,7 +623,7 @@ class Controller extends AdminController
         $d->hidden = ($d->hidden) ? 0 : 1;
         $d->save();
         $this->clearCache();
-        $this->redirect('admin/dsection/data_item/' . $d->id);
+        $this->redirect('admin/dsection/data_item/'.$d->id);
     }
 
     public function data_add_data()
@@ -636,29 +632,29 @@ class Controller extends AdminController
         $this->setTemplate('elib:admin/section.tpl');
 
         if (isset($_GET['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         } elseif (isset($_GET['data_type']) && is_numeric($_GET['data_type'])) {
             switch ($_GET['data_type']) {
                 case 0:
-                    $this->redirect('admin/dsection/data_add_data_heading/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_add_data_heading/'.$_GET['id']);
                     break;
                 case 1:
-                    $this->redirect('admin/dsection/data_add_data_body/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_add_data_body/'.$_GET['id']);
                     break;
                 case 2:
-                    $this->redirect('admin/dsection/data_add_data_image/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_add_data_image/'.$_GET['id']);
                     break;
                 case 3:
-                    $this->redirect('admin/dsection/data_add_data_audio/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_add_data_audio/'.$_GET['id']);
                     break;
                 case 4:
-                    $this->redirect('admin/dsection/data_add_data_video/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_add_data_video/'.$_GET['id']);
                     break;
                 case 5:
                     $this->dataAddDataContainer();
                     break;
                 default:
-                    $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+                    $this->redirect('admin/dsection/data_item/'.$_GET['id']);
                     break;
             }
         } else {
@@ -667,12 +663,12 @@ class Controller extends AdminController
             $this->presenter->assign('class', 'data_item');
             $this->presenter->assign('data_item', $d);
             $this->presenter->assign('data_item_id', $d->id);
-            //$this->presenter->assign('add_data_menu', 1);
+            // $this->presenter->assign('add_data_menu', 1);
             $this->presenter->assign('data_types', $this->getDataTypes());
 
             $c = Model::load(Container::class);
             $containers = $c->getAllCustom('');
-            $containers_arr = array();
+            $containers_arr = [];
             $containers_arr[0] = 'Default';
             foreach ($containers as $item) {
                 $id = $item['id'];
@@ -699,10 +695,10 @@ class Controller extends AdminController
                 $this->update_timestamps($d->data_item_id);
                 $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+                $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         }
 
         $this->buildNavData();
@@ -728,10 +724,10 @@ class Controller extends AdminController
                 $d->insert();
                 $this->update_timestamps($d->data_item_id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $d->data_item_id);
+                $this->redirect('admin/dsection/data_item/'.$d->data_item_id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         }
         $this->buildNavData();
         $this->setTemplate('elib:admin/section.tpl');
@@ -752,11 +748,11 @@ class Controller extends AdminController
                 $c = Model::load(ContainerImageSize::class);
                 $sizes = $c->getImageSizes($p->container_id);
             } else {
-                $sizes = array();
+                $sizes = [];
             }
 
-            $images = array();
-            if (!is_array($_FILES['file']['name'])) {
+            $images = [];
+            if (! is_array($_FILES['file']['name'])) {
 
                 $images[0] = $_FILES['file'];
             } else {
@@ -770,7 +766,7 @@ class Controller extends AdminController
 
                 $u = new ImageUpload('data', true, $sizes);
 
-                if ($u->error != '') {
+                if ($u->error !== '') {
                     $this->presenter->assign('error', $u->error);
                 } else {
                     $d = Model::load(DataItem::class);
@@ -790,11 +786,11 @@ class Controller extends AdminController
                     // $this->clearCache();
                 }
             }
-            if ($success === sizeof($images)) {
-                $this->redirect('admin/dsection/data_item/' . $new_id);
+            if ($success === count($images)) {
+                $this->redirect('admin/dsection/data_item/'.$new_id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         }
         $this->buildNavData();
         $this->assign('class', 'data_item');
@@ -802,15 +798,13 @@ class Controller extends AdminController
         $this->assign('data_item_id', $_GET['id']);
     }
 
-
-
     public function data_add_data_audio()
     {
         if (isset($_POST['save'])) {
             $_GET['id'] = $_POST['id'];
 
             $u = new AudioUpload();
-            if ($u->error != '') {
+            if ($u->error !== '') {
                 $this->presenter->assign('error', $u->error);
             } else {
                 $d = Model::load(DataItem::class);
@@ -821,10 +815,10 @@ class Controller extends AdminController
                 $d->hidden = 'DEFAULT';
                 $id = $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $id);
+                $this->redirect('admin/dsection/data_item/'.$id);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_POST['id']);
+            $this->redirect('admin/dsection/data_item/'.$_POST['id']);
         }
         $this->buildNavData();
         $this->assign('data_item_id', $_GET['id']);
@@ -832,10 +826,9 @@ class Controller extends AdminController
         $this->setTemplate('elib:admin/section.tpl');
     }
 
-
     public function data_add_data_video()
     {
-        if (isset($_GET['iframe']) && $_GET['iframe'] == true) {
+        if (isset($_GET['iframe']) && $_GET['iframe'] === true) {
             $this->setTemplate('elib:admin/video_upload.tpl');
         } else {
             $this->setTemplate('elib:admin/section.tpl');
@@ -846,11 +839,11 @@ class Controller extends AdminController
             $v = Model::load(VideoUpload::class);
             $v->upload();
 
-            if ($v->error == '') {
+            if ($v->error === '') {
                 $v->make_flv();
             }
 
-            if ($v->error != '') {
+            if ($v->error !== '') {
                 $this->presenter->assign('error', $v->error);
             } else {
                 $d = Model::load(DataItem::class);
@@ -864,7 +857,7 @@ class Controller extends AdminController
                 $this->update_timestamps($d->data_item_id);
                 $v->generateThumb();
                 $this->clearCache();
-                //$this->redirect('admin/data_item/'.mysql_insert_id());
+                // $this->redirect('admin/data_item/'.mysql_insert_id());
             }
         }
         $this->buildNavData();
@@ -887,7 +880,7 @@ class Controller extends AdminController
             $this->update_timestamps($d->data_item_id);
             $id = $d->insert();
             $this->clearCache();
-            $this->redirect('admin/dsection/data_item/' . $id);
+            $this->redirect('admin/dsection/data_item/'.$id);
         }
     }
 
@@ -905,10 +898,10 @@ class Controller extends AdminController
                 $this->update_timestamps($d->id);
                 $d->save();
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+                $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         }
 
         $this->buildNavData();
@@ -932,10 +925,10 @@ class Controller extends AdminController
                 $d->save();
                 $this->update_timestamps($d->id);
                 $this->clearCache();
-                $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+                $this->redirect('admin/dsection/data_item/'.$_GET['id']);
             }
         } elseif (isset($_POST['cancel'])) {
-            $this->redirect('admin/dsection/data_item/' . $_GET['id']);
+            $this->redirect('admin/dsection/data_item/'.$_GET['id']);
         }
 
         $this->buildNavData();
@@ -1005,7 +998,7 @@ class Controller extends AdminController
             $c->load($_GET['id']);
             $c->name = $_POST['name'];
             $c->validates();
-            if (!$c->hasValErrors()) {
+            if (! $c->hasValErrors()) {
                 $c->save();
                 $this->clearCache();
                 $this->redirect('admin/dsection/containers');
@@ -1044,7 +1037,7 @@ class Controller extends AdminController
                 $i->$field = $_POST['value'];
                 $i->validates();
                 if ($i->hasValErrors()) {
-                    //$this->logMe($i->getValErrors());
+                    // $this->logMe($i->getValErrors());
                     $return_code = 2;
                 } else {
                     $i->save();
@@ -1118,7 +1111,7 @@ class Controller extends AdminController
         $i->load($_GET['id']);
         $images = $i->getDataFiles();
 
-        $d = array(array($i->prefix . '_', $i->width, $i->height));
+        $d = [[$i->prefix.'_', $i->width, $i->height]];
         $u = new ImageUpload('', false, $d);
         set_time_limit(300);
         $u->resize($images);
@@ -1131,7 +1124,7 @@ class Controller extends AdminController
         $position = 1;
         foreach ($_POST as $type => $value) {
 
-            if ($type == 'section') {
+            if ($type === 'section') {
                 $model = SectionItem::class;
             } else {
                 $model = DataItem::class;
@@ -1148,6 +1141,7 @@ class Controller extends AdminController
 
         header('Content-type: application/json');
         echo json_encode(1);
+
         return false;
     }
 
@@ -1186,7 +1180,6 @@ class Controller extends AdminController
         $this->assign('content', $content);
     }
 
-
     public function export_container()
     {
         $this->buildNavData();
@@ -1214,7 +1207,6 @@ class Controller extends AdminController
         } else {
             $this->buildNavData();
         }
-
 
         $this->setTemplate('elib:admin/section.tpl');
         $this->assertID();

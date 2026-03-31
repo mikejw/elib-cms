@@ -1,35 +1,38 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
 use Empathy\MVC\Entity;
-use Empathy\ELib\Storage\DataItem;
-use Empathy\ELib\Storage\ContainerImageSize;
-
+use Empathy\MVC\Model;
 
 class ImageSize extends Entity
 {
-    const TABLE = 'image_size';
+    public const TABLE = 'image_size';
 
     public int $id;
+
     public $name;
+
     public $prefix;
+
     public $width;
+
     public $height;
 
     public function validates()
     {
-        if (!ctype_alnum(str_replace(' ', '', $this->name))) {
+        if (! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid name');
         }
-        if (!ctype_alpha($this->prefix)) {
+        if (! ctype_alpha($this->prefix)) {
             $this->addValError('Invalid prefix');
         }
-        if (!is_numeric($this->width)) {
+        if (! is_numeric($this->width)) {
             $this->addValError('Invalid width');
         }
-        if (!is_numeric($this->height)) {
+        if (! is_numeric($this->height)) {
             $this->addValError('Invalid height');
         }
     }
@@ -50,9 +53,9 @@ class ImageSize extends Entity
             $ids[] = $row['id'];
         }
 
-        if (sizeof($ids) > 0) {
-            list($unionString, $params) = $this->buildUnionString($ids);
-            $sql = 'SELECT image FROM '.Model::getTable(DataItem::class).' WHERE data_item_id IN '. $unionString;
+        if (count($ids) > 0) {
+            [$unionString, $params] = $this->buildUnionString($ids);
+            $sql = 'SELECT image FROM '.Model::getTable(DataItem::class).' WHERE data_item_id IN '.$unionString;
             $error = 'Could not got images matching image size.';
             $result = $this->query($sql, $error, $params);
             foreach ($result as $row) {

@@ -1,18 +1,21 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Empathy\ELib\Storage;
 
-use Empathy\MVC\Model;
-use Empathy\MVC\Entity;
 use Empathy\ELib\Storage\Container as EContainer;
-use Empathy\ELib\Storage\ContainerImageSize;
+use Empathy\MVC\Entity;
+use Empathy\MVC\Model;
 
 class Container extends Entity
 {
-    const TABLE = 'container';
+    public const TABLE = 'container';
 
     public int $id;
+
     public $name;
+
     public $description;
 
     public function getAll()
@@ -32,7 +35,7 @@ class Container extends Entity
         $last_id = 0;
         foreach ($result as $row) {
             $id = $row['container_id'];
-            if ($last_id != $id) {
+            if ($last_id !== $id) {
                 $container[$id]['name'] = $row['container_name'];
             }
 
@@ -63,7 +66,7 @@ class Container extends Entity
 
     public function validates()
     {
-        if ($this->name == '' || !ctype_alnum(str_replace(' ', '', $this->name))) {
+        if ($this->name === '' || ! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid container name');
         }
     }
