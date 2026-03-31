@@ -2,25 +2,31 @@
 
 namespace ESuite;
 
-use Empathy\MVC\EntityManager;
+use Empathy\MVC\Util\Testing\Util\DB;
+use Empathy\MVC\Util\Testing\Util\Config;
 use Empathy\MVC\EntityPopulator;
+use Empathy\MVC\EntityManager;
 use Nelmio\Alice\Fixtures\Loader;
+use Empathy\MVC\Util\Testing\EmpathyApp;
+use Empathy\MVC\DI;
+use Empathy\MVC\Controller;
 
-
-abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
+abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
 {
    
-    protected function setUp()
+    protected function setUp(): void
     {
-        \ESuite\Util\DB::loadDefDBCreds();
+        $e = new EmpathyApp();
+        $b = $e->makeFakeBootstrap(\Empathy\MVC\Plugin\ELibs::TESTING_LIB);
+        DI::getContainer()->set('Controller', new Controller($b));
     }
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         //
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         //
     }
@@ -28,15 +34,15 @@ abstract class ESuiteTest extends \PHPUnit_Framework_TestCase
     protected function loadFixtures($reset, $file)
     {
         $populator = new EntityPopulator();
-        \ESuite\Util\DB::reset($reset);
+        DB::reset($reset, true);
         $objectManager = new EntityManager();
 
-        $file = \ESuite\Util\Config::get('base').$file;
+        $path = Config::get('base') . '/' . $file;
         $loader = new Loader();
         $loader->addPopulator($populator);
 
-        $objects = $loader->load($file);
+        /** @var list<object> $objects */
+        $objects = array_values($loader->load($path));
         $objectManager->persist($objects);
     }
-
 }

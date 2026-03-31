@@ -3,22 +3,21 @@
 namespace ESuite\DSection;
 
 use ESuite\ESuiteTest;
-use Empathy\MVC\Model;
 use Empathy\ELib\DSection\ImportExport;
-use Empathy\ELib\User\CurrentUser;
+use Empathy\MVC\DI;
 
 
 class ImportExportTest extends ESuiteTest
 {
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
     }
 
     public function testSectionRootHasSectionAndData()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(0), JSON_OBJECT_AS_ARRAY);
 
@@ -28,7 +27,7 @@ class ImportExportTest extends ESuiteTest
 
     public function testHasSectionAndData()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
         $this->assertEquals('New Section', $output['label']);
@@ -37,7 +36,7 @@ class ImportExportTest extends ESuiteTest
 
     public function testHasSection()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
         $ie = new ImportExport();
         $output = json_decode($ie->export(1), JSON_OBJECT_AS_ARRAY);
         $this->assertEquals('New Test Section', $output['label']);
@@ -45,9 +44,10 @@ class ImportExportTest extends ESuiteTest
 
     public function testPopulateSectionFromRoot()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures3.yml');
-        CurrentUser::detectUser();
-        CurrentUser::setUserID(1);
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
+        $currentUser = DI::getContainer()->get('CurrentUser');
+        $currentUser->detectUser();
+        $currentUser->setUserID(1);
         $ie = new ImportExport();
         $output = $ie->export(0);
         $ie->import(0, $output);
@@ -58,9 +58,10 @@ class ImportExportTest extends ESuiteTest
 
     public function testPopulateSectionAndData()
     {
-        $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
-        CurrentUser::detectUser();
-        CurrentUser::setUserID(1);
+        $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
+        $currentUser = DI::getContainer()->get('CurrentUser');
+        $currentUser->detectUser();
+        $currentUser->setUserID(1);
         $ie = new ImportExport();
         $output = $ie->export(1);
         $ie->import(0, $output);

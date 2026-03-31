@@ -3,6 +3,7 @@
 namespace ESuite\Util;
 
 use Empathy\MVC\Config as EmpConfig;
+use Empathy\MVC\Util\Testing\Util\Config;
 
 class DB
 {
@@ -16,7 +17,7 @@ class DB
             'db_host' => '127.0.0.1',
             'db_name' => 'project',
             'db_user' => 'root',
-            'db_pass' => '',
+            'db_pass' => 'example',
             'db_port' => 3306
         );
     }
@@ -60,9 +61,9 @@ class DB
     private static function load($file)
     {
         $exec = Config::get('mysql').' -u '.EmpConfig::get('DB_USER').' --password=\''.EmpConfig::get('DB_PASS').'\' '
+            .'-h '.EmpConfig::get('DB_SERVER').' '
             .EmpConfig::get('DB_NAME').' < '.$file;
         exec($exec);
-        //echo $exec;
     }
 
 
