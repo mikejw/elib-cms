@@ -11,7 +11,7 @@ use Empathy\MVC\Util\Testing\EmpathyApp;
 use Empathy\MVC\DI;
 use Empathy\MVC\Controller;
 
-abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
+class ESuiteTest extends \PHPUnit\Framework\TestCase
 {
    
     protected function setUp(): void
@@ -44,5 +44,10 @@ abstract class ESuiteTest extends \PHPUnit\Framework\TestCase
         /** @var list<object> $objects */
         $objects = array_values($loader->load($path));
         $objectManager->persist($objects);
+    }
+
+    public function testSomething()
+    {
+        $this->assertTrue(true);
     }
 }
