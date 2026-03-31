@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 use Empathy\ELib\DSection\ImportExport;
 use Empathy\MVC\DI;
-
 test('section root has section and data', function () {
-    $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
+    loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
     $ie = new ImportExport();
     $output = json_decode($ie->export(0), true);
 
@@ -15,7 +14,7 @@ test('section root has section and data', function () {
 });
 
 test('has section and data', function () {
-    $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
+    loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
     $ie = new ImportExport();
     $output = json_decode($ie->export(1), true);
 
@@ -24,7 +23,7 @@ test('has section and data', function () {
 });
 
 test('has section', function () {
-    $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
+    loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
     $ie = new ImportExport();
     $output = json_decode($ie->export(1), true);
 
@@ -32,7 +31,7 @@ test('has section', function () {
 });
 
 test('populate section from root', function () {
-    $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
+    loadFixtures('fixtures/dd.sql', 'fixtures/fixtures3.yml');
     $currentUser = DI::getContainer()->get('CurrentUser');
     $currentUser->detectUser();
     $currentUser->setUserID(1);
@@ -46,7 +45,7 @@ test('populate section from root', function () {
 });
 
 test('populate section and data', function () {
-    $this->loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
+    loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
     $currentUser = DI::getContainer()->get('CurrentUser');
     $currentUser->detectUser();
     $currentUser->setUserID(1);

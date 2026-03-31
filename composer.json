@@ -26,7 +26,8 @@
   "require-dev": {
     "nelmio/alice": "dev-2.x-dev",
     "pestphp/pest": "4.x-dev",
-    "laravel/pint": "dev-main"
+    "laravel/pint": "dev-main",
+    "phpstan/phpstan": "2.2.x-dev"
   },
   "autoload": {
     "psr-0": {

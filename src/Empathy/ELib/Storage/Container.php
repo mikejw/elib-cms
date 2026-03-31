@@ -18,7 +18,7 @@ class Container extends Entity
 
     public $description;
 
-    public function getAll()
+    public function getAll(): array
     {
         $container = [];
         $sql = 'SELECT'

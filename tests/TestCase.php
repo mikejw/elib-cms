@@ -45,7 +45,7 @@ abstract class TestCase extends BaseTestCase
         DI::getContainer()->set('Controller', $this->controller);
     }
 
-    protected function loadFixtures(string $reset, string $file): void
+    public function loadFixtures(string $reset, string $file): void
     {
         $populator = new EntityPopulator();
         DB::reset($reset, true);

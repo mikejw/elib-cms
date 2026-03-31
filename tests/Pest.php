@@ -2,6 +2,11 @@
 
 declare(strict_types=1);
 
+use Empathy\MVC\EntityManager;
+use Empathy\MVC\EntityPopulator;
+use Empathy\MVC\Util\Testing\Util\Config as TestingConfig;
+use Empathy\MVC\Util\Testing\Util\DB;
+use Nelmio\Alice\Fixtures\Loader;
 use Tests\TestCase;
 
 /*
@@ -41,3 +46,18 @@ expect()->extend('toBeOne', fn () => $this->toBe(1));
 | global functions to help you to reduce the number of lines of code in your test files.
 |
 */
+
+function loadFixtures(string $reset, string $file): void
+{
+    $populator = new EntityPopulator();
+    DB::reset($reset, true);
+    $objectManager = new EntityManager();
+
+    $path = TestingConfig::get('base') . '/' . ltrim($file, '/');
+    $loader = new Loader();
+    $loader->addPopulator($populator);
+
+    /** @var list<object> $objects */
+    $objects = array_values($loader->load($path));
+    $objectManager->persist($objects);
+}

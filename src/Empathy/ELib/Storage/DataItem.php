@@ -102,10 +102,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return key($this->data);
     }
 
-    #[\ReturnTypeWillChange]
-    public function next()
+    public function next(): void
     {
-        return next($this->data);
+        next($this->data);
     }
 
     public function valid(): bool
@@ -256,7 +255,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function find($type, $pattern = null, $options = [])
     {
         $item = null;
+        $lastDataItem = null;
         foreach ($this as $d) {
+            $lastDataItem = $d;
 
             if ($pattern !== null) {
                 if (isset($d->label)) {
@@ -318,10 +319,10 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
             }
         }
 
-        if (in_array(self::FIND_DEEP_ALL, $options, true) && $d->hasData()) {
-            $deepItem = $d->find($type, $pattern, $options);
+        if (in_array(self::FIND_DEEP_ALL, $options, true) && $lastDataItem !== null && $lastDataItem->hasData()) {
+            $deepItem = $lastDataItem->find($type, $pattern, $options);
             if ($deepItem !== null) {
-                $item = array_merge($item, $deepItem);
+                $item = array_merge((array) $item, (array) $deepItem);
             }
         }
 
@@ -509,6 +510,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     // ammended to perform search by position value
     {
         $id = 0;
+        $row = ['id' => 0];
         $sql = 'SELECT id FROM '.Model::getTable(EDataItem::class).
             ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
         $error = 'Could not get most recent video.';

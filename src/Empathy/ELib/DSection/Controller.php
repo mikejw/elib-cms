@@ -85,6 +85,7 @@ class Controller extends AdminController
 
     public function addDataContainer()
     {
+        $id = (int) ($_GET['id'] ?? 0);
         if (isset($_GET['container_type']) && is_numeric($_GET['container_type'])) {
             $d = Model::load(DataItem::class);
             $d->section_id = $_GET['id'];
@@ -161,6 +162,7 @@ class Controller extends AdminController
 
     public function add_data_image()
     {
+        $id = (int) ($_GET['id'] ?? 0);
         if (isset($_POST['save'])) {
 
             $_GET['id'] = $_POST['id'];
@@ -217,6 +219,7 @@ class Controller extends AdminController
 
         if (isset($_POST['id'])) {
             echo 1;
+            /** @var VideoUpload $v */
             $v = Model::load(VideoUpload::class);
             $v->upload();
 
@@ -273,7 +276,7 @@ class Controller extends AdminController
         $this->presenter->assign('section_id', $_GET['id']);
     }
 
-    public function default_event()
+    public function default_event(): void
     {
         $ui_array = ['id'];
         $this->loadUIVars('ui_section', $ui_array);
@@ -836,6 +839,7 @@ class Controller extends AdminController
 
         if (isset($_POST['id'])) {
             echo 1;
+            /** @var VideoUpload $v */
             $v = Model::load(VideoUpload::class);
             $v->upload();
 

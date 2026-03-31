@@ -6,7 +6,6 @@ use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\SectionItem;
 use Empathy\MVC\Model;
-
 test('get section item entity', function () {
     $section = Model::load(SectionItem::class);
 
@@ -14,7 +13,7 @@ test('get section item entity', function () {
 });
 
 test('has section', function () {
-    $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+    loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
     $section = Model::load(SectionItem::class, 1);
     $data = Model::load(DataItem::class);
 
@@ -25,7 +24,7 @@ test('has section', function () {
 });
 
 test('root is section', function () {
-    $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
+    loadFixtures('fixtures/dd.sql', '/fixtures/fixtures1.yml');
     $section = Model::load(SectionItem::class);
     $data = Model::load(DataItem::class);
 
@@ -36,7 +35,7 @@ test('root is section', function () {
 });
 
 test('has section and data', function () {
-    $this->loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
+    loadFixtures('fixtures/dd.sql', '/fixtures/fixtures2.yml');
     $section = Model::load(SectionItem::class, 0);
     $data = Model::load(DataItem::class);
 

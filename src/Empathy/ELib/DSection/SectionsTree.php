@@ -173,8 +173,7 @@ class SectionsTree extends Tree
                     $current_id,
                     $value['id'],
                     $value['data'],
-                    $current_is_section,
-                    $this->detect_hidden
+                    $current_is_section
                 );
             }
             $markup .= "</li>\n";
