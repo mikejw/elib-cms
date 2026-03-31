@@ -18,12 +18,21 @@ use Empathy\MVC\RequestException;
 
 class Controller extends AdminController
 {
+    private function normalizeInt(mixed $value): int
+    {
+        if (is_object($value) && isset($value->id)) {
+            return (int) $value->id;
+        }
+
+        return (int) ($value ?? 0);
+    }
+
     /**
      */
     private function clearCache(): void
     {
         $cache = $this->stash->get('cache');
-        if (is_object($cache)) {
+        if (is_object($cache) && method_exists($cache, 'clear')) {
             $cache->clear();
         }
     }
@@ -101,7 +110,7 @@ class Controller extends AdminController
             $d = Model::load(DataItem::class);
             $d->section_id = $_GET['id'];
             if ($_GET['container_type'] > 0) {
-                $d->container_id = $_GET['container_type'];
+                $d->container_id = (int) $_GET['container_type'];
             }
             $d->label = 'Container';
             $d->position = 'DEFAULT';
@@ -135,7 +144,7 @@ class Controller extends AdminController
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/'.$d->section_id);
+                $this->redirect('admin/dsection/'.$this->normalizeInt($d->section_id));
             }
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/'.$_POST['id']);
@@ -165,7 +174,7 @@ class Controller extends AdminController
                 $u = new SectionsUpdate($su, $d->section_id);
                 $d->insert();
                 $this->clearCache();
-                $this->redirect('admin/dsection/'.$d->section_id);
+                $this->redirect('admin/dsection/'.$this->normalizeInt($d->section_id));
             }
         } elseif (isset($_POST['cancel'])) {
             $this->redirect('admin/dsection/'.$_POST['id']);
@@ -348,7 +357,7 @@ class Controller extends AdminController
     {
         if (isset($_GET['id']) && is_numeric($_GET['id'])) {
             $s = Model::load(SectionItem::class);
-            $s->section_id = $_GET['id'];
+            $s->section_id = (int) $_GET['id'];
             $s->label = 'New Section';
             $s->template = 'DEFAULT';
             $s->position = 'DEFAULT';
@@ -370,7 +379,7 @@ class Controller extends AdminController
         $s->load($_GET['id']);
         $sd = new SectionsDelete($s, $d, true);
         $this->clearCache();
-        $this->redirect('admin/dsection/'.$s->section_id);
+        $this->redirect('admin/dsection/'.$this->normalizeInt($s->section_id));
     }
 
     /**
@@ -523,7 +532,7 @@ class Controller extends AdminController
                 $parent->load($parentId);
                 if ($parent->isContainer() && isset($parent->container_id)) {
                     $c = Model::load(ContainerImageSize::class);
-                    $imageSizes = $c->getImageSizes($parent->container_id);
+                    $imageSizes = $c->getImageSizes((int) $parent->container_id);
                     if (count($imageSizes) > 0) {
                         $imagePrefix = $imageSizes[0][0];
                     }
@@ -550,7 +559,7 @@ class Controller extends AdminController
         $this->clearCache();
 
         if (! is_numeric($d->data_item_id)) {
-            $this->redirect('admin/dsection/'.$d->section_id);
+            $this->redirect('admin/dsection/'.$this->normalizeInt($d->section_id));
         } else {
             $this->redirect('admin/dsection/data_item/'.$d->data_item_id);
         }
@@ -558,19 +567,20 @@ class Controller extends AdminController
 
     /**
      */
-    public function update_timestamps(int $id): void
+    public function update_timestamps(int|string|null $id): void
     {
+        $id = $this->normalizeInt($id);
         $d = Model::load(DataItem::class);
         $ancestors = [];
         $ancestors = $d->getAncestorIDs($id, $ancestors);
 
         if (count($ancestors) > 0) {
-            $d->id = min($ancestors);
+            $d->id = (int) min($ancestors);
         } else {
             $d->id = $id;
         }
         $d->load($d->id);
-        $u = new SectionsUpdate(Model::load(SectionItem::class), $d->section_id);
+        $u = new SectionsUpdate(Model::load(SectionItem::class), $this->normalizeInt($d->section_id));
     }
 
     /**
@@ -806,7 +816,11 @@ class Controller extends AdminController
 
             if (is_numeric($p->container_id)) {
                 $c = Model::load(ContainerImageSize::class);
-                $sizes = $c->getImageSizes($p->container_id);
+                $sizes = $c->getImageSizes((int) $p->container_id);
+                $sizes = array_map(
+                    static fn (array $size): array => [(string) $size[0], (int) $size[1], (int) $size[2]],
+                    $sizes
+                );
             } else {
                 $sizes = [];
             }
@@ -824,7 +838,7 @@ class Controller extends AdminController
             foreach ($images as $img) {
                 $_FILES['file'] = $img;
 
-                $u = new ImageUpload('data', true, $sizes);
+                $u = new ImageUpload('data', true, array_values($sizes));
 
                 if ($u->error !== '') {
                     $this->presenter->assign('error', $u->error);
@@ -939,7 +953,7 @@ class Controller extends AdminController
             $d = Model::load(DataItem::class);
             $d->data_item_id = $_GET['id'];
             if ($_GET['container_type'] > 0) {
-                $d->container_id = $_GET['container_type'];
+                $d->container_id = (int) $_GET['container_type'];
             }
             $d->label = 'Container';
             $d->position = 'DEFAULT';
@@ -1200,7 +1214,7 @@ class Controller extends AdminController
         $i->load($_GET['id']);
         $images = $i->getDataFiles();
 
-        $d = [[$i->prefix.'_', $i->width, $i->height]];
+        $d = [[$i->prefix.'_', (int) $i->width, (int) $i->height]];
         $u = new ImageUpload('', false, $d);
         set_time_limit(300);
         $u->resize($images);

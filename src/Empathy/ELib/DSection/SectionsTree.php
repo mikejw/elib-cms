@@ -11,6 +11,15 @@ use Empathy\MVC\Config;
 
 class SectionsTree extends Tree
 {
+    private function normalizeInt(mixed $value): int
+    {
+        if (is_object($value) && isset($value->id)) {
+            return (int) $value->id;
+        }
+
+        return (int) ($value ?? 0);
+    }
+
     private SectionItem $section;
 
     private ?DataItem $data_item = null;
@@ -18,10 +27,10 @@ class SectionsTree extends Tree
     /** @var array<int, array<string, mixed>> */
     private array $data = [];
 
-    /** @var list<int> */
+    /** @var list<int|string> */
     private array $section_ancestors = [];
 
-    /** @var list<int> */
+    /** @var list<int|string> */
     private array $data_item_ancestors = [];
 
     private ?bool $detect_hidden = null;
@@ -67,7 +76,7 @@ class SectionsTree extends Tree
                 if (is_numeric($data_item->section_id)) {
                     $active_section = $data_item->section_id;
                 } else {
-                    $active_section = $this->data_item->findLastSection($parent_id);
+                    $active_section = $this->data_item->findLastSection($this->normalizeInt($parent_id));
                 }
             }
             if ($current_id !== 0) {

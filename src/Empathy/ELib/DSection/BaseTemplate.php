@@ -7,6 +7,7 @@ namespace Empathy\ELib\DSection;
 use Empathy\ELib\EController;
 use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\SectionItem;
+use Empathy\MVC\Bootstrap;
 use Empathy\MVC\Model;
 
 class BaseTemplate extends EController
@@ -15,7 +16,7 @@ class BaseTemplate extends EController
 
     protected DataItem $data_item;
 
-    public function __construct(object $boot)
+    public function __construct(Bootstrap $boot)
     {
         parent::__construct($boot);
         $this->section = Model::load(SectionItem::class);

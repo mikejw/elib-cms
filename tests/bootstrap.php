@@ -5,7 +5,11 @@ use Empathy\MVC\Util\Testing\Util\Config;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-Config::init(realpath(dirname(__FILE__)));
+$base = realpath(dirname(__FILE__));
+if ($base === false) {
+    throw new \RuntimeException('Could not resolve tests bootstrap path.');
+}
+Config::init($base);
 if (Config::get('set_test_mode')) {
     define('MVC_TEST_MODE', Config::get('set_test_mode'));
 }

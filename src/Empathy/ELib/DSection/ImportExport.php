@@ -61,7 +61,7 @@ class ImportExport
             $s->meta = $data['meta'];
             $s->stamp = $data['stamp'] ?
                 is_numeric($data['stamp']) ?
-                    date('Y-m-d H:i:s', $data['stamp'])
+                    date('Y-m-d H:i:s', (int) $data['stamp'])
                     : $data['stamp']
                 : 'MYSQLTIME';
 
@@ -117,7 +117,7 @@ class ImportExport
                 $parent = Model::load(DataItem::class, $parentId);
                 if ($parent->isContainer() && isset($parent->container_id)) {
                     $c = Model::load(ContainerImageSize::class);
-                    $imageSizes = $c->getImageSizes($parent->container_id);
+                    $imageSizes = $c->getImageSizes((int) $parent->container_id);
                     if (count($imageSizes) > 0) {
                         $imagePrefixes = array_map(function ($item) {
                             return $item[0];
@@ -215,7 +215,12 @@ class ImportExport
             ];
         }
 
-        return json_encode($sectionsData, JSON_PRETTY_PRINT);
+        $json = json_encode($sectionsData, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Unable to encode section export payload.');
+        }
+
+        return $json;
     }
 
     public function import(int $target_parent_id, string $sectionsData): void
@@ -233,7 +238,12 @@ class ImportExport
         $data->setExporting();
         $data->getSectionDataRecursive();
 
-        return json_encode($data, JSON_PRETTY_PRINT);
+        $json = json_encode($data, JSON_PRETTY_PRINT);
+        if ($json === false) {
+            throw new \RuntimeException('Unable to encode container export payload.');
+        }
+
+        return $json;
     }
 
     public function importContainer(int $target_parent_id, string $data, bool $topLevelSection): void

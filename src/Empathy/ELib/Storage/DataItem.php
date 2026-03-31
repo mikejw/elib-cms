@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Empathy\ELib\Storage;
 
+use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Storage\DataItem as EDataItem;
 use Empathy\MVC\DI;
 use Empathy\MVC\Entity;
@@ -11,7 +12,7 @@ use Empathy\MVC\Model;
 use Michelf\Markdown;
 
 /**
- * @implements \Iterator<int, DataItem>
+ * @implements \Iterator<int|string, mixed>
  */
 class DataItem extends Entity implements \Iterator, \JsonSerializable
 {
@@ -69,7 +70,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
     public int|string|null $stamp = null;
 
-    /** @var list<DataItem> */
+    /** @var array<int, DataItem> */
     private array $data = [];
 
     private bool $export = false;
@@ -105,7 +106,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
     public function current(): mixed
     {
-        return current($this->data);
+        $current = current($this->data);
+
+        return $current === false ? null : $current;
     }
 
     public function key(): mixed
@@ -157,7 +160,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     /**
      */
     /**
-     * @return list<DataItem>
+     * @return array<int, DataItem>
      */
     public function getDataValue(): array
     {
@@ -244,9 +247,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     /**
      */
     /**
-     * @return list<DataItem>|null
+     * @return array<int, DataItem>
      */
-    public function getSectionDataRecursive(int|string|null $section_id = null, bool $disconnect = true): ?array
+    public function getSectionDataRecursive(int|string|null $section_id = null, bool $disconnect = true): array
     {
         $this->getData(true, $section_id, $disconnect);
 
@@ -270,6 +273,10 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function findAndConvertAllToMD(): void
     {
         foreach ($this as $d) {
+            if (! $d instanceof self) {
+                continue;
+            }
+
             if (isset($d->body)) {
                 $d->convertToMarkdown();
             }
@@ -281,10 +288,15 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
      */
     /**
      * @param list<DataItem> $found
+     * @param-out list<DataItem> $found
      */
     public function findContainers(array &$found = [], bool $recursive = true): void
     {
         foreach ($this as $d) {
+            if (! $d instanceof self) {
+                continue;
+            }
+
             if ($d->isContainer()) {
                 $found[] = $d;
             }
@@ -355,7 +367,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
                     throw new \Exception('No valid find type.');
             }
 
-            if ($item !== null && in_array(self::FIND_OPT_CONVERT_MD, $options, true)) {
+            if ($item instanceof self && in_array(self::FIND_OPT_CONVERT_MD, $options, true)) {
                 $item->convertToMarkdown();
             }
 
@@ -373,9 +385,13 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
             }
         }
 
-        if ($item !== null && in_array(self::FIND_OPT_UNPACK, $options, true) && $item->hasData()) {
+        if ($item instanceof self && in_array(self::FIND_OPT_UNPACK, $options, true) && $item->hasData()) {
             if (in_array(self::FIND_OPT_CONVERT_MD, $options, true)) {
                 foreach ($item as $d) {
+                    if (! $d instanceof self) {
+                        continue;
+                    }
+
                     if (isset($d->body)) {
                         $d->convertToMarkdown();
                     }
@@ -391,7 +407,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     /**
      */
     /**
-     * @return list<DataItem>
+     * @return array<int, DataItem>
      */
     public function getLocalData(): array
     {
@@ -422,7 +438,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         if (! is_numeric($row['section_id'])) {
             $section_id = $this->findLastSection($row['data_item_id']);
         } else {
-            $section_id = $row['section_id'];
+            $section_id = (int) $row['section_id'];
         }
 
         return $section_id;
@@ -431,8 +447,8 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     /**
      */
     /**
-     * @param list<int|string> $ancestors
-     * @return list<int|string>
+     * @param list<int> $ancestors
+     * @return list<int>
      */
     public function getAncestorIDs(int|string $id, array $ancestors): array
     {
@@ -444,11 +460,11 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
-            $data_item_id = $row['data_item_id'];
+            $data_item_id = (int) $row['data_item_id'];
         }
         if ($data_item_id !== 0) {
             array_push($ancestors, $data_item_id);
-            $ancestors = $this->getAncestorIDs($data_item_id, $ancestors);
+            $ancestors = array_map('intval', $this->getAncestorIDs($data_item_id, $ancestors));
         }
 
         return $ancestors;
@@ -497,7 +513,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
      * @param list<int|string> $order
      * @return array<int, array<string, mixed>>
      */
-    public function buildTree(int|string $current, object $tree, array $order = [], bool $asc = true): array
+    public function buildTree(int|string $current, SectionsTree $tree, array $order = [], bool $asc = true): array
     {
         $i = 0;
         $nodes = [];
@@ -622,7 +638,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     }
 
     /**
-     * @param array<int, mixed> $filter
+     * @param list<string> $filter
      */
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {

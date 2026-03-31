@@ -10,10 +10,10 @@ class SectionsUpdate
 {
     public SectionItem $section;
 
-    public function __construct(SectionItem $section, int $section_id)
+    public function __construct(SectionItem $section, int|string|object|null $section_id)
     {
         $this->section = $section;
-        $this->section->id = $section_id;
+        $this->section->id = is_object($section_id) ? (int) ($section_id->id ?? 0) : (int) $section_id;
         $this->update_timestamps();
     }
 

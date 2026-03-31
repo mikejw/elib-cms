@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Empathy\ELib\Storage;
 
+use Empathy\ELib\DSection\SectionsDelete;
+use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Storage\SectionItem as ESectionItem;
 use Empathy\MVC\DI;
 use Empathy\MVC\Entity;
@@ -114,10 +116,10 @@ class SectionItem extends Entity
     /**
      * @param list<int|string> $ids
      */
-    public function buildDelete(int|string $id, array &$ids, object $tree): void
+    public function buildDelete(int|string $id, array &$ids, SectionsDelete $tree): void
     {
         array_push($ids, $id);
-        $tree->deleteData($id, 1);
+        $tree->deleteData((int) $id, 1);
         $params = [];
         $sql = 'SELECT id FROM '.Model::getTable(ESectionItem::class).' WHERE section_id = ?';
         $params[] = $id;
@@ -148,7 +150,7 @@ class SectionItem extends Entity
      * @param list<int|string> $order
      * @return array<int, array<string, mixed>>
      */
-    public function buildTree(int|string $current, object $tree, array $order = [], bool $asc = true): array
+    public function buildTree(int|string $current, SectionsTree $tree, array $order = [], bool $asc = true): array
     {
         $i = 0;
         $nodes = [];
@@ -228,6 +230,7 @@ class SectionItem extends Entity
         $i = 0;
         $build = 1;
         $params = [];
+        $url = [];
         while ($build) {
             $sql = 'SELECT section_id, label  FROM '.Model::getTable(ESectionItem::class)
                 .' WHERE id = ?';
@@ -236,7 +239,7 @@ class SectionItem extends Entity
             $result = $this->query($sql, $error, $params);
             $row = $result->fetch();
 
-            $url[$i] = $row['label'];
+            $url[$i] = (string) $row['label'];
 
             $id = $row['section_id'];
             if ($id === 0) {
@@ -246,13 +249,13 @@ class SectionItem extends Entity
             $i++;
         }
 
-        return $url;
+        return array_values($url);
     }
 
     /**
      */
     /**
-     * @param list<int|string> $ignore
+     * @param list<int> $ignore
      * @return list<array<string, scalar|null>>
      */
     public function getAllForSitemap(array $ignore): array
@@ -288,7 +291,7 @@ class SectionItem extends Entity
     }
 
     /**
-     * @param array<int, mixed> $filter
+     * @param list<string> $filter
      */
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {

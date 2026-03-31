@@ -37,13 +37,13 @@ class Container extends Entity
 
         $last_id = 0;
         foreach ($result as $row) {
-            $id = $row['container_id'];
+            $id = (int) $row['container_id'];
             if ($last_id !== $id) {
                 $container[$id]['name'] = $row['container_name'];
             }
 
             if (is_numeric($row['image_size_id'])) {
-                $image_size_id = $row['image_size_id'];
+                $image_size_id = (int) $row['image_size_id'];
                 $container[$id]['image_sizes'][$image_size_id] = $row['image_size_name'];
             }
 
