@@ -2,6 +2,13 @@
 # Changelog
 
 
+## [4.2.0] - 2026-03-31
+
+### Changed
+
+- Migrate to Pest
+
+
 ## [4.1.2] - 2026-03-22
 
 ### Fixed
