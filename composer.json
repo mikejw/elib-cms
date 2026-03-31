@@ -24,16 +24,27 @@
     "michelf/php-markdown": "1.9.1"
   },
   "require-dev": {
-    "phpunit/phpunit": "^12",
-    "nelmio/alice": "dev-2.x-dev"
+    "nelmio/alice": "dev-2.x-dev",
+    "pestphp/pest": "^4.4"
   },
   "autoload": {
     "psr-0": {
-      "Empathy": "src/"
+      "Empathy\\": "src/"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "Tests\\": "tests/"
     }
   },
   "scripts": {
+    "pest": "pest",
     "test": "phpunit -c ./phpunit.xml"
   },
-  "minimum-stability": "dev"
+  "minimum-stability": "dev",
+  "config": {
+    "allow-plugins": {
+      "pestphp/pest-plugin": true
+    }
+  }
 }
