@@ -13,15 +13,15 @@ class ImageSize extends Entity
 
     public int $id;
 
-    public $name;
+    public ?string $name = null;
 
-    public $prefix;
+    public ?string $prefix = null;
 
-    public $width;
+    public int|string|null $width = null;
 
-    public $height;
+    public int|string|null $height = null;
 
-    public function validates()
+    public function validates(): void
     {
         if (! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid name');
@@ -37,7 +37,10 @@ class ImageSize extends Entity
         }
     }
 
-    public function getDataFiles()
+    /**
+     * @return array<int, mixed>
+     */
+    public function getDataFiles(): array
     {
         $images = [];
         $ids = [];

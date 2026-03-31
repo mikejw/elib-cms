@@ -14,10 +14,13 @@ class Container extends Entity
 
     public int $id;
 
-    public $name;
+    public ?string $name = null;
 
-    public $description;
+    public ?string $description = null;
 
+    /**
+     * @return array<int, mixed>
+     */
     public function getAll(): array
     {
         $container = [];
@@ -57,21 +60,24 @@ class Container extends Entity
         return $container;
     }
 
-    public function remove()
+    public function remove(): void
     {
         $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
             .' WHERE container_id = '.$this->id;
         $this->delete();
     }
 
-    public function validates()
+    public function validates(): void
     {
         if ($this->name === '' || ! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid container name');
         }
     }
 
-    public function update($id, $new_sizes)
+    /**
+     * @param array<int, mixed> $new_sizes
+     */
+    public function update(int $id, array $new_sizes): void
     {
         $params = [];
         $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)

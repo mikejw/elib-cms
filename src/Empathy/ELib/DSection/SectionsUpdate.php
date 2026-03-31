@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Empathy\ELib\DSection;
 
+use Empathy\ELib\Storage\SectionItem;
+
 class SectionsUpdate
 {
-    public $section;
+    public SectionItem $section;
 
-    public function __construct($section, $section_id)
+    public function __construct(SectionItem $section, int $section_id)
     {
         $this->section = $section;
         $this->section->id = $section_id;
         $this->update_timestamps();
     }
 
-    public function update_timestamps()
+    public function update_timestamps(): void
     {
         // current section
         $this->section->load($this->section->id);

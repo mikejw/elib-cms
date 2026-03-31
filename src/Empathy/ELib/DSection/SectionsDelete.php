@@ -6,14 +6,16 @@ namespace Empathy\ELib\DSection;
 
 use Empathy\ELib\File\Image as ImageUpload;
 use Empathy\ELib\File\Upload as AudioUpload;
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\SectionItem;
 
 class SectionsDelete
 {
-    private $section;
+    private SectionItem $section;
 
-    private $data_item;
+    private DataItem $data_item;
 
-    public function __construct($section, $data_item, $current_is_section)
+    public function __construct(SectionItem $section, DataItem $data_item, bool $current_is_section)
     {
         $this->section = $section;
         $this->data_item = $data_item;
@@ -24,7 +26,7 @@ class SectionsDelete
         }
     }
 
-    public function deleteData($id, $section_start)
+    public function deleteData(int $id, int $section_start): void
     {
         $ids = [];
         $this->data_item->buildDelete($id, $ids, $section_start);
@@ -72,7 +74,7 @@ class SectionsDelete
         }
     }
 
-    public function delete($id)
+    public function delete(int $id): void
     {
         $ids = [];
         $this->section->buildDelete($id, $ids, $this);

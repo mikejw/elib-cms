@@ -40,7 +40,7 @@
     }
   },
   "scripts": {
-    "format": "pint",
+    "format": "pint ./src ./tests",
     "format-check": "pint --test ./src ./tests",
     "analyse": "phpstan --memory-limit=1G",
     "test": "pest",

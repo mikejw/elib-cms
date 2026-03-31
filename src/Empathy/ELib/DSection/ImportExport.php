@@ -13,7 +13,10 @@ use Empathy\MVC\Model;
 
 class ImportExport
 {
-    private function load($sectionId)
+    /**
+     * @return array<int, array<string, mixed>>
+     */
+    private function load(int $sectionId): array
     {
         $sectionsData = [];
         $section = Model::load(SectionItem::class, $sectionId);
@@ -41,7 +44,11 @@ class ImportExport
         return $sectionsData;
     }
 
-    private function insertSection($parent_id, $data, $topLevelSection)
+    /**
+     * @param array<string, mixed> $data
+     * @return array{0: bool, 1: int}
+     */
+    private function insertSection(int $parent_id, array $data, bool $topLevelSection): array
     {
         if (isset($data['template'])) {
             $s = Model::load(SectionItem::class);
@@ -64,7 +71,10 @@ class ImportExport
         }
     }
 
-    private function insertData($parent_id, $data, $sectionParent, $topLevelSection = false)
+    /**
+     * @param array<string, mixed> $data
+     */
+    private function insertData(int $parent_id, array $data, bool $sectionParent, bool $topLevelSection = false): int
     {
         $d = Model::load(DataItem::class);
         if (($sectionParent || $topLevelSection) && ! isset($data['data_item_id'])) {
@@ -128,7 +138,10 @@ class ImportExport
         return $d->insert();
     }
 
-    private function populate($sectionsData, $parent_id, $sectionParent = false, $topLevelSection = false)
+    /**
+     * @param array<int, array<string, mixed>> $sectionsData
+     */
+    private function populate(array $sectionsData, int $parent_id, bool $sectionParent = false, bool $topLevelSection = false): void
     {
         foreach ($sectionsData as $item) {
 
@@ -148,7 +161,10 @@ class ImportExport
         }
     }
 
-    private function populateData($data, $parent_id, $sectionParent = true)
+    /**
+     * @param array<int, array<string, mixed>> $data
+     */
+    private function populateData(array $data, int $parent_id, bool $sectionParent = true): void
     {
         foreach ($data as $item) {
             $id = $this->insertData($parent_id, $item, $sectionParent);
@@ -159,7 +175,7 @@ class ImportExport
         }
     }
 
-    public function export($target_id)
+    public function export(int $target_id): string
     {
         $target_id = (int) $target_id;
         $target = Model::load(SectionItem::class);
@@ -202,13 +218,13 @@ class ImportExport
         return json_encode($sectionsData, JSON_PRETTY_PRINT);
     }
 
-    public function import($target_parent_id, $sectionsData)
+    public function import(int $target_parent_id, string $sectionsData): void
     {
         $sectionsData = '['.$sectionsData.']';
         $this->populate(json_decode($sectionsData, true), $target_parent_id, true);
     }
 
-    public function exportContainer($target_id)
+    public function exportContainer(int $target_id): string
     {
         $target_id = (int) $target_id;
         $data = Model::load(DataItem::class);
@@ -220,7 +236,7 @@ class ImportExport
         return json_encode($data, JSON_PRETTY_PRINT);
     }
 
-    public function importContainer($target_parent_id, $data, $topLevelSection)
+    public function importContainer(int $target_parent_id, string $data, bool $topLevelSection): void
     {
         $data = '['.$data.']';
         $this->populate(json_decode($data, true), $target_parent_id, false, $topLevelSection);

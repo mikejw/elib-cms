@@ -4,31 +4,39 @@ declare(strict_types=1);
 
 namespace Empathy\ELib\DSection;
 
+use Empathy\ELib\Storage\DataItem;
+use Empathy\ELib\Storage\SectionItem;
 use Empathy\ELib\Tree;
 use Empathy\MVC\Config;
 
 class SectionsTree extends Tree
 {
-    private $section;
+    private SectionItem $section;
 
-    private $data_item;
+    private ?DataItem $data_item = null;
 
-    private $data;
+    /** @var array<int, array<string, mixed>> */
+    private array $data = [];
 
-    private $section_ancestors;
+    /** @var list<int> */
+    private array $section_ancestors = [];
 
-    private $data_item_ancestors;
+    /** @var list<int> */
+    private array $data_item_ancestors = [];
 
-    private $detect_hidden;
+    private ?bool $detect_hidden = null;
 
+    /**
+     * @param list<int|string> $order
+     */
     public function __construct(
-        $section,
-        $data_item = null,
-        $current_is_section = null,
-        $collapsed = null,
-        $detect_hidden = null,
-        $order = [],
-        $asc = true
+        SectionItem $section,
+        ?DataItem $data_item = null,
+        ?bool $current_is_section = null,
+        ?bool $collapsed = null,
+        ?bool $detect_hidden = null,
+        array $order = [],
+        bool $asc = true
     ) {
 
         $this->detect_hidden = $detect_hidden;
@@ -77,7 +85,15 @@ class SectionsTree extends Tree
         }
     }
 
-    public function buildTree($id, $is_section, $tree, $order, $asc)
+    /**
+     * @param array<int, mixed> $order
+     * @return array<int, mixed>
+     */
+    /**
+     * @param list<int|string> $order
+     * @return array<int, array<string, mixed>>
+     */
+    public function buildTree(int $id, int $is_section, self $tree, array $order, bool $asc): array
     {
         $nodes = [];
         if ($is_section) {
@@ -89,7 +105,10 @@ class SectionsTree extends Tree
         return $nodes;
     }
 
-    private function buildMarkup($data, $level, $current_id, $last_id, $last_node_data, $current_is_section)
+    /**
+     * @param array<int, mixed> $data
+     */
+    private function buildMarkup(array $data, int $level, int $current_id, int $last_id, int $last_node_data, bool $current_is_section): string
     {
         $markup = "\n<ul";
 
@@ -183,12 +202,12 @@ class SectionsTree extends Tree
         return $markup;
     }
 
-    public function getDataItem()
+    public function getDataItem(): ?DataItem
     {
         return $this->data_item;
     }
 
-    public function getDetectHidden()
+    public function getDetectHidden(): ?bool
     {
         return $this->detect_hidden;
     }

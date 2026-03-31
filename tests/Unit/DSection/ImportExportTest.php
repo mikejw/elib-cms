@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 use Empathy\ELib\DSection\ImportExport;
 use Empathy\MVC\DI;
+
 test('section root has section and data', function () {
     loadFixtures('fixtures/dd.sql', 'fixtures/fixtures2.yml');
     $ie = new ImportExport();

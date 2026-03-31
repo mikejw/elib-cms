@@ -11,11 +11,11 @@ use Empathy\MVC\Model;
 
 class BaseTemplate extends EController
 {
-    protected $section;
+    protected SectionItem $section;
 
-    protected $data_item;
+    protected DataItem $data_item;
 
-    public function __construct($boot)
+    public function __construct(object $boot)
     {
         parent::__construct($boot);
         $this->section = Model::load(SectionItem::class);

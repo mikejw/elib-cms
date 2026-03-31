@@ -6,6 +6,7 @@ use Empathy\ELib\DSection\SectionsTree;
 use Empathy\ELib\Storage\DataItem;
 use Empathy\ELib\Storage\SectionItem;
 use Empathy\MVC\Model;
+
 test('get section item entity', function () {
     $section = Model::load(SectionItem::class);
 

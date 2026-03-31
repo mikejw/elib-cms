@@ -15,25 +15,30 @@ class SectionItem extends Entity
 
     public int $id;
 
-    public $section_id;
+    public int|string|object|null $section_id = null;
 
-    public $label;
+    public ?string $label = null;
 
-    public $friendly_url;
+    public ?string $friendly_url = null;
 
-    public $template;
+    public ?string $template = null;
 
-    public $position;
+    public int|string|null $position = null;
 
-    public $hidden;
+    public int|bool|string|null $hidden = null;
 
-    public $stamp;
+    public int|string|null $stamp = null;
 
-    public $meta;
+    public ?string $meta = null;
 
-    public $user_id;
+    public int|string|object|null $user_id = null;
 
-    public function updateTimeStamps($update)
+    /**
+     */
+    /**
+     * @param array{0: string, 1: list<int|string>} $update
+     */
+    public function updateTimeStamps(array $update): void
     {
         $sql = 'UPDATE '.Model::getTable(ESectionItem::class)
             .' SET stamp = NOW() WHERE id IN '.$update[0];
@@ -41,7 +46,12 @@ class SectionItem extends Entity
         $this->query($sql, $error, $update[1]);
     }
 
-    public function getContactCountries($section_id)
+    /**
+     */
+    /**
+     * @return list<array<string, scalar|null>>
+     */
+    public function getContactCountries(int|string $section_id): array
     {
         $country = [];
         $params = [];
@@ -63,14 +73,22 @@ class SectionItem extends Entity
         return $country;
     }
 
-    public function validates()
+    /**
+     */
+    public function validates(): void
     {
         if ($this->label === '' || ! ctype_alnum(str_replace([' ', '-'], '', $this->label))) {
             $this->addValError('Invalid label');
         }
     }
 
-    public function getAncestorIDs($id, $ancestors)
+    /**
+     */
+    /**
+     * @param list<int> $ancestors
+     * @return list<int>
+     */
+    public function getAncestorIDs(int|string $id, array $ancestors): array
     {
         $params = [];
         $section_id = 0;
@@ -91,7 +109,12 @@ class SectionItem extends Entity
         return $ancestors;
     }
 
-    public function buildDelete($id, &$ids, $tree)
+    /**
+     */
+    /**
+     * @param list<int|string> $ids
+     */
+    public function buildDelete(int|string $id, array &$ids, object $tree): void
     {
         array_push($ids, $id);
         $tree->deleteData($id, 1);
@@ -107,14 +130,25 @@ class SectionItem extends Entity
         }
     }
 
-    public function doDelete($idsString, $params)
+    /**
+     */
+    /**
+     * @param list<int|string> $params
+     */
+    public function doDelete(string $idsString, array $params): void
     {
         $sql = 'DELETE FROM '.Model::getTable(ESectionItem::class).' WHERE id IN '.$idsString;
         $error = 'Could not remove section item(s).';
         $this->query($sql, $error, $params);
     }
 
-    public function buildTree($current, $tree, $order = [], $asc = true)
+    /**
+     */
+    /**
+     * @param list<int|string> $order
+     * @return array<int, array<string, mixed>>
+     */
+    public function buildTree(int|string $current, object $tree, array $order = [], bool $asc = true): array
     {
         $i = 0;
         $nodes = [];
@@ -184,7 +218,12 @@ class SectionItem extends Entity
         return $nodes;
     }
 
-    public function buildURL($id)
+    /**
+     */
+    /**
+     * @return list<string>
+     */
+    public function buildURL(int|string $id): array
     {
         $i = 0;
         $build = 1;
@@ -210,7 +249,13 @@ class SectionItem extends Entity
         return $url;
     }
 
-    public function getAllForSitemap($ignore)
+    /**
+     */
+    /**
+     * @param list<int|string> $ignore
+     * @return list<array<string, scalar|null>>
+     */
+    public function getAllForSitemap(array $ignore): array
     {
         $sections = [];
         [$unionSql, $params] = $this->buildUnionString($ignore);
@@ -242,6 +287,9 @@ class SectionItem extends Entity
         return $sections;
     }
 
+    /**
+     * @param array<int, mixed> $filter
+     */
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {

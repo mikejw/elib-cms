@@ -12,11 +12,14 @@ class ContainerImageSize extends Entity
 {
     public const TABLE = 'container_image_size';
 
-    public $container_id;
+    public int $container_id;
 
-    public $image_size_id;
+    public int $image_size_id;
 
-    public function getImageSizes($container_id)
+    /**
+     * @return array<int, mixed>
+     */
+    public function getImageSizes(int $container_id): array
     {
         $params = [];
         $sizes = [];
@@ -36,7 +39,10 @@ class ContainerImageSize extends Entity
         return $sizes;
     }
 
-    public function getContainerPrefixes($container_id)
+    /**
+     * @return array<int, mixed>
+     */
+    public function getContainerPrefixes(int $container_id): array
     {
         $prefix = [];
         $params = [];

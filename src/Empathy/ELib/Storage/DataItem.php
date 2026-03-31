@@ -10,6 +10,9 @@ use Empathy\MVC\Entity;
 use Empathy\MVC\Model;
 use Michelf\Markdown;
 
+/**
+ * @implements \Iterator<int, DataItem>
+ */
 class DataItem extends Entity implements \Iterator, \JsonSerializable
 {
     public const TABLE = 'data_item';
@@ -34,41 +37,42 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
     public int $id;
 
-    public $data_item_id;
+    public int|string|null $data_item_id = null;
 
-    public $section_id;
+    public int|string|object|null $section_id = null;
 
-    public $container_id;
+    public int|string|null $container_id = null;
 
-    public $label;
+    public ?string $label = null;
 
-    public $heading;
+    public ?string $heading = null;
 
-    public $body;
+    public ?string $body = null;
 
-    public $image;
+    public ?string $image = null;
 
-    public $image_width;
+    public int|string|null $image_width = null;
 
-    public $image_height;
+    public int|string|null $image_height = null;
 
-    public $video;
+    public ?string $video = null;
 
-    public $audio;
+    public ?string $audio = null;
 
-    public $user_id;
+    public int|string|object|null $user_id = null;
 
-    public $position;
+    public int|string|null $position = null;
 
-    public $hidden;
+    public int|bool|string|null $hidden = null;
 
-    public $meta;
+    public ?string $meta = null;
 
-    public $stamp;
+    public int|string|null $stamp = null;
 
-    private $data;
+    /** @var list<DataItem> */
+    private array $data = [];
 
-    private $export;
+    private bool $export = false;
 
     public function __construct()
     {
@@ -77,12 +81,19 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $this->export = false;
     }
 
-    public function setExporting()
+    /**
+     */
+    public function setExporting(): void
     {
         $this->export = true;
     }
 
-    public function setData($data)
+    /**
+     */
+    /**
+     * @param list<DataItem> $data
+     */
+    public function setData(array $data): void
     {
         $this->data = $data;
     }
@@ -115,7 +126,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $var;
     }
 
-    public function hasData()
+    /**
+     */
+    public function hasData(): int
     {
         return count($this->data);
     }
@@ -125,7 +138,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return get_object_vars($this);
     }
 
-    public function isContainer()
+    /**
+     */
+    public function isContainer(): bool
     {
         $container = false;
         if (! isset($this->heading) &&
@@ -139,13 +154,23 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $container;
     }
 
-    public function getDataValue()
+    /**
+     */
+    /**
+     * @return list<DataItem>
+     */
+    public function getDataValue(): array
     {
         return $this->data;
     }
 
     // data is 'pseudo property'
-    public function getData($recursive = false, $section_id = null, $disconnect = true)
+    /**
+     */
+    /**
+     * @return list<array<string, scalar|null>>
+     */
+    public function getData(bool $recursive = false, int|string|null $section_id = null, bool $disconnect = true): array
     {
         if (is_numeric($section_id)) {
             $data_set = [];
@@ -194,7 +219,12 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $data_set;
     }
 
-    public function getSectionData($section_id)
+    /**
+     */
+    /**
+     * @return list<int|string>
+     */
+    public function getSectionData(int|string $section_id): array
     {
         $ids = [];
         $sql = 'SELECT id FROM '.Model::getTable(EDataItem::class).' WHERE section_id = '.$section_id
@@ -211,26 +241,33 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $ids;
     }
 
-    public function getSectionDataRecursive($section_id = null, $disconnect = true)
+    /**
+     */
+    /**
+     * @return list<DataItem>|null
+     */
+    public function getSectionDataRecursive(int|string|null $section_id = null, bool $disconnect = true): ?array
     {
         $this->getData(true, $section_id, $disconnect);
 
         if ($disconnect) {
             $this->dbDisconnect();
         }
-        if (isset($this->data)) {
-            return $this->data;
-        }
+        return $this->data;
     }
 
-    public function convertToMarkdown()
+    /**
+     */
+    public function convertToMarkdown(): void
     {
         if ($this->body) {
             $this->body = Markdown::defaultTransform($this->body);
         }
     }
 
-    public function findAndConvertAllToMD()
+    /**
+     */
+    public function findAndConvertAllToMD(): void
     {
         foreach ($this as $d) {
             if (isset($d->body)) {
@@ -240,7 +277,12 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         }
     }
 
-    public function findContainers(&$found = [], $recursive = true)
+    /**
+     */
+    /**
+     * @param list<DataItem> $found
+     */
+    public function findContainers(array &$found = [], bool $recursive = true): void
     {
         foreach ($this as $d) {
             if ($d->isContainer()) {
@@ -252,7 +294,12 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         }
     }
 
-    public function find($type, $pattern = null, $options = [])
+    /**
+     */
+    /**
+     * @param list<int> $options
+     */
+    public function find(int $type, ?string $pattern = null, array $options = []): mixed
     {
         $item = null;
         $lastDataItem = null;
@@ -341,19 +388,28 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         }
     }
 
-    public function getLocalData()
+    /**
+     */
+    /**
+     * @return list<DataItem>
+     */
+    public function getLocalData(): array
     {
         return $this->data;
     }
 
-    public function validates()
+    /**
+     */
+    public function validates(): void
     {
         if ($this->label === '' || ! ctype_alnum(str_replace(' ', '', $this->label))) {
             $this->addValError('Invalid label');
         }
     }
 
-    public function findLastSection($id)
+    /**
+     */
+    public function findLastSection(int|string $id): int
     {
         $section_id = 0;
         $params = [];
@@ -372,7 +428,13 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $section_id;
     }
 
-    public function getAncestorIDs($id, $ancestors)
+    /**
+     */
+    /**
+     * @param list<int|string> $ancestors
+     * @return list<int|string>
+     */
+    public function getAncestorIDs(int|string $id, array $ancestors): array
     {
         $data_item_id = 0;
         $params = [];
@@ -392,7 +454,12 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $ancestors;
     }
 
-    public function buildDelete($id, &$ids, $section_start)
+    /**
+     */
+    /**
+     * @param list<int|string> $ids
+     */
+    public function buildDelete(int|string $id, array &$ids, int|bool $section_start): void
     {
         $params = [];
         if ($section_start) {
@@ -412,14 +479,25 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         }
     }
 
-    public function doDelete($idsString, $params)
+    /**
+     */
+    /**
+     * @param list<int|string> $params
+     */
+    public function doDelete(string $idsString, array $params): void
     {
         $sql = 'DELETE FROM '.Model::getTable(EDataItem::class).' WHERE id IN '.$idsString;
         $error = 'Could not remove data item(s).';
         $this->query($sql, $error, $params);
     }
 
-    public function buildTree($current, $tree, $order = [], $asc = true)
+    /**
+     */
+    /**
+     * @param list<int|string> $order
+     * @return array<int, array<string, mixed>>
+     */
+    public function buildTree(int|string $current, object $tree, array $order = [], bool $asc = true): array
     {
         $i = 0;
         $nodes = [];
@@ -458,7 +536,13 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $nodes;
     }
 
-    public function getImageFilenames($sql, $params)
+    /**
+     */
+    /**
+     * @param list<int|string> $params
+     * @return list<string>
+     */
+    public function getImageFilenames(string $sql, array $params): array
     {
         $images = [];
         $sql = 'SELECT image FROM '.Model::getTable(EDataItem::class).' WHERE image IS NOT NULL'
@@ -474,7 +558,13 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $images;
     }
 
-    public function getVideoFilenames($sql, $params)
+    /**
+     */
+    /**
+     * @param list<int|string> $params
+     * @return list<string>
+     */
+    public function getVideoFilenames(string $sql, array $params): array
     {
         $videos = [];
         $sql = 'SELECT video FROM '.Model::getTable(EDataItem::class).' WHERE video IS NOT NULL'
@@ -490,7 +580,13 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $videos;
     }
 
-    public function getAudioFilenames($sql, $params)
+    /**
+     */
+    /**
+     * @param list<int|string> $params
+     * @return list<string>
+     */
+    public function getAudioFilenames(string $sql, array $params): array
     {
         $audioFiles = [];
         $sql = 'SELECT audio FROM '.Model::getTable(EDataItem::class).' WHERE audio IS NOT NULL'
@@ -506,7 +602,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $audioFiles;
     }
 
-    public function getMostRecentVideoID()
+    /**
+     */
+    public function getMostRecentVideoID(): int
     // ammended to perform search by position value
     {
         $id = 0;
@@ -523,6 +621,9 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         return $id;
     }
 
+    /**
+     * @param array<int, mixed> $filter
+     */
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {
