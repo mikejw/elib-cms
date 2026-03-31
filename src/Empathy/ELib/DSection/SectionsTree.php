@@ -20,8 +20,6 @@ class SectionsTree extends Tree
         return (int) ($value ?? 0);
     }
 
-    private SectionItem $section;
-
     private ?DataItem $data_item = null;
 
     /** @var array<int, array<string, mixed>> */
@@ -33,33 +31,27 @@ class SectionsTree extends Tree
     /** @var list<int|string> */
     private array $data_item_ancestors = [];
 
-    private ?bool $detect_hidden = null;
-
     /**
      * @param list<int|string> $order
      */
     public function __construct(
-        SectionItem $section,
+        private readonly SectionItem $section,
         ?DataItem $data_item = null,
         ?bool $current_is_section = null,
         ?bool $collapsed = null,
-        ?bool $detect_hidden = null,
+        private readonly ?bool $detect_hidden = null,
         array $order = [],
         bool $asc = true
     ) {
 
-        $this->detect_hidden = $detect_hidden;
-
-        $this->section = $section;
-
         // allow tree use without building markup
-        if ($data_item !== null) {
+        if ($data_item instanceof \Empathy\ELib\Storage\DataItem) {
 
             $this->data_item = $data_item;
 
             if ($current_is_section) {
-                $current_id = $section->id;
-                $parent_id = $section->section_id;
+                $current_id = $this->section->id;
+                $parent_id = $this->section->section_id;
                 $active_section = $current_id;
             } else {
 
@@ -71,7 +63,7 @@ class SectionsTree extends Tree
             $this->data_item_ancestors = [];
             if (! $current_is_section) {
                 if (! $collapsed) {
-                    array_push($this->data_item_ancestors, $current_id);
+                    $this->data_item_ancestors[] = $current_id;
                 }
                 if (is_numeric($data_item->section_id)) {
                     $active_section = $data_item->section_id;
@@ -86,7 +78,7 @@ class SectionsTree extends Tree
                 $this->data_item_ancestors = $this->data_item->getAncestorIDs($current_id, $this->data_item_ancestors);
             }
             if (! $collapsed || ! $current_is_section) {
-                array_push($this->section_ancestors, $active_section);
+                $this->section_ancestors[] = $active_section;
             }
 
             $this->data = $this->buildTree(0, 1, $this, $order, $asc);
@@ -105,7 +97,7 @@ class SectionsTree extends Tree
     public function buildTree(int $id, int $is_section, self $tree, array $order, bool $asc): array
     {
         $nodes = [];
-        if ($is_section) {
+        if ($is_section !== 0) {
             $nodes = $tree->section->buildTree($id, $tree, $order, $asc);
         } else {
             $nodes = $tree->data_item->buildTree($id, $tree, $order, $asc);
@@ -121,11 +113,7 @@ class SectionsTree extends Tree
     {
         $markup = "\n<ul";
 
-        if ($last_node_data) {
-            $ancestors = $this->data_item_ancestors;
-        } else {
-            $ancestors = $this->section_ancestors;
-        }
+        $ancestors = $last_node_data !== 0 ? $this->data_item_ancestors : $this->section_ancestors;
 
         $class = 'clearfix';
         if (! in_array($last_id, $ancestors, true)) {
@@ -138,17 +126,13 @@ class SectionsTree extends Tree
             $level++;
         }
         $markup .= ">\n";
-        foreach ($data as $index => $value) {
+        foreach ($data as $value) {
 
             $toggle = '+';
             $folder = '<i class="far fa-folder"></i>';
             $url = 'dsection';
 
-            if ($value['data'] === 1) {
-                $ancestors = $this->data_item_ancestors;
-            } else {
-                $ancestors = $this->section_ancestors;
-            }
+            $ancestors = $value['data'] === 1 ? $this->data_item_ancestors : $this->section_ancestors;
 
             if (in_array($value['id'], $ancestors, true)) {
                 $toggle = '-';
@@ -206,9 +190,8 @@ class SectionsTree extends Tree
             }
             $markup .= "</li>\n";
         }
-        $markup .= "</ul>\n";
 
-        return $markup;
+        return $markup . "</ul>\n";
     }
 
     public function getDataItem(): ?DataItem

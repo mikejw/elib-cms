@@ -26,7 +26,7 @@ class ImageSize extends Entity
         if (! ctype_alnum(str_replace(' ', '', $this->name))) {
             $this->addValError('Invalid name');
         }
-        if (! ctype_alpha($this->prefix)) {
+        if (! ctype_alpha((string) $this->prefix)) {
             $this->addValError('Invalid prefix');
         }
         if (! is_numeric($this->width)) {

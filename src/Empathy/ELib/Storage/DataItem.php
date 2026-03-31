@@ -75,13 +75,6 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
     private bool $export = false;
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->data = [];
-        $this->export = false;
-    }
-
     /**
      */
     public function setExporting(): void
@@ -124,9 +117,8 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function valid(): bool
     {
         $key = key($this->data);
-        $var = ($key !== null);
 
-        return $var;
+        return $key !== null;
     }
 
     /**
@@ -146,11 +138,11 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function isContainer(): bool
     {
         $container = false;
-        if (! isset($this->heading) &&
-            ! isset($this->body) &&
-            ! isset($this->image) &&
-            ! isset($this->video) &&
-            ! isset($this->audio)) {
+        if ($this->heading === null &&
+            $this->body === null &&
+            $this->image === null &&
+            $this->video === null &&
+            $this->audio === null) {
             $container = true;
         }
 
@@ -179,7 +171,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
             $data_set = [];
             $data_set_sections = $this->getSectionData($section_id);
             foreach ($data_set_sections as $d) {
-                array_push($data_set, ['id' => $d]);
+                $data_set[] = ['id' => $d];
             }
         } else {
             $data_set = $this->getAllCustom(' where data_item_id = '.$this->id
@@ -188,7 +180,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
         if ($recursive) {
             $i = 0;
-            foreach ($data_set as $index => $item) {
+            foreach ($data_set as $item) {
 
                 $data = Model::load(EDataItem::class);
                 if ($this->export) {
@@ -206,11 +198,11 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
                 if ($this->export) {
                     if ($data->body) {
                         $data->body = preg_replace("!\r?\n!", "\n", $data->body);
-                        $data->body = preg_replace('!&nbsp;!', '', $data->body);
+                        $data->body = preg_replace('!&nbsp;!', '', (string) $data->body);
                     }
                     if ($data->meta) {
                         $data->meta = preg_replace("!\r?\n!", "\n", $data->meta);
-                        $data->meta = preg_replace('!&nbsp;!', '', $data->meta);
+                        $data->meta = preg_replace('!&nbsp;!', '', (string) $data->meta);
                     }
                 }
 
@@ -237,7 +229,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $result = $this->query($sql, $error);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($ids, $row['id']);
+                $ids[] = $row['id'];
             }
         }
 
@@ -277,7 +269,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
                 continue;
             }
 
-            if (isset($d->body)) {
+            if ($d->body !== null) {
                 $d->convertToMarkdown();
             }
             $d->findAndConvertAllToMD();
@@ -340,7 +332,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
                             if (! is_array($item)) {
                                 $item = [];
                             }
-                            array_push($item, $d);
+                            $item[] = $d;
 
                             continue 2;
                         } else {
@@ -392,7 +384,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
                         continue;
                     }
 
-                    if (isset($d->body)) {
+                    if ($d->body !== null) {
                         $d->convertToMarkdown();
                     }
                 }
@@ -427,7 +419,6 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
      */
     public function findLastSection(int|string $id): int
     {
-        $section_id = 0;
         $params = [];
         $sql = 'SELECT id,section_id,data_item_id FROM '.Model::getTable(EDataItem::class).' WHERE id = ?';
         $params[] = $id;
@@ -435,13 +426,8 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
         $result = $this->query($sql, $error, $params);
         $row = $result->fetch();
-        if (! is_numeric($row['section_id'])) {
-            $section_id = $this->findLastSection($row['data_item_id']);
-        } else {
-            $section_id = (int) $row['section_id'];
-        }
 
-        return $section_id;
+        return is_numeric($row['section_id']) ? (int) $row['section_id'] : $this->findLastSection($row['data_item_id']);
     }
 
     /**
@@ -463,8 +449,8 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
             $data_item_id = (int) $row['data_item_id'];
         }
         if ($data_item_id !== 0) {
-            array_push($ancestors, $data_item_id);
-            $ancestors = array_map('intval', $this->getAncestorIDs($data_item_id, $ancestors));
+            $ancestors[] = $data_item_id;
+            $ancestors = array_map(intval(...), $this->getAncestorIDs($data_item_id, $ancestors));
         }
 
         return $ancestors;
@@ -484,7 +470,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         } else {
             $sql = 'SELECT id FROM '.Model::getTable(EDataItem::class).' WHERE data_item_id = ?';
             $params[] = $id;
-            array_push($ids, $id);
+            $ids[] = $id;
         }
         $error = 'Could not find data items for deletion.';
         $result = $this->query($sql, $error, $params);
@@ -523,7 +509,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
 
         $orderParams = [];
         if (count($order)) {
-            foreach ($order as $key => $value) {
+            foreach ($order as $value) {
                 $orderParams[] = '?';
                 $params[] = $value;
             }
@@ -567,7 +553,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($images, $row['image']);
+                $images[] = $row['image'];
             }
         }
 
@@ -589,7 +575,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($videos, $row['video']);
+                $videos[] = $row['video'];
             }
         }
 
@@ -611,7 +597,7 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($audioFiles, $row['audio']);
+                $audioFiles[] = $row['audio'];
             }
         }
 
@@ -623,7 +609,6 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
     public function getMostRecentVideoID(): int
     // ammended to perform search by position value
     {
-        $id = 0;
         $row = ['id' => 0];
         $sql = 'SELECT id FROM '.Model::getTable(EDataItem::class).
             ' WHERE video IS NOT NULL ORDER BY position LIMIT 0,1';
@@ -632,14 +617,14 @@ class DataItem extends Entity implements \Iterator, \JsonSerializable
         if ($result->rowCount() > 0) {
             $row = $result->fetch();
         }
-        $id = $row['id'];
 
-        return $id;
+        return $row['id'];
     }
 
     /**
      * @param list<string> $filter
      */
+    #[\Override]
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {

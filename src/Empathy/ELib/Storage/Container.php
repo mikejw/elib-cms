@@ -21,6 +21,7 @@ class Container extends Entity
     /**
      * @return array<int, mixed>
      */
+    #[\Override]
     public function getAll(): array
     {
         $container = [];
@@ -50,7 +51,7 @@ class Container extends Entity
             $last_id = $id;
         }
 
-        foreach ($container as $index => $item) {
+        foreach (array_keys($container) as $index) {
             if (isset($container[$index]['image_sizes'])) {
                 $container[$index]['image_size_ids'] =
                     array_keys($container[$index]['image_sizes']);
@@ -62,8 +63,7 @@ class Container extends Entity
 
     public function remove(): void
     {
-        $sql = 'DELETE FROM '.Model::getTable(ContainerImageSize::class)
-            .' WHERE container_id = '.$this->id;
+        Model::getTable(ContainerImageSize::class);
         $this->delete();
     }
 
@@ -85,7 +85,7 @@ class Container extends Entity
         $params[] = $id;
         $error = 'Could not clear old image sizes from container.';
         $this->query($sql, $error, $params);
-        foreach ($new_sizes as $index => $size_id) {
+        foreach ($new_sizes as $size_id) {
             $params = [];
             $sql = 'INSERT INTO '.Model::getTable(ContainerImageSize::class)
                 .' VALUES(?, ?)';

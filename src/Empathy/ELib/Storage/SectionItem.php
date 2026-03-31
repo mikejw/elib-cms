@@ -68,7 +68,7 @@ class SectionItem extends Entity
         $result = $this->query($sql, $error, $params);
         if ($result->rowCount() > 0) {
             foreach ($result as $row) {
-                array_push($country, $row);
+                $country[] = $row;
             }
         }
 
@@ -104,7 +104,7 @@ class SectionItem extends Entity
         }
 
         if ($section_id !== 0) {
-            array_push($ancestors, $section_id);
+            $ancestors[] = $section_id;
             $ancestors = $this->getAncestorIDs($section_id, $ancestors);
         }
 
@@ -118,7 +118,7 @@ class SectionItem extends Entity
      */
     public function buildDelete(int|string $id, array &$ids, SectionsDelete $tree): void
     {
-        array_push($ids, $id);
+        $ids[] = $id;
         $tree->deleteData((int) $id, 1);
         $params = [];
         $sql = 'SELECT id FROM '.Model::getTable(ESectionItem::class).' WHERE section_id = ?';
@@ -165,7 +165,7 @@ class SectionItem extends Entity
 
         $orderParams = [];
         if (count($order)) {
-            foreach ($order as $key => $value) {
+            foreach ($order as $value) {
                 $orderParams[] = '?';
                 $params[] = $value;
             }
@@ -197,7 +197,7 @@ class SectionItem extends Entity
             }
         }
 
-        if ($tree->getDataItem() !== null) {
+        if ($tree->getDataItem() instanceof \Empathy\ELib\Storage\DataItem) {
 
             $params = [];
             $sql = 'SELECT id,label FROM '.Model::getTable(DataItem::class).' WHERE section_id = ?'
@@ -270,7 +270,7 @@ class SectionItem extends Entity
             foreach ($result as $row) {
 
                 // old bestival code
-                $url = ESectionItem::buildURL($row['id']);
+                $url = $this->buildURL($row['id']);
                 $j = (count($url) - 1);
                 $k = 0;
 
@@ -283,7 +283,7 @@ class SectionItem extends Entity
                     $j--;
                 }
                 $row['url'] = $full_url;
-                array_push($sections, $row);
+                $sections[] = $row;
             }
         }
 
@@ -293,6 +293,7 @@ class SectionItem extends Entity
     /**
      * @param list<string> $filter
      */
+    #[\Override]
     public function insert(array $filter = [], bool $includeAutoIdColumn = true): int
     {
         if ($this->user_id === null) {

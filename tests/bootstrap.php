@@ -5,7 +5,7 @@ use Empathy\MVC\Util\Testing\Util\Config;
 
 require dirname(__DIR__).'/vendor/autoload.php';
 
-$base = realpath(dirname(__FILE__));
+$base = realpath(__DIR__);
 if ($base === false) {
     throw new \RuntimeException('Could not resolve tests bootstrap path.');
 }

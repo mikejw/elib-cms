@@ -96,7 +96,7 @@ class ImportExport
         $d->image = $data['image'];
 
         if ($data['image']) {
-            $data['image'] = trim(escapeshellarg($data['image']), '\'');
+            $data['image'] = trim(escapeshellarg((string) $data['image']), '\'');
         }
 
         $path = Config::get('DOC_ROOT').'/public_html/uploads';
@@ -115,13 +115,11 @@ class ImportExport
             $parentId = $data['data_item_id'];
             if (isset($parentId)) {
                 $parent = Model::load(DataItem::class, $parentId);
-                if ($parent->isContainer() && isset($parent->container_id)) {
+                if ($parent->isContainer() && $parent->container_id !== null) {
                     $c = Model::load(ContainerImageSize::class);
                     $imageSizes = $c->getImageSizes((int) $parent->container_id);
                     if (count($imageSizes) > 0) {
-                        $imagePrefixes = array_map(function ($item) {
-                            return $item[0];
-                        }, $imageSizes);
+                        $imagePrefixes = array_map(fn ($item) => $item[0], $imageSizes);
                     }
                 }
             }
@@ -169,7 +167,7 @@ class ImportExport
         foreach ($data as $item) {
             $id = $this->insertData($parent_id, $item, $sectionParent);
 
-            if (count($item['data'])) {
+            if (count($item['data']) > 0) {
                 $this->populateData($item['data'], $id, false);
             }
         }
@@ -177,7 +175,6 @@ class ImportExport
 
     public function export(int $target_id): string
     {
-        $target_id = (int) $target_id;
         $target = Model::load(SectionItem::class);
         $data = Model::load(DataItem::class);
         $data->setExporting();
@@ -231,7 +228,6 @@ class ImportExport
 
     public function exportContainer(int $target_id): string
     {
-        $target_id = (int) $target_id;
         $data = Model::load(DataItem::class);
 
         $data->load($target_id);

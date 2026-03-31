@@ -11,14 +11,8 @@ use Empathy\ELib\Storage\SectionItem;
 
 class SectionsDelete
 {
-    private SectionItem $section;
-
-    private DataItem $data_item;
-
-    public function __construct(SectionItem $section, DataItem $data_item, bool $current_is_section)
+    public function __construct(private readonly SectionItem $section, private readonly DataItem $data_item, bool $current_is_section)
     {
-        $this->section = $section;
-        $this->data_item = $data_item;
         if ($current_is_section) {
             $this->delete($this->section->id);
         } else {
@@ -45,8 +39,8 @@ class SectionsDelete
                 // take care of video thumbnails
                 $all_videos = [];
                 foreach ($videos as $video) {
-                    array_push($all_videos, $video);
-                    array_push($all_videos, $video.'.jpg');
+                    $all_videos[] = $video;
+                    $all_videos[] = $video.'.jpg';
                 }
                 $all_files = array_merge($all_videos, $images);
             } else {

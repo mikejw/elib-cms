@@ -306,6 +306,7 @@ class Controller extends AdminController
         $this->presenter->assign('section_id', $_GET['id']);
     }
 
+    #[\Override]
     public function default_event(): void
     {
         $ui_array = ['id'];
@@ -337,11 +338,7 @@ class Controller extends AdminController
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
 
-        if (isset($_GET['collapsed']) && $_GET['collapsed'] === 1) {
-            $collapsed = 1;
-        } else {
-            $collapsed = 0;
-        }
+        $collapsed = isset($_GET['collapsed']) && $_GET['collapsed'] === 1 ? 1 : 0;
 
         if (! $s->load($_GET['id']) && $_GET['id'] !== 0) {
             throw new RequestException('Section item not found.');
@@ -377,7 +374,7 @@ class Controller extends AdminController
         $s = Model::load(SectionItem::class);
         $d = Model::load(DataItem::class);
         $s->load($_GET['id']);
-        $sd = new SectionsDelete($s, $d, true);
+        new SectionsDelete($s, $d, true);
         $this->clearCache();
         $this->redirect('admin/dsection/'.$this->normalizeInt($s->section_id));
     }
@@ -497,12 +494,7 @@ class Controller extends AdminController
         if (! $d->load($_GET['id'])) {
             throw new RequestException('Data item not found.');
         }
-        $is_section = 0;
-        if (isset($_GET['collapsed']) && $_GET['collapsed'] === 1) {
-            $collapsed = 1;
-        } else {
-            $collapsed = 0;
-        }
+        $collapsed = isset($_GET['collapsed']) && $_GET['collapsed'] === 1 ? 1 : 0;
 
         $st = new SectionsTree($s, $d, false, (bool) $collapsed);
         $this->presenter->assign('sections', $st->getMarkup());
@@ -530,7 +522,7 @@ class Controller extends AdminController
             if (isset($parentId)) {
                 $parent = Model::load(DataItem::class);
                 $parent->load($parentId);
-                if ($parent->isContainer() && isset($parent->container_id)) {
+                if ($parent->isContainer() && $parent->container_id !== null) {
                     $c = Model::load(ContainerImageSize::class);
                     $imageSizes = $c->getImageSizes((int) $parent->container_id);
                     if (count($imageSizes) > 0) {
@@ -555,7 +547,7 @@ class Controller extends AdminController
         $d = Model::load(DataItem::class);
         $d->load($_GET['id']);
         $this->update_timestamps($d->id);
-        $sd = new SectionsDelete($s, $d, false);
+        new SectionsDelete($s, $d, false);
         $this->clearCache();
 
         if (! is_numeric($d->data_item_id)) {
@@ -574,13 +566,9 @@ class Controller extends AdminController
         $ancestors = [];
         $ancestors = $d->getAncestorIDs($id, $ancestors);
 
-        if (count($ancestors) > 0) {
-            $d->id = (int) min($ancestors);
-        } else {
-            $d->id = $id;
-        }
+        $d->id = count($ancestors) > 0 ? min($ancestors) : $id;
         $d->load($d->id);
-        $u = new SectionsUpdate(Model::load(SectionItem::class), $this->normalizeInt($d->section_id));
+        new SectionsUpdate(Model::load(SectionItem::class), $this->normalizeInt($d->section_id));
     }
 
     /**
@@ -1229,11 +1217,7 @@ class Controller extends AdminController
         $position = 1;
         foreach ($_POST as $type => $value) {
 
-            if ($type === 'section') {
-                $model = SectionItem::class;
-            } else {
-                $model = DataItem::class;
-            }
+            $model = $type === 'section' ? SectionItem::class : DataItem::class;
 
             foreach ($value as $id) {
                 $object = Model::load($model);
