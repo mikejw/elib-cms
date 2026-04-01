@@ -12,5 +12,5 @@ class AdminDSection extends ControllerGen
 
     protected string $module = 'admin';
 
-    protected string $parent = \Empathy\ELib\DSection\Controller::class;
+    protected string $parent = "\Empathy\ELib\DSection\Controller";
 }
