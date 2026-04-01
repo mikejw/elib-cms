@@ -1244,7 +1244,7 @@ class Controller extends AdminController
 
         if (isset($_POST['submit'])) {
             $ie = new ImportExport();
-            $output = $ie->export($_POST['target_id']);
+            $output = $ie->export((int) $_POST['target_id']);
             $target_id = $_POST['target_id'];
         }
 
@@ -1265,7 +1265,7 @@ class Controller extends AdminController
             $parent_id = $_POST['parent_id'];
             $ie = new ImportExport();
             $content = $_POST['content'];
-            $ie->import($parent_id, $content);
+            $ie->import((int) $parent_id, $content);
             $this->redirect('admin/dsection');
         }
 
@@ -1284,7 +1284,7 @@ class Controller extends AdminController
 
         if (isset($_POST['submit'])) {
             $ie = new ImportExport();
-            $output = $ie->exportContainer($_POST['target_id']);
+            $output = $ie->exportContainer((int) $_POST['target_id']);
             $target_id = $_POST['target_id'];
         }
 
@@ -1314,7 +1314,7 @@ class Controller extends AdminController
             $parent_id = $_POST['parent_id'];
             $ie = new ImportExport();
             $content = $_POST['content'];
-            $ie->importContainer($parent_id, $content, $topLevelSection);
+            $ie->importContainer((int) $parent_id, $content, $topLevelSection);
             $this->redirect('admin/dsection');
         }
 
