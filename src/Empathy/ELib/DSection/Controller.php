@@ -340,7 +340,8 @@ class Controller extends AdminController
 
         $collapsed = isset($_GET['collapsed']) && $_GET['collapsed'] === 1 ? 1 : 0;
 
-        if (! $s->load($_GET['id']) && $_GET['id'] !== 0) {
+        $id = (int) $_GET['id'];
+        if (! $s->load($id) && $id !== 0) {
             throw new RequestException('Section item not found.');
         }
         $st = new SectionsTree($s, $d, true, (bool) $collapsed);
